@@ -17,16 +17,16 @@ spring:
   mail:
     # Credentials come from the environment in every profile. The dev
     # profile overrides the username default with the shared Gmail account.
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USER:mahfuz.lijohn@gmail.com}
-    password: ${MAIL_PASSWORD:emaghpsthwktxaka}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
-          auth: ${MAIL_SMTP_AUTH:true}
+          auth: ${MAIL_SMTP_AUTH}
           starttls:
-            enable: ${MAIL_SMTP_STARTTLS:true}
+            enable: ${MAIL_SMTP_STARTTLS}
   jpa:
     open-in-view: false
     hibernate:

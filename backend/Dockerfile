@@ -21,9 +21,9 @@ RUN groupadd -r appgroup && useradd -r -g appgroup -d /app appuser
 
 # Create upload directory and set permissions
 RUN mkdir -p /app/uploads && chown -R appuser:appgroup /app
-
+s
 # Copy executable jar from build stage
-COPY --from=build --chown=appuser:appgroup /workspace/target/rentals-backend-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build --chown=appuser:appgroup /workspace/target/rentals-backend-1.0.0.jar app.jar
 
 USER appuser
 
