@@ -6,6 +6,33 @@ import type { LoginRequest, Role, UserResponse } from '@/types/api';
 
 type Status = 'loading' | 'authenticated' | 'anonymous';
 
+/**
+ * Last-known profile snapshot. The access token is memory-only by design
+ * (architecture D4), so a reload always needs a refresh round trip before
+ * the real session is known. Persisting the profile lets the navbar render
+ * the correct user instantly instead of flashing the logged-out state; the
+ * server still decides what the session may do once boot completes.
+ */
+const SESSION_KEY = 'haven.session.v2';
+
+function readSnapshot(): UserResponse | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as UserResponse) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeSnapshot(next: UserResponse | null): void {
+  try {
+    if (next) localStorage.setItem(SESSION_KEY, JSON.stringify(next));
+    else localStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* storage unavailable: the snapshot simply will not survive a reload */
+  }
+}
+
 interface AuthContextValue {
   user: UserResponse | null;
   status: Status;
@@ -24,10 +51,13 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<UserResponse | null>(null);
-  const [status, setStatus] = useState<Status>('loading');
+  const [user, setUser] = useState<UserResponse | null>(() => readSnapshot());
+  const [status, setStatus] = useState<Status>(() =>
+    tokens.hasSession() ? 'loading' : 'anonymous'
+  );
 
   const applyUser = useCallback((next: UserResponse | null) => {
+    writeSnapshot(next);
     setUser(next);
     setStatus(next ? 'authenticated' : 'anonymous');
   }, []);
@@ -56,8 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const me = await userApi.me();
         if (!cancelled) {
-          setUser(me);
-          setStatus('authenticated');
+          applyUser(me);
           queryClient.setQueryData(['me'], me);
         }
       } catch {
@@ -79,8 +108,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           void userApi
             .me()
             .then((me) => {
-              setUser(me);
-              setStatus('authenticated');
+              applyUser(me);
+              queryClient.setQueryData(['me'], me);
             })
             .catch(() => undefined)
             .finally(() => undefined);
@@ -98,8 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     async (payload: LoginRequest) => {
       const response = await authApi.login(payload);
       tokens.set(response);
-      setUser(response.user);
-      setStatus('authenticated');
+      applyUser(response.user);
       queryClient.setQueryData(['me'], response.user);
       return response.user;
     },
@@ -129,8 +157,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!tokens.accessToken) return null;
     try {
       const me = await userApi.me();
-      setUser(me);
-      setStatus('authenticated');
+      applyUser(me);
       queryClient.setQueryData(['me'], me);
       return me;
     } catch {

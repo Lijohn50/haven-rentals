@@ -1,60 +1,60 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, Navigate, useRouteError } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ROUTES } from '@/config/routes';
 import { PublicLayout, HostShell, StaffShell, RequireAuth, RequireGuest } from '@/components/layout';
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary';
-import { Button, EmptyState } from '@/components/ui';
+import { Button, EmptyState, Spinner } from '@/components/ui';
 
-import { LandingPage } from '@/features/landing/LandingPage';
-import { SearchPage } from '@/features/search/SearchPage';
-import { ListingPage } from '@/features/listings/ListingPage';
-import { HostProfilePage } from '@/features/listings/HostProfilePage';
-import {
-  CancellationPoliciesPage,
-  HelpPage,
-  HowItWorksPage,
-  PrivacyPage,
-  TermsPage,
-} from '@/features/static/StaticPages';
-import { LoginPage } from '@/features/auth/LoginPage';
-import { RegisterPage } from '@/features/auth/RegisterPage';
-import { VerifyEmailPage } from '@/features/auth/VerifyEmailPage';
-import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage';
-import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
-import { AccountPage } from '@/features/account/AccountPage';
-import { SecurityPage } from '@/features/account/SecurityPage';
-import { MyDisputesPage } from '@/features/account/MyDisputesPage';
-import { BecomeHostPage } from '@/features/account/BecomeHostPage';
-import { CheckoutPage } from '@/features/booking/CheckoutPage';
-import { PayPage } from '@/features/booking/PayPage';
-import { TripsPage } from '@/features/trips/TripsPage';
-import { TripDetailPage } from '@/features/trips/TripDetailPage';
-import { ReviewFormPage } from '@/features/trips/ReviewFormPage';
-import { DisputeFormPage } from '@/features/trips/DisputeFormPage';
-import { ReviewsPage } from '@/features/reviews/ReviewsPage';
-import { InboxPage } from '@/features/messaging/InboxPage';
-import { NotificationsPage } from '@/features/notifications/NotificationsPage';
-import { HostDashboardPage } from '@/features/host/HostDashboardPage';
-import { HostListingsPage } from '@/features/host/HostListingsPage';
-import { HostListingPage } from '@/features/host/HostListingPage';
-import { ListingWizardPage } from '@/features/host/ListingWizardPage';
-import { HostBookingsPage } from '@/features/host/HostBookingsPage';
-import { HostBookingDetailPage } from '@/features/host/HostBookingDetailPage';
-import { HostPayoutsPage } from '@/features/host/HostPayoutsPage';
-import { HostReviewsPage } from '@/features/host/HostReviewsPage';
-import { SupportDisputesPage } from '@/features/support/SupportDisputesPage';
-import { SupportDisputeDetailPage } from '@/features/support/SupportDisputeDetailPage';
-import { AdminSummaryPage } from '@/features/admin/AdminSummaryPage';
-import { AdminListingsPage } from '@/features/admin/AdminListingsPage';
-import { AdminListingPage } from '@/features/admin/AdminListingPage';
-import { AdminUsersPage } from '@/features/admin/AdminUsersPage';
-import { AdminUserPage } from '@/features/admin/AdminUserPage';
-import { AdminBookingsPage } from '@/features/admin/AdminBookingsPage';
-import { AdminCommissionPage } from '@/features/admin/AdminCommissionPage';
-import { AdminAmenitiesPage } from '@/features/admin/AdminAmenitiesPage';
-import { AdminAuditPage } from '@/features/admin/AdminAuditPage';
-import { AdminReviewsPage } from '@/features/admin/AdminReviewsPage';
+// Route-level code splitting: every page loads on navigation instead of
+// shipping all ~35 routes in the entry chunk.
+const LandingPage = lazy(() => import('@/features/landing/LandingPage').then(m => ({ default: m.LandingPage })));
+const SearchPage = lazy(() => import('@/features/search/SearchPage').then(m => ({ default: m.SearchPage })));
+const ListingPage = lazy(() => import('@/features/listings/ListingPage').then(m => ({ default: m.ListingPage })));
+const HostProfilePage = lazy(() => import('@/features/listings/HostProfilePage').then(m => ({ default: m.HostProfilePage })));
+const CancellationPoliciesPage = lazy(() => import('@/features/static/StaticPages').then(m => ({ default: m.CancellationPoliciesPage })));
+const HelpPage = lazy(() => import('@/features/static/StaticPages').then(m => ({ default: m.HelpPage })));
+const HowItWorksPage = lazy(() => import('@/features/static/StaticPages').then(m => ({ default: m.HowItWorksPage })));
+const PrivacyPage = lazy(() => import('@/features/static/StaticPages').then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import('@/features/static/StaticPages').then(m => ({ default: m.TermsPage })));
+const LoginPage = lazy(() => import('@/features/auth/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('@/features/auth/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const VerifyEmailPage = lazy(() => import('@/features/auth/VerifyEmailPage').then(m => ({ default: m.VerifyEmailPage })));
+const ForgotPasswordPage = lazy(() => import('@/features/auth/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('@/features/auth/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
+const AccountPage = lazy(() => import('@/features/account/AccountPage').then(m => ({ default: m.AccountPage })));
+const SecurityPage = lazy(() => import('@/features/account/SecurityPage').then(m => ({ default: m.SecurityPage })));
+const MyDisputesPage = lazy(() => import('@/features/account/MyDisputesPage').then(m => ({ default: m.MyDisputesPage })));
+const BecomeHostPage = lazy(() => import('@/features/account/BecomeHostPage').then(m => ({ default: m.BecomeHostPage })));
+const CheckoutPage = lazy(() => import('@/features/booking/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
+const PayPage = lazy(() => import('@/features/booking/PayPage').then(m => ({ default: m.PayPage })));
+const TripsPage = lazy(() => import('@/features/trips/TripsPage').then(m => ({ default: m.TripsPage })));
+const TripDetailPage = lazy(() => import('@/features/trips/TripDetailPage').then(m => ({ default: m.TripDetailPage })));
+const ReviewFormPage = lazy(() => import('@/features/trips/ReviewFormPage').then(m => ({ default: m.ReviewFormPage })));
+const DisputeFormPage = lazy(() => import('@/features/trips/DisputeFormPage').then(m => ({ default: m.DisputeFormPage })));
+const ReviewsPage = lazy(() => import('@/features/reviews/ReviewsPage').then(m => ({ default: m.ReviewsPage })));
+const InboxPage = lazy(() => import('@/features/messaging/InboxPage').then(m => ({ default: m.InboxPage })));
+const NotificationsPage = lazy(() => import('@/features/notifications/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
+const HostDashboardPage = lazy(() => import('@/features/host/HostDashboardPage').then(m => ({ default: m.HostDashboardPage })));
+const HostListingsPage = lazy(() => import('@/features/host/HostListingsPage').then(m => ({ default: m.HostListingsPage })));
+const HostListingPage = lazy(() => import('@/features/host/HostListingPage').then(m => ({ default: m.HostListingPage })));
+const ListingWizardPage = lazy(() => import('@/features/host/ListingWizardPage').then(m => ({ default: m.ListingWizardPage })));
+const HostBookingsPage = lazy(() => import('@/features/host/HostBookingsPage').then(m => ({ default: m.HostBookingsPage })));
+const HostBookingDetailPage = lazy(() => import('@/features/host/HostBookingDetailPage').then(m => ({ default: m.HostBookingDetailPage })));
+const HostPayoutsPage = lazy(() => import('@/features/host/HostPayoutsPage').then(m => ({ default: m.HostPayoutsPage })));
+const HostReviewsPage = lazy(() => import('@/features/host/HostReviewsPage').then(m => ({ default: m.HostReviewsPage })));
+const SupportDisputesPage = lazy(() => import('@/features/support/SupportDisputesPage').then(m => ({ default: m.SupportDisputesPage })));
+const SupportDisputeDetailPage = lazy(() => import('@/features/support/SupportDisputeDetailPage').then(m => ({ default: m.SupportDisputeDetailPage })));
+const AdminSummaryPage = lazy(() => import('@/features/admin/AdminSummaryPage').then(m => ({ default: m.AdminSummaryPage })));
+const AdminListingsPage = lazy(() => import('@/features/admin/AdminListingsPage').then(m => ({ default: m.AdminListingsPage })));
+const AdminListingPage = lazy(() => import('@/features/admin/AdminListingPage').then(m => ({ default: m.AdminListingPage })));
+const AdminUsersPage = lazy(() => import('@/features/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
+const AdminUserPage = lazy(() => import('@/features/admin/AdminUserPage').then(m => ({ default: m.AdminUserPage })));
+const AdminBookingsPage = lazy(() => import('@/features/admin/AdminBookingsPage').then(m => ({ default: m.AdminBookingsPage })));
+const AdminCommissionPage = lazy(() => import('@/features/admin/AdminCommissionPage').then(m => ({ default: m.AdminCommissionPage })));
+const AdminAmenitiesPage = lazy(() => import('@/features/admin/AdminAmenitiesPage').then(m => ({ default: m.AdminAmenitiesPage })));
+const AdminAuditPage = lazy(() => import('@/features/admin/AdminAuditPage').then(m => ({ default: m.AdminAuditPage })));
+const AdminReviewsPage = lazy(() => import('@/features/admin/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
 
 const NotFoundPage: React.FC = () => (
   <div className="mx-auto max-w-narrow px-4 py-20">
@@ -97,20 +97,33 @@ function RouteCrash() {
   );
 }
 
+const PageFallback: React.FC = () => (
+  <div className="flex min-h-[40vh] items-center justify-center">
+    <Spinner label="Loading…" />
+  </div>
+);
+
+/** Wraps a lazily loaded route so its chunk fetch shows a fallback. */
+const page = (Component: React.LazyExoticComponent<React.ComponentType>): React.ReactNode => (
+  <Suspense fallback={<PageFallback />}>
+    <Component />
+  </Suspense>
+);
+
 export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
     errorElement: <RouteCrash />,
     children: [
-      { path: ROUTES.HOME, element: <LandingPage /> },
-      { path: ROUTES.SEARCH, element: <SearchPage /> },
-      { path: ROUTES.LISTING(':id'), element: <ListingPage /> },
-      { path: ROUTES.HOST_PROFILE(':id'), element: <HostProfilePage /> },
-      { path: ROUTES.HOW_IT_WORKS, element: <HowItWorksPage /> },
-      { path: ROUTES.CANCELLATION_POLICIES, element: <CancellationPoliciesPage /> },
-      { path: ROUTES.HELP, element: <HelpPage /> },
-      { path: ROUTES.TERMS, element: <TermsPage /> },
-      { path: ROUTES.PRIVACY, element: <PrivacyPage /> },
+      { path: ROUTES.HOME, element: page(LandingPage) },
+      { path: ROUTES.SEARCH, element: page(SearchPage) },
+      { path: ROUTES.LISTING(':id'), element: page(ListingPage) },
+      { path: ROUTES.HOST_PROFILE(':id'), element: page(HostProfilePage) },
+      { path: ROUTES.HOW_IT_WORKS, element: page(HowItWorksPage) },
+      { path: ROUTES.CANCELLATION_POLICIES, element: page(CancellationPoliciesPage) },
+      { path: ROUTES.HELP, element: page(HelpPage) },
+      { path: ROUTES.TERMS, element: page(TermsPage) },
+      { path: ROUTES.PRIVACY, element: page(PrivacyPage) },
       { path: ROUTES.FORBIDDEN, element: <ForbiddenPage /> },
       { path: '*', element: <NotFoundPage /> },
 
@@ -118,20 +131,20 @@ export const router = createBrowserRouter([
       {
         element: <RequireAuth />,
         children: [
-          { path: ROUTES.CHECKOUT(':listingId'), element: <CheckoutPage /> },
-          { path: ROUTES.TRIPS, element: <TripsPage /> },
-          { path: `${ROUTES.TRIPS}/:reference/pay`, element: <PayPage /> },
-          { path: `${ROUTES.TRIPS}/:reference/review`, element: <ReviewFormPage /> },
-          { path: `${ROUTES.TRIPS}/:reference/dispute`, element: <DisputeFormPage /> },
-          { path: ROUTES.TRIP(':reference'), element: <TripDetailPage /> },
-          { path: ROUTES.REVIEWS, element: <ReviewsPage /> },
-          { path: ROUTES.INBOX, element: <InboxPage /> },
-          { path: ROUTES.CONVERSATION(':id'), element: <InboxPage /> },
-          { path: ROUTES.NOTIFICATIONS, element: <NotificationsPage /> },
-          { path: ROUTES.ACCOUNT, element: <AccountPage /> },
-          { path: ROUTES.ACCOUNT_SECURITY, element: <SecurityPage /> },
-          { path: ROUTES.ACCOUNT_DISPUTES, element: <MyDisputesPage /> },
-          { path: ROUTES.BECOME_HOST, element: <BecomeHostPage /> },
+          { path: ROUTES.CHECKOUT(':listingId'), element: page(CheckoutPage) },
+          { path: ROUTES.TRIPS, element: page(TripsPage) },
+          { path: `${ROUTES.TRIPS}/:reference/pay`, element: page(PayPage) },
+          { path: `${ROUTES.TRIPS}/:reference/review`, element: page(ReviewFormPage) },
+          { path: `${ROUTES.TRIPS}/:reference/dispute`, element: page(DisputeFormPage) },
+          { path: ROUTES.TRIP(':reference'), element: page(TripDetailPage) },
+          { path: ROUTES.REVIEWS, element: page(ReviewsPage) },
+          { path: ROUTES.INBOX, element: page(InboxPage) },
+          { path: ROUTES.CONVERSATION(':id'), element: page(InboxPage) },
+          { path: ROUTES.NOTIFICATIONS, element: page(NotificationsPage) },
+          { path: ROUTES.ACCOUNT, element: page(AccountPage) },
+          { path: ROUTES.ACCOUNT_SECURITY, element: page(SecurityPage) },
+          { path: ROUTES.ACCOUNT_DISPUTES, element: page(MyDisputesPage) },
+          { path: ROUTES.BECOME_HOST, element: page(BecomeHostPage) },
         ],
       },
 
@@ -139,13 +152,13 @@ export const router = createBrowserRouter([
       {
         element: <RequireGuest />,
         children: [
-          { path: ROUTES.LOGIN, element: <LoginPage /> },
-          { path: ROUTES.REGISTER, element: <RegisterPage /> },
+          { path: ROUTES.LOGIN, element: page(LoginPage) },
+          { path: ROUTES.REGISTER, element: page(RegisterPage) },
         ],
       },
-      { path: ROUTES.VERIFY_EMAIL, element: <VerifyEmailPage /> },
-      { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
-      { path: ROUTES.RESET_PASSWORD, element: <ResetPasswordPage /> },
+      { path: ROUTES.VERIFY_EMAIL, element: page(VerifyEmailPage) },
+      { path: ROUTES.FORGOT_PASSWORD, element: page(ForgotPasswordPage) },
+      { path: ROUTES.RESET_PASSWORD, element: page(ResetPasswordPage) },
     ],
   },
   {
@@ -154,14 +167,14 @@ export const router = createBrowserRouter([
       {
         element: <HostShell />,
         children: [
-          { path: ROUTES.HOST_DASHBOARD, element: <HostDashboardPage /> },
-          { path: ROUTES.HOST_LISTINGS, element: <HostListingsPage /> },
-          { path: ROUTES.HOST_LISTING_NEW, element: <ListingWizardPage /> },
-          { path: ROUTES.HOST_LISTING(':id'), element: <HostListingPage /> },
-          { path: ROUTES.HOST_BOOKINGS, element: <HostBookingsPage /> },
-          { path: ROUTES.HOST_BOOKING(':id'), element: <HostBookingDetailPage /> },
-          { path: ROUTES.HOST_PAYOUTS, element: <HostPayoutsPage /> },
-          { path: ROUTES.HOST_REVIEWS, element: <HostReviewsPage /> },
+          { path: ROUTES.HOST_DASHBOARD, element: page(HostDashboardPage) },
+          { path: ROUTES.HOST_LISTINGS, element: page(HostListingsPage) },
+          { path: ROUTES.HOST_LISTING_NEW, element: page(ListingWizardPage) },
+          { path: ROUTES.HOST_LISTING(':id'), element: page(HostListingPage) },
+          { path: ROUTES.HOST_BOOKINGS, element: page(HostBookingsPage) },
+          { path: ROUTES.HOST_BOOKING(':id'), element: page(HostBookingDetailPage) },
+          { path: ROUTES.HOST_PAYOUTS, element: page(HostPayoutsPage) },
+          { path: ROUTES.HOST_REVIEWS, element: page(HostReviewsPage) },
         ],
       },
     ],
@@ -173,8 +186,8 @@ export const router = createBrowserRouter([
         element: <StaffShell />,
         children: [
           { path: ROUTES.SUPPORT_HOME, element: <Navigate to={ROUTES.SUPPORT_DISPUTES} replace /> },
-          { path: ROUTES.SUPPORT_DISPUTES, element: <SupportDisputesPage /> },
-          { path: ROUTES.SUPPORT_DISPUTE(':id'), element: <SupportDisputeDetailPage /> },
+          { path: ROUTES.SUPPORT_DISPUTES, element: page(SupportDisputesPage) },
+          { path: ROUTES.SUPPORT_DISPUTE(':id'), element: page(SupportDisputeDetailPage) },
         ],
       },
     ],
@@ -185,16 +198,16 @@ export const router = createBrowserRouter([
       {
         element: <StaffShell />,
         children: [
-          { path: ROUTES.ADMIN_HOME, element: <AdminSummaryPage /> },
-          { path: ROUTES.ADMIN_LISTINGS, element: <AdminListingsPage /> },
-          { path: ROUTES.ADMIN_LISTING(':id'), element: <AdminListingPage /> },
-          { path: ROUTES.ADMIN_USERS, element: <AdminUsersPage /> },
-          { path: ROUTES.ADMIN_USER(':id'), element: <AdminUserPage /> },
-          { path: ROUTES.ADMIN_BOOKINGS, element: <AdminBookingsPage /> },
-          { path: ROUTES.ADMIN_REVIEWS, element: <AdminReviewsPage /> },
-          { path: ROUTES.ADMIN_COMMISSION, element: <AdminCommissionPage /> },
-          { path: ROUTES.ADMIN_AMENITIES, element: <AdminAmenitiesPage /> },
-          { path: ROUTES.ADMIN_AUDIT, element: <AdminAuditPage /> },
+          { path: ROUTES.ADMIN_HOME, element: page(AdminSummaryPage) },
+          { path: ROUTES.ADMIN_LISTINGS, element: page(AdminListingsPage) },
+          { path: ROUTES.ADMIN_LISTING(':id'), element: page(AdminListingPage) },
+          { path: ROUTES.ADMIN_USERS, element: page(AdminUsersPage) },
+          { path: ROUTES.ADMIN_USER(':id'), element: page(AdminUserPage) },
+          { path: ROUTES.ADMIN_BOOKINGS, element: page(AdminBookingsPage) },
+          { path: ROUTES.ADMIN_REVIEWS, element: page(AdminReviewsPage) },
+          { path: ROUTES.ADMIN_COMMISSION, element: page(AdminCommissionPage) },
+          { path: ROUTES.ADMIN_AMENITIES, element: page(AdminAmenitiesPage) },
+          { path: ROUTES.ADMIN_AUDIT, element: page(AdminAuditPage) },
         ],
       },
     ],

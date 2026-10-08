@@ -353,14 +353,15 @@ public class BookingService {
 
         var searchCache = cacheManager.getCache(CacheConfig.CACHE_SEARCH_RESULTS);
         if (searchCache != null) searchCache.clear();
+        evictHostDashboard();
 
         return toResponse(booking, hostId);
     }
 
     /**
-     * Every transition in or out of PENDING_APPROVAL changes the pending-request
-     * count the host dashboard shows, so the cached dashboard must be dropped
-     * immediately instead of waiting out its 60 second TTL.
+     * The cached dashboard embeds pending-request counts, upcoming
+     * check-ins and recent bookings, so any booking transition must
+     * drop it immediately instead of waiting out its 60 second TTL.
      */
     private void evictHostDashboard() {
         var dashboardCache = cacheManager.getCache(CacheConfig.CACHE_HOST_DASHBOARD);

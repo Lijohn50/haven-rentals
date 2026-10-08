@@ -78,7 +78,18 @@ export const NotificationBell: React.FC = () => {
 
 export const UserMenu: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isHost, isStaff, isAdmin, signOut } = useAuth();
+  const { user, status, isHost, isStaff, isAdmin, signOut } = useAuth();
+
+  // Session is still being restored (refresh + /me round trips after a
+  // reload); neither the signed-in nor the signed-out state is known yet.
+  if (status === 'loading') {
+    return (
+      <div
+        className="h-10 w-10 animate-pulse rounded-full bg-neutral-soft"
+        aria-label="Loading session"
+      />
+    );
+  }
 
   if (!user) {
     return (
