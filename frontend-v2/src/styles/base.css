@@ -1,0 +1,84 @@
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    /* tokens.css stores RGB channels, so these need rgb() wrapping. */
+    background: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+  h2 {
+    font-size: 1.75rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  /* visible focus on everything interactive */
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-primary));
+    outline-offset: 2px;
+  }
+
+  /* money and metrics line up in columns */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .skeleton {
+    animation: skeleton-pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* calm, low-saturation map tiles */
+  .leaflet-tile {
+    filter: grayscale(0.35) contrast(0.96) brightness(1.02);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* print a trip receipt without the chrome */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    body {
+      background: #fff;
+    }
+  }
+}

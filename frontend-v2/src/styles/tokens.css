@@ -1,0 +1,46 @@
+/* Palette 1: Coastal Teal (architecture 6.2). Light theme only in v1.
+
+   Colour channels are stored as space-separated RGB triplets rather than hex so that
+   Tailwind can apply an alpha modifier. tailwind.config.ts reads these as
+   `rgb(var(--token) / <alpha-value>)`; with a plain hex value Tailwind cannot inject
+   alpha, so every `bg-primary/30`-style class was silently dropped from the build. Any
+   direct `var(--color-x)` outside Tailwind must therefore be wrapped in `rgb()` too. */
+:root {
+  --color-primary: 15 118 110;
+  --color-primary-dark: 17 94 89;
+  --color-primary-soft: 204 251 241;
+  --color-accent: 194 65 12;
+  --color-accent-dark: 154 52 18;
+  --color-bg: 248 250 252;
+  --color-surface: 255 255 255;
+  --color-text: 15 23 42;
+  --color-muted: 71 85 105;
+  --color-border: 226 232 240;
+  --color-highlight: 204 251 241;
+
+  --color-success: 21 128 61;
+  --color-success-text: 22 101 52;
+  --color-success-soft: 220 252 231;
+  --color-warning: 180 83 9;
+  --color-warning-text: 146 64 14;
+  --color-warning-soft: 254 243 199;
+  --color-danger: 185 28 28;
+  --color-danger-text: 153 27 27;
+  --color-danger-soft: 254 226 226;
+  --color-info: 29 78 216;
+  --color-info-text: 30 64 175;
+  --color-info-soft: 219 234 254;
+  --color-neutral: 71 85 105;
+  --color-neutral-text: 51 65 85;
+  --color-neutral-soft: 226 232 240;
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-hero: 16px;
+
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-pop: 0 16px 40px -16px rgba(15, 23, 42, 0.18);
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Poppins', 'Inter', system-ui, sans-serif;
+}

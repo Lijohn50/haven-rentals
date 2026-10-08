@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/rentals_test}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/rentals_test}
+  mail:
+    host: localhost
+    port: 1025
+
+management:
+  health:
+    mail:
+      enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.example.rentals: INFO

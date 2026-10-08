@@ -1,0 +1,9 @@
+**/node_modules/
+**/dist/
+**/target/
+**/uploads/
+**/.idea/
+**/.env
+**/.env.*
+!**/.env.example
+*.log

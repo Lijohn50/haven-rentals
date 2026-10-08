@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Stylised coastal hillside with a house and the sea at sunrise">
+  <title>Coastal hillside at sunrise</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ccfbf1" />
+      <stop offset="38%" stop-color="#99f6e4" />
+      <stop offset="100%" stop-color="#f0fdfa" />
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#115e59" />
+    </linearGradient>
+    <linearGradient id="hillsFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5eead4" />
+      <stop offset="100%" stop-color="#2dd4bf" />
+    </linearGradient>
+    <linearGradient id="hillsNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#134e4a" />
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef3c7" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.42" />
+      <stop offset="55%" stop-color="#0f172a" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.32" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#sky)" />
+
+  <g>
+    <circle cx="1160" cy="330" r="150" fill="#fef9c3" opacity="0.45" />
+    <circle cx="1160" cy="330" r="96" fill="url(#sun)" />
+  </g>
+
+  <g fill="#5eead4" opacity="0.75">
+    <path d="M0 250c120-40 200 20 320-6 130-28 190 26 300 6 120-22 200 18 300 4 90-12 160 16 260 8v140H0z" opacity="0.5" />
+  </g>
+
+  <path d="M0 470l240-140 200 96 220-124 240 130 200-96 220 122 280-84v540H0z" fill="url(#hillsFar)" opacity="0.85" />
+
+  <path d="M0 560c160-56 300 22 450-6 170-32 260 40 410 22 150-18 220 30 330 20 130-12 260 26 410 6v320H0z" fill="#2dd4bf" opacity="0.7" />
+
+  <path d="M0 690c200-40 320 30 500 8 180-22 280 34 430 20 160-16 260 22 390 8 90-10 170 6 280 2v172H0z" fill="url(#sea)" />
+
+  <g stroke="#ccfbf1" stroke-width="6" stroke-linecap="round" opacity="0.55">
+    <path d="M120 760h180" />
+    <path d="M420 800h240" />
+    <path d="M860 748h200" />
+    <path d="M1200 812h160" />
+  </g>
+
+  <g>
+    <path d="M300 640l260-190 260 190v250H300z" fill="#f8fafc" />
+    <path d="M266 646l294-214 294 214-34 44-260-186-260 186z" fill="#c2410c" />
+    <path d="M470 890V760h180v130z" fill="#0f766e" />
+    <g fill="#99f6e4">
+      <rect x="356" y="700" width="76" height="72" rx="8" />
+      <rect x="688" y="700" width="76" height="72" rx="8" />
+    </g>
+    <g stroke="#475569" stroke-width="5" opacity="0.6">
+      <path d="M394 700v72M356 736h76" />
+      <path d="M726 700v72M688 736h76" />
+    </g>
+    <path d="M470 760h180l-90-64z" fill="#115e59" opacity="0.9" />
+  </g>
+
+  <g fill="#0f766e">
+    <path d="M980 890l40-180 40 180z" opacity="0.9" />
+    <path d="M1090 890l30-140 30 140z" opacity="0.8" />
+    <path d="M140 890l36-160 36 160z" opacity="0.85" />
+  </g>
+
+  <g fill="#134e4a" opacity="0.6">
+    <path d="M980 890c6-70 24-120 40-140 18 26 34 78 40 140z" />
+  </g>
+
+  <rect width="1600" height="900" fill="url(#shade)" />
+</svg>

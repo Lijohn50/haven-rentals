@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/rentals}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:1234}
+    driver-class-name: org.postgresql.Driver
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb+srv://loki:loki1234@spring.3lufpl6.mongodb.net/rentals?appName=spring}
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER:mahfuz.lijohn@gmail.com}
+    password: ${MAIL_PASSWORD:emaghpsthwktxaka}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
+
+management:
+  health:
+    mail:
+      # No local SMTP catcher is running in dev; the mail health probe would otherwise
+      # report the whole application DOWN. EmailService already swallows send failures
+      # and logs the verification/reset token, so the flows still work.
+      enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.example.rentals: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

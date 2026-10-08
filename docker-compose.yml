@@ -1,0 +1,94 @@
+services:
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: haven-web
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
+    networks:
+      - haven-net
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: haven-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:postgresql://postgres:5432/rentals
+      - DB_USER=rentals_user
+      - DB_PASSWORD=rentals_secret
+      - MONGO_URI=mongodb://mongo:27017/rentals
+      - JWT_SECRET=dev-secret-key-must-be-at-least-32-bytes-long-123456
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
+      - APP_FRONTEND_URL=http://localhost:3000
+      - APP_CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+      - APP_STORAGE_PATH=/app/uploads
+      - APP_AI_ENABLED=false
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    networks:
+      - haven-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: haven-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=rentals
+      - POSTGRES_USER=rentals_user
+      - POSTGRES_PASSWORD=rentals_secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rentals_user -d rentals"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - haven-net
+
+  mongo:
+    image: mongo:7.0
+    container_name: haven-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - haven-net
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: haven-mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - haven-net
+
+volumes:
+  pgdata:
+  mongodata:
+  uploads_data:
+
+networks:
+  haven-net:
+    driver: bridge

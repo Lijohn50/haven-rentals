@@ -1,0 +1,57 @@
+package com.example.rentals.common;
+
+import org.springframework.http.HttpStatus;
+
+public enum ErrorCode {
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST),
+    MALFORMED_REQUEST(HttpStatus.BAD_REQUEST),
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST),
+    INVALID_PAGE_SIZE(HttpStatus.BAD_REQUEST),
+    INVALID_SORT(HttpStatus.BAD_REQUEST),
+    INVALID_OR_EXPIRED_TOKEN(HttpStatus.BAD_REQUEST),
+    
+    UNAUTHENTICATED(HttpStatus.UNAUTHORIZED),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED),
+    REFRESH_TOKEN_REUSED(HttpStatus.UNAUTHORIZED),
+    
+    PAYMENT_FAILED(HttpStatus.PAYMENT_REQUIRED),
+    
+    FORBIDDEN(HttpStatus.FORBIDDEN),
+    ACCOUNT_SUSPENDED(HttpStatus.FORBIDDEN),
+    EMAIL_NOT_VERIFIED(HttpStatus.FORBIDDEN),
+    
+    RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND),
+    
+    EMAIL_ALREADY_REGISTERED(HttpStatus.CONFLICT),
+    DUPLICATE_RESOURCE(HttpStatus.CONFLICT),
+    BOOKING_CONFLICT(HttpStatus.CONFLICT),
+    PRICE_CHANGED(HttpStatus.CONFLICT),
+    INVALID_STATE_TRANSITION(HttpStatus.CONFLICT),
+    BOOKING_EXPIRED(HttpStatus.CONFLICT),
+    CANCELLATION_NOT_ALLOWED(HttpStatus.CONFLICT),
+    LISTING_NOT_BOOKABLE(HttpStatus.CONFLICT),
+    LISTING_HAS_ACTIVE_BOOKINGS(HttpStatus.CONFLICT),
+    CONCURRENT_MODIFICATION(HttpStatus.CONFLICT),
+    
+    PAYLOAD_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE),
+    UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE),
+    
+    BUSINESS_RULE_VIOLATION(HttpStatus.UNPROCESSABLE_ENTITY),
+    IDEMPOTENCY_KEY_REUSED(HttpStatus.UNPROCESSABLE_ENTITY),
+    
+    RATE_LIMITED(HttpStatus.TOO_MANY_REQUESTS),
+    
+    AI_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE),
+    SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE),
+    INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR);
+
+    private final HttpStatus defaultStatus;
+
+    ErrorCode(HttpStatus defaultStatus) {
+        this.defaultStatus = defaultStatus;
+    }
+
+    public HttpStatus getDefaultStatus() {
+        return defaultStatus;
+    }
+}

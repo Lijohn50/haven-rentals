@@ -1,0 +1,92 @@
+server:
+  port: 8080
+  shutdown: graceful
+  error:
+    include-stacktrace: never
+    include-message: never
+
+spring:
+  application:
+    name: rentals-backend
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 25MB
+  mail:
+    # Credentials come from the environment in every profile. The dev
+    # profile overrides the username default with the shared Gmail account.
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER:mahfuz.lijohn@gmail.com}
+    password: ${MAIL_PASSWORD:emaghpsthwktxaka}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+app:
+  booking:
+    payment-hold-minutes: 15
+    host-response-hours: 24
+  payout:
+    release-delay-hours: 24
+  payment:
+    # Which PaymentGateway bean is active: fake (scripted test outcomes) or
+    # stripe (real card charges; requires STRIPE_API_KEY).
+    gateway: ${APP_PAYMENT_GATEWAY:fake}
+    currency: ${APP_PAYMENT_CURRENCY:usd}
+  stripe:
+    api-key: ${STRIPE_API_KEY:}
+  review:
+    window-days: 14
+  dispute:
+    window-days: 14
+  security:
+    jwt-secret: ${JWT_SECRET:dev-secret-key-must-be-at-least-32-bytes-long-123456}
+    max-failed-logins: 5
+    lockout-minutes: 15
+    access-token-minutes: 15
+    refresh-token-days: 7
+  upload:
+    max-photo-bytes: 5242880
+    max-photos-per-listing: 20
+    min-photos-to-submit: 3
+  cors:
+    # Vite forwards the browser's `Origin` header even for same-origin POSTs, so the dev
+    # origin must be whitelisted whether it is reached as localhost or 127.0.0.1.
+    origins: ${APP_CORS_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
+  frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
+  storage:
+    path: ${APP_STORAGE_PATH:./uploads}
+  ai:
+    enabled: ${APP_AI_ENABLED:false}
+    api-key: ${SPRING_AI_API_KEY:}
+  mail:
+    # Must be an address the SMTP relay is allowed to send as. Defaults to
+    # the authenticated mail user so Gmail accepts the sender.
+    from: ${APP_MAIL_FROM:${MAIL_USER:no-reply@haven.test}}
