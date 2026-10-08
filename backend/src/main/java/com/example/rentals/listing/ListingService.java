@@ -45,7 +45,22 @@ public class ListingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
 
         if (listing.getStatus() == ListingStatus.ACTIVE) {
-            return ListingResponse.from(listing);
+            // The public view of a live listing is identical for every
+            // visitor, so it can be cached. The non-active branch below is
+            // gated to the host or an admin and must never be cached, or a
+            // random visitor would be served an unlisted listing.
+            var cache = cacheManager.getCache(CacheConfig.CACHE_LISTING_DETAIL);
+            if (cache != null) {
+                ListingResponse cached = cache.get(id, ListingResponse.class);
+                if (cached != null) {
+                    return cached;
+                }
+            }
+            ListingResponse response = ListingResponse.from(listing);
+            if (cache != null) {
+                cache.put(id, response);
+            }
+            return response;
         }
 
         if (currentUserId != null) {

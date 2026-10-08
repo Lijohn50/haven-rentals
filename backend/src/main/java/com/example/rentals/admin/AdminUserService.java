@@ -116,6 +116,7 @@ public class AdminUserService {
         target = userRepository.save(target);
 
         evictUserAuthCache();
+        evictSearchCache();
         auditService.log(adminId, "USER_SUSPENDED", "User", targetUserId,
                 Map.of("reason", reason));
 
@@ -135,6 +136,7 @@ public class AdminUserService {
         target = userRepository.save(target);
 
         evictUserAuthCache();
+        evictSearchCache();
         auditService.log(adminId, "USER_UNSUSPENDED", "User", targetUserId, Map.of());
 
         return AdminUserResponse.from(target, hostCancellationCount(target.getId()));
@@ -227,6 +229,7 @@ public class AdminUserService {
         target = userRepository.save(target);
 
         evictUserAuthCache();
+        evictSearchCache();
         auditService.log(adminId, "USER_DELETED", "User", targetUserId,
                 Map.of("reason", reason, "email", target.getEmail()));
 
@@ -278,6 +281,20 @@ public class AdminUserService {
             if (cache != null) cache.clear();
         } catch (Exception e) {
             log.warn("Failed to evict userAuth cache: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Suspending or deleting a host removes their listings from search
+     * (the search spec filters on host-active), and unsuspending adds them
+     * back, so the search cache cannot outlive the account change.
+     */
+    private void evictSearchCache() {
+        try {
+            var cache = cacheManager.getCache("searchResults");
+            if (cache != null) cache.clear();
+        } catch (Exception e) {
+            log.warn("Failed to evict searchResults cache: {}", e.getMessage());
         }
     }
 }
