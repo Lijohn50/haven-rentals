@@ -21,7 +21,7 @@ RUN groupadd -r appgroup && useradd -r -g appgroup -d /app appuser
 
 # Create upload directory and set permissions
 RUN mkdir -p /app/uploads && chown -R appuser:appgroup /app
-s
+
 # Copy executable jar from build stage
 COPY --from=build --chown=appuser:appgroup /workspace/target/rentals-backend-1.0.0.jar app.jar
 
@@ -34,6 +34,6 @@ ENV SERVER_PORT=8080
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:${SERVER_PORT:-8080}/actuator/health || exit 1
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
