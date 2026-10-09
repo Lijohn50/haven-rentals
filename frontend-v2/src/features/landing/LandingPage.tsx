@@ -199,7 +199,7 @@ const Hero: React.FC = () => (
         `bg-primary-dark` base show through, which darkens the picture and strips out the
         high-frequency detail that competed with the headline; the scrim then sets a flat
         floor so the white h1 keeps its contrast over the brightest part of the photo. */}
-    <div className="absolute inset-0 bg-ink/60" aria-hidden />
+    <div className="absolute inset-0 bg-ink/35" aria-hidden />
     <div className={cn(SECTION, 'relative flex min-h-[min(72vh,640px)] flex-col justify-center gap-6 py-14 sm:py-20')}>
       <div className="max-w-2xl text-white">
         <h1 className="font-heading text-4xl font-semibold leading-tight sm:text-5xl">
