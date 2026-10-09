@@ -101,7 +101,10 @@ export function primaryNav({ isAuthenticated, isHost, isStaff, isAdmin }: NavFla
     entries.push({ to: ROUTES.BECOME_HOST, label: 'List your place' });
   }
 
-  if (isStaff) entries.push({ to: ROUTES.SUPPORT_DISPUTES, label: 'Operations' });
+  // One portal entry per role, named after the role. Admins are staff too, so
+  // they would otherwise get both "Operations" and "Admin" pointing into the
+  // same staff shell; the dispute queue stays in that shell's sidebar.
+  if (isStaff && !isAdmin) entries.push({ to: ROUTES.SUPPORT_DISPUTES, label: 'Operations' });
   if (isAdmin) entries.push({ to: ROUTES.ADMIN_HOME, label: 'Admin' });
 
   entries.push({ to: ROUTES.HELP, label: 'Help' });
