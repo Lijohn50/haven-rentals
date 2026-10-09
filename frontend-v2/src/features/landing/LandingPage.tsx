@@ -193,12 +193,11 @@ const Hero: React.FC = () => (
       // accessibility tree. fetchpriority lets it win the LCP race against the JS bundle.
       fetchPriority="high"
       decoding="async"
-      className="absolute inset-0 h-full w-full object-cover opacity-70"
+      className="absolute inset-0 h-full w-full object-cover"
     />
-    {/* The photo is dimmed in two steps on purpose. Dropping the image to 70% lets the
-        `bg-primary-dark` base show through, which darkens the picture and strips out the
-        high-frequency detail that competed with the headline; the scrim then sets a flat
-        floor so the white h1 keeps its contrast over the brightest part of the photo. */}
+    {/* The photo renders at full opacity; the scrim alone sets a flat
+        floor so the white h1 keeps its contrast over the brightest
+        part of the photo. */}
     <div className="absolute inset-0 bg-ink/35" aria-hidden />
     <div className={cn(SECTION, 'relative flex min-h-[min(72vh,640px)] flex-col justify-center gap-6 py-14 sm:py-20')}>
       <div className="max-w-2xl text-white">
