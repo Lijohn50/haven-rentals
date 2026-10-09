@@ -1,5 +1,5 @@
-import React, { forwardRef, useId } from 'react';
-import { AlertCircle } from 'lucide-react';
+import React, { forwardRef, useId, useState } from 'react';
+import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 export interface FieldProps {
@@ -52,6 +52,42 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   )
 );
 Input.displayName = 'Input';
+
+export interface PasswordInputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  hasError?: boolean;
+}
+
+/** Password field with a show/hide toggle, styled like Input. */
+export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ className, hasError, ...props }, ref) => {
+    const [visible, setVisible] = useState(false);
+    return (
+      <div className="relative">
+        <input
+          ref={ref}
+          type={visible ? 'text' : 'password'}
+          className={cn(controlClasses, 'pr-10', hasError && 'border-danger', className)}
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? 'Hide password' : 'Show password'}
+          aria-pressed={visible}
+          className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-control text-muted transition-colors hover:bg-bg hover:text-ink"
+        >
+          {visible ? (
+            <EyeOff className="h-4 w-4" aria-hidden />
+          ) : (
+            <Eye className="h-4 w-4" aria-hidden />
+          )}
+        </button>
+      </div>
+    );
+  }
+);
+PasswordInput.displayName = 'PasswordInput';
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   hasError?: boolean;

@@ -18,6 +18,7 @@ import {
   Field,
   InlineAlert,
   Input,
+  PasswordInput,
   TraceId,
   applyFieldErrors,
 } from '@/components/ui';
@@ -174,9 +175,8 @@ export const LoginPage: React.FC = () => {
               </Link>
             }
           >
-            <Input
+            <PasswordInput
               id="login-password"
-              type="password"
               autoComplete="current-password"
               {...passwordRegister}
               ref={mergeRefs(passwordRegister.ref, passwordRef)}

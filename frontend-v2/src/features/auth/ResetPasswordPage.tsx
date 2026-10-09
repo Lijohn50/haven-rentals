@@ -16,7 +16,7 @@ import {
   Card,
   Field,
   InlineAlert,
-  Input,
+  PasswordInput,
   TraceId,
   applyFieldErrors,
 } from '@/components/ui';
@@ -135,9 +135,8 @@ export const ResetPasswordPage: React.FC = () => {
                 error={errors.newPassword?.message}
                 required
               >
-                <Input
+                <PasswordInput
                   id="reset-password"
-                  type="password"
                   autoComplete="new-password"
                   {...passwordRegister}
                   ref={mergeRefs(passwordRegister.ref, passwordRef)}
@@ -173,9 +172,8 @@ export const ResetPasswordPage: React.FC = () => {
                 error={errors.confirmPassword?.message}
                 required
               >
-                <Input
+                <PasswordInput
                   id="reset-confirm"
-                  type="password"
                   autoComplete="new-password"
                   {...confirmRegister}
                   ref={mergeRefs(confirmRegister.ref, confirmRef)}

@@ -23,7 +23,7 @@ import {
   DialogTitle,
   Field,
   InlineAlert,
-  Input,
+  PasswordInput,
   TraceId,
   applyFieldErrors,
 } from '@/components/ui';
@@ -139,9 +139,8 @@ export const SecurityPage: React.FC = () => {
             error={errors.currentPassword?.message}
             required
           >
-            <Input
+            <PasswordInput
               id="current-password"
-              type="password"
               autoComplete="current-password"
               {...currentRegister}
               ref={mergeRefs(currentRegister.ref, currentRef)}
@@ -151,9 +150,8 @@ export const SecurityPage: React.FC = () => {
           </Field>
 
           <Field label="New password" htmlFor="new-password" error={errors.newPassword?.message} required>
-            <Input
+            <PasswordInput
               id="new-password"
-              type="password"
               autoComplete="new-password"
               hasError={Boolean(errors.newPassword)}
               aria-invalid={Boolean(errors.newPassword)}
@@ -206,9 +204,8 @@ export const SecurityPage: React.FC = () => {
                 required
                 hint={`Signed in as ${user?.email ?? ''}`}
               >
-                <Input
+                <PasswordInput
                   id="delete-password"
-                  type="password"
                   autoComplete="current-password"
                   value={deletePassword}
                   hasError={Boolean(deleteError)}

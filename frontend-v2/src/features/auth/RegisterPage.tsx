@@ -18,6 +18,7 @@ import {
   Field,
   InlineAlert,
   Input,
+  PasswordInput,
   TraceId,
   applyFieldErrors,
 } from '@/components/ui';
@@ -164,9 +165,8 @@ export const RegisterPage: React.FC = () => {
             error={errors.password?.message}
             required
           >
-            <Input
+            <PasswordInput
               id="register-password"
-              type="password"
               autoComplete="new-password"
               hasError={Boolean(errors.password)}
               aria-invalid={Boolean(errors.password)}
