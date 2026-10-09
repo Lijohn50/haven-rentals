@@ -274,7 +274,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
               <button
                 type="button"
                 className={cn(
-                  'flex min-w-0 flex-col justify-center rounded-control border-l border-line px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40',
+                  'flex min-w-0 flex-col justify-center rounded-control lg:border-l lg:border-line px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40',
                   segmentHeight
                 )}
               >
@@ -335,7 +335,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
               <button
                 type="button"
                 className={cn(
-                  'flex min-w-0 flex-col justify-center rounded-control border-l border-line px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40',
+                  'flex min-w-0 flex-col justify-center rounded-control lg:border-l lg:border-line px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40',
                   segmentHeight
                 )}
               >

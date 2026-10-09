@@ -44,19 +44,20 @@ import type { PropertyType, SearchResultResponse, SearchSort } from '@/types/api
 const SECTION = 'mx-auto w-full max-w-content px-4 sm:px-6';
 const SECTION_HEADING = 'font-heading text-2xl font-semibold text-ink sm:text-3xl';
 
-const SectionHeader: React.FC<{ title: string; sub?: string; to?: string; linkLabel?: string }> = ({
-  title,
-  sub,
-  to,
-  linkLabel,
-}) => (
-  <div className={cn(SECTION, 'mb-4 flex flex-wrap items-end justify-between gap-3')}>
+const SectionHeader: React.FC<{
+  title: string;
+  sub?: string;
+  to?: string;
+  linkLabel?: string;
+  className?: string;
+}> = ({ title, sub, to, linkLabel, className }) => (
+  <div className={cn('mb-6 flex flex-wrap items-end justify-between gap-3', className)}>
     <div>
       <h2 className={SECTION_HEADING}>{title}</h2>
       {sub && <p className="mt-1 text-sm text-muted">{sub}</p>}
     </div>
     {to && linkLabel && (
-      <Link className="text-sm font-medium text-primary underline underline-offset-4" to={to}>
+      <Link className="text-sm font-medium text-primary underline underline-offset-4 hover:text-primary-dark" to={to}>
         {linkLabel}
       </Link>
     )}
@@ -93,44 +94,48 @@ const Carousel: React.FC<{ label: string; listings: SearchResultResponse[] }> = 
   };
 
   return (
-    <section aria-label={label} className={SECTION}>
-      <div className="relative">
-        <div
-          ref={scroller}
-          onScroll={measure}
-          className="-mx-1 flex snap-x snap-mandatory items-stretch gap-4 overflow-x-auto px-1 pb-2"
-        >
-          {listings.map((listing) => (
-            <div
-              key={listing.id}
-              className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]"
-            >
-              <ListingCard listing={listing} layout="stack" />
-            </div>
-          ))}
-        </div>
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute -left-3 top-1/2 z-10 hidden -translate-y-1/2 bg-surface shadow-card md:inline-flex"
-          onClick={() => scrollBy(-1)}
-          disabled={edges.start}
-          aria-label={`Previous homes in ${label}`}
-        >
-          <ChevronLeft className="h-4 w-4" aria-hidden />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute -right-3 top-1/2 z-10 hidden -translate-y-1/2 bg-surface shadow-card md:inline-flex"
-          onClick={() => scrollBy(1)}
-          disabled={edges.end}
-          aria-label={`Next homes in ${label}`}
-        >
-          <ChevronRight className="h-4 w-4" aria-hidden />
-        </Button>
+    <div className="relative">
+      <div
+        ref={scroller}
+        onScroll={measure}
+        className="-mx-1 flex snap-x snap-mandatory items-stretch gap-4 overflow-x-auto px-1 pb-2 scrollbar-none"
+      >
+        {listings.map((listing) => (
+          <div
+            key={listing.id}
+            className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]"
+          >
+            <ListingCard listing={listing} layout="stack" />
+          </div>
+        ))}
       </div>
-    </section>
+      <Button
+        variant="outline"
+        size="icon"
+        className={cn(
+          'absolute -left-3.5 top-[36%] z-10 hidden -translate-y-1/2 rounded-full bg-surface shadow-card transition-opacity duration-150 md:inline-flex',
+          edges.start ? 'pointer-events-none opacity-0' : 'opacity-100'
+        )}
+        onClick={() => scrollBy(-1)}
+        disabled={edges.start}
+        aria-label={`Previous homes in ${label}`}
+      >
+        <ChevronLeft className="h-4 w-4" aria-hidden />
+      </Button>
+      <Button
+        variant="outline"
+        size="icon"
+        className={cn(
+          'absolute -right-3.5 top-[36%] z-10 hidden -translate-y-1/2 rounded-full bg-surface shadow-card transition-opacity duration-150 md:inline-flex',
+          edges.end ? 'pointer-events-none opacity-0' : 'opacity-100'
+        )}
+        onClick={() => scrollBy(1)}
+        disabled={edges.end}
+        aria-label={`Next homes in ${label}`}
+      >
+        <ChevronRight className="h-4 w-4" aria-hidden />
+      </Button>
+    </div>
   );
 };
 
@@ -172,10 +177,10 @@ const CardCarousel: React.FC<{
   if (query.isError || listings.length < minResults) return null;
 
   return (
-    <>
+    <section aria-label={label} className={SECTION}>
       <SectionHeader title={title} sub={sub} to={linkTo} linkLabel={linkLabel} />
       <Carousel label={label} listings={listings} />
-    </>
+    </section>
   );
 };
 
@@ -340,7 +345,7 @@ const PopularDestinations: React.FC = () => {
       {survivors.length === 0 && !allResolved && (
         <section aria-label="Popular destinations" className={SECTION}>
           <Skeleton className="h-8 w-64" />
-          <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
             {[0, 1, 2, 3].map((slot) => (
               <Skeleton key={slot} className="h-20 w-full rounded-card" />
             ))}
@@ -349,24 +354,22 @@ const PopularDestinations: React.FC = () => {
       )}
 
       {survivors.length >= MIN_DESTINATIONS_SHOWN && (
-        <section aria-label="Popular destinations" className="py-10">
-          <div className={SECTION}>
-            <SectionHeader
-              title="Popular destinations"
-              sub="Places with whole homes already listed"
-              to={ROUTES.SEARCH}
-              linkLabel="See all homes"
-            />
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              {survivors.map((entry) => (
-                <DestinationTile
-                  key={`${entry.city}-${entry.country}`}
-                  city={entry.city}
-                  country={entry.country}
-                  homes={counts[entry.city]}
-                />
-              ))}
-            </div>
+        <section aria-label="Popular destinations" className={SECTION}>
+          <SectionHeader
+            title="Popular destinations"
+            sub="Places with whole homes already listed"
+            to={ROUTES.SEARCH}
+            linkLabel="See all homes"
+          />
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {survivors.map((entry) => (
+              <DestinationTile
+                key={`${entry.city}-${entry.country}`}
+                city={entry.city}
+                country={entry.country}
+                homes={counts[entry.city]}
+              />
+            ))}
           </div>
         </section>
       )}
@@ -395,7 +398,7 @@ const STEPS: { title: string; body: string; Icon: LucideIcon }[] = [
 ];
 
 const HowItWorks: React.FC = () => (
-  <section aria-label="How it works" className="border-y border-line bg-surface py-10">
+  <section aria-label="How it works" className="border-y border-line bg-surface py-12">
     <div className={SECTION}>
       <SectionHeader title="How it works" to={ROUTES.HOW_IT_WORKS} linkLabel="More detail" />
       <ol className="grid gap-6 md:grid-cols-3">
@@ -489,8 +492,11 @@ const FAQS: { question: string; answer: React.ReactNode }[] = [
 ];
 
 const Faq: React.FC = () => (
-  <section aria-label="Frequently asked questions" className={cn(SECTION, 'py-10')}>
-    <h2 className={SECTION_HEADING}>Questions people ask</h2>
+  <section aria-label="Frequently asked questions" className={cn(SECTION, 'py-12')}>
+    <SectionHeader
+      title="Questions people ask"
+      sub="Common questions about booking, cancellation policies and verified reviews"
+    />
     <Accordion type="single" collapsible className="mt-4">
       {FAQS.map((item) => (
         <AccordionItem key={item.question} value={item.question}>
@@ -512,51 +518,49 @@ export const LandingPage: React.FC = () => {
   setCanonical(ROUTES.HOME);
 
   return (
-    <>
+    <div className="flex flex-col gap-12 sm:gap-14 pb-16">
       <Hero />
       <PropertyTypeStripSection />
       <TrustBar />
 
-      <div className="space-y-12 py-12">
-        <CardCarousel
-          label="Top rated homes"
-          title="Top-rated homes"
-          sub="Highest rated stays with published reviews"
-          sort="RATING_DESC"
-          requireReviews
-          linkTo={`${ROUTES.SEARCH}?sort=RATING_DESC`}
-          linkLabel="See all"
-          minResults={3}
-        />
-        <PopularDestinations />
-        <CardCarousel
-          label="Book instantly"
-          title="Book instantly"
-          sub="Confirmed the moment you pay"
-          sort="RATING_DESC"
-          instantBook
-          linkTo={`${ROUTES.SEARCH}?instantBook=true`}
-          linkLabel="See all"
-          minResults={1}
-        />
-      </div>
+      <CardCarousel
+        label="Top rated homes"
+        title="Top-rated homes"
+        sub="Highest rated stays with published reviews"
+        sort="RATING_DESC"
+        requireReviews
+        linkTo={`${ROUTES.SEARCH}?sort=RATING_DESC`}
+        linkLabel="See all"
+        minResults={3}
+      />
+
+      <PopularDestinations />
+
+      <CardCarousel
+        label="Book instantly"
+        title="Book instantly"
+        sub="Confirmed the moment you pay"
+        sort="RATING_DESC"
+        instantBook
+        linkTo={`${ROUTES.SEARCH}?instantBook=true`}
+        linkLabel="See all"
+        minResults={1}
+      />
 
       <HowItWorks />
 
-      <div className="space-y-12 py-12">
-        <CardCarousel
-          label="New on the site"
-          title="New on the site"
-          sub="Recently listed homes"
-          sort="NEWEST"
-          linkTo={`${ROUTES.SEARCH}?sort=NEWEST`}
-          linkLabel="See all"
-          minResults={1}
-        />
-      </div>
+      <CardCarousel
+        label="New on the site"
+        title="New on the site"
+        sub="Recently listed homes"
+        sort="NEWEST"
+        linkTo={`${ROUTES.SEARCH}?sort=NEWEST`}
+        linkLabel="See all"
+        minResults={1}
+      />
 
       <HostBand />
       <Faq />
-    </>
+    </div>
   );
 };
