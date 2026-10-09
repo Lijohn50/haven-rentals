@@ -56,10 +56,15 @@ app:
   payout:
     release-delay-hours: 24
   payment:
-    # Which PaymentGateway bean is active: fake (scripted test outcomes) or
-    # stripe (real card charges; requires STRIPE_API_KEY).
-    gateway: ${APP_PAYMENT_GATEWAY:fake}
-    currency: ${APP_PAYMENT_CURRENCY:usd}
+    # Which PaymentGateway bean is active: fake (scripted test outcomes),
+    # stripe (real card charges; requires STRIPE_API_KEY), or sslcommerz.
+    gateway: ${APP_PAYMENT_GATEWAY:sslcommerz}
+    currency: ${APP_PAYMENT_CURRENCY:bdt}
+  sslcommerz:
+    store-id: ${SSLCOMMERZ_STORE_ID:testbox}
+    store-password: ${SSLCOMMERZ_STORE_PASSWORD:qwerty}
+    sandbox: ${SSLCOMMERZ_SANDBOX:true}
+    backend-url: ${APP_BACKEND_URL:http://localhost:8080}
   stripe:
     api-key: ${STRIPE_API_KEY:}
   review:

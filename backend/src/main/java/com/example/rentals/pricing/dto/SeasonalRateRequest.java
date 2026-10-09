@@ -20,7 +20,7 @@ public record SeasonalRateRequest(
         LocalDate endDate,
 
         @NotNull(message = "Nightly price is required")
-        @DecimalMin(value = "1.00", message = "Nightly price must be at least 1.00")
-        @DecimalMax(value = "100000.00", message = "Nightly price cannot exceed 100000.00")
+        @DecimalMin(value = "50.00", message = "Nightly price must be at least 50.00")
+        @DecimalMax(value = "1000000.00", message = "Nightly price cannot exceed 1000000.00")
         BigDecimal nightlyPrice
 ) {}

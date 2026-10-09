@@ -79,6 +79,10 @@ public class SecurityConfig {
                     "/api/v1/health",
                     "/api/v1/ai/listings/*/review-summary"
                 ).permitAll()
+                // SSLCommerz payment callbacks and IPN (public webhook)
+                .requestMatchers(
+                    "/api/v1/payments/sslcommerz/**"
+                ).permitAll()
                 // Swagger & actuator
                 .requestMatchers(
                     "/swagger-ui.html",

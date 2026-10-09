@@ -7,6 +7,8 @@ import com.example.rentals.listing.Listing;
 import com.example.rentals.listing.ListingRepository;
 import com.example.rentals.listing.ListingStatus;
 import com.example.rentals.payment.*;
+import com.example.rentals.payment.sslcommerz.SslCommerzInitResponse;
+import com.example.rentals.payment.sslcommerz.SslCommerzService;
 import com.example.rentals.pricing.PriceBreakdown;
 import com.example.rentals.pricing.PricingService;
 import com.example.rentals.pricing.dto.PriceBreakdownResponse;
@@ -46,7 +48,9 @@ public class BookingService {
     private final AvailabilityService availabilityService;
     private final PricingService pricingService;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
     private final PaymentGateway paymentGateway;
+    private final SslCommerzService sslCommerzService;
     private final RefundService refundService;
     private final PayoutService payoutService;
     private final CancellationPolicyResolver policyResolver;
@@ -218,12 +222,20 @@ public class BookingService {
         User guest = booking.getGuest();
         Instant now = clock.instant();
 
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
+
         if (result.success()) {
             // Check if expired in the meantime
             if (booking.getExpiresAt() != null && booking.getExpiresAt().isBefore(now)) {
                 log.warn("Payment succeeded but hold expired for booking id={}", bookingId);
                 refundService.issueRefund(booking, booking.getTotalAmount(), RefundReason.LATE_PAYMENT, null);
                 throw new ConflictException(ErrorCode.BOOKING_EXPIRED, "Payment received after hold expired; refund has been issued");
+            }
+
+            if (payment != null) {
+                payment.setStatus(PaymentStatus.SUCCEEDED);
+                payment.setProviderReference(result.providerReference());
+                paymentRepository.save(payment);
             }
 
             if (booking.isInstantBook()) {
@@ -239,6 +251,12 @@ public class BookingService {
 
             recordHistory(booking, BookingStatus.PENDING_PAYMENT.name(), booking.getStatus().name(), guestId, "GUEST", "Payment succeeded");
         } else {
+            if (payment != null) {
+                payment.setStatus(PaymentStatus.FAILED);
+                payment.setFailureCode(result.failureCode());
+                paymentRepository.save(payment);
+            }
+
             booking.transitionTo(BookingStatus.PAYMENT_FAILED, guest);
             recordHistory(booking, BookingStatus.PENDING_PAYMENT.name(), BookingStatus.PAYMENT_FAILED.name(), guestId, "GUEST", "Payment failed: " + result.failureCode());
             bookingRepository.save(booking);
@@ -254,6 +272,109 @@ public class BookingService {
         evictHostDashboard();
 
         return toResponse(booking, guestId);
+    }
+
+    public SslCommerzInitResponse initiateSslCommerzPayment(Long guestId, Long bookingId) {
+        Booking booking = tx().execute(status -> getValidPendingBooking(guestId, bookingId));
+        Payment payment = tx().execute(status -> paymentService.createPendingPayment(booking));
+        return sslCommerzService.initiateSession(booking, booking.getGuest(), payment);
+    }
+
+    @Transactional
+    public Booking finalizeSslCommerzPayment(String tranId, String valId, BigDecimal amount) {
+        Long bookingId = parseBookingIdFromTranId(tranId);
+        Booking booking = bookingRepository.findByIdForUpdate(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found for transaction: " + tranId));
+
+        if (booking.getStatus() == BookingStatus.CONFIRMED || booking.getStatus() == BookingStatus.PENDING_APPROVAL) {
+            log.info("Booking {} already finalized for transaction {}", booking.getReference(), tranId);
+            return booking;
+        }
+
+        Payment payment = paymentRepository.findByBookingIdForUpdate(bookingId)
+                .orElse(null);
+
+        User guest = booking.getGuest();
+        Instant now = clock.instant();
+
+        // Check hold expiry
+        if (booking.getExpiresAt() != null && booking.getExpiresAt().isBefore(now)) {
+            log.warn("SSLCommerz payment succeeded but hold expired for booking id={}", bookingId);
+            refundService.issueRefund(booking, booking.getTotalAmount(), RefundReason.LATE_PAYMENT, null);
+            throw new ConflictException(ErrorCode.BOOKING_EXPIRED, "Payment received after hold expired; refund has been issued");
+        }
+
+        if (payment != null) {
+            payment.setStatus(PaymentStatus.SUCCEEDED);
+            payment.setProviderReference(valId);
+            paymentRepository.save(payment);
+        }
+
+        if (booking.isInstantBook()) {
+            booking.transitionTo(BookingStatus.CONFIRMED, guest);
+            ZoneId zoneId = ZoneId.of(booking.getListingTimezone());
+            Instant checkInInstant = booking.getCheckIn().atTime(booking.getCheckInTime()).atZone(zoneId).toInstant();
+            Instant scheduledPayout = checkInInstant.plus(appProperties.getPayout().getReleaseDelayHours(), ChronoUnit.HOURS);
+            payoutService.createPayout(booking, scheduledPayout.isBefore(now) ? now : scheduledPayout);
+        } else {
+            booking.transitionTo(BookingStatus.PENDING_APPROVAL, guest);
+            booking.setExpiresAt(now.plus(appProperties.getBooking().getHostResponseHours(), ChronoUnit.HOURS));
+        }
+
+        recordHistory(booking, BookingStatus.PENDING_PAYMENT.name(), booking.getStatus().name(), guest.getId(), "GUEST",
+                "Payment succeeded via SSLCommerz (val_id: " + valId + ")");
+        booking = bookingRepository.save(booking);
+
+        var searchCache = cacheManager.getCache(CacheConfig.CACHE_SEARCH_RESULTS);
+        if (searchCache != null) searchCache.clear();
+        evictHostDashboard();
+
+        return booking;
+    }
+
+    @Transactional
+    public Booking failSslCommerzPayment(String tranId, String failureReason) {
+        Long bookingId = parseBookingIdFromTranId(tranId);
+        Booking booking = bookingRepository.findByIdForUpdate(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found for transaction: " + tranId));
+
+        if (booking.getStatus() == BookingStatus.PENDING_PAYMENT) {
+            booking.transitionTo(BookingStatus.PAYMENT_FAILED, booking.getGuest());
+            recordHistory(booking, BookingStatus.PENDING_PAYMENT.name(), BookingStatus.PAYMENT_FAILED.name(),
+                    booking.getGuest().getId(), "GUEST", "SSLCommerz payment failed: " + failureReason);
+            booking = bookingRepository.save(booking);
+
+            paymentRepository.findByBookingIdForUpdate(bookingId).ifPresent(p -> {
+                p.setStatus(PaymentStatus.FAILED);
+                p.setFailureCode("SSLCOMMERZ_DECLINED");
+                paymentRepository.save(p);
+            });
+        }
+        return booking;
+    }
+
+    @Transactional(readOnly = true)
+    public Booking getBookingForTranId(String tranId) {
+        Long bookingId = parseBookingIdFromTranId(tranId);
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found for transaction: " + tranId));
+    }
+
+    private Long parseBookingIdFromTranId(String tranId) {
+        if (tranId == null || tranId.isBlank()) {
+            throw new ApiException(ErrorCode.MALFORMED_REQUEST, "Missing transaction ID");
+        }
+        if (tranId.startsWith("BK-")) {
+            String[] parts = tranId.split("-");
+            if (parts.length >= 2) {
+                try {
+                    return Long.parseLong(parts[1]);
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return paymentRepository.findByIdempotencyKey(tranId)
+                .map(p -> p.getBooking().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot resolve booking for transaction ID: " + tranId));
     }
 
     @Transactional

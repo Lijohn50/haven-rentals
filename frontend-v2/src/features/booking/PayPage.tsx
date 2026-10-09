@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, Copy, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApiError } from '@/api/errors';
@@ -7,7 +7,11 @@ import { BRAND } from '@/config/brand';
 import { ENV } from '@/config/env';
 import { ROUTES } from '@/config/routes';
 import { useBooking, useBookingMutations, useBookingPaymentDetail } from '@/features/booking/api';
-import { CardPaymentField, FakePaymentField } from '@/features/booking/PaymentMethodField';
+import {
+  CardPaymentField,
+  FakePaymentField,
+  SslCommerzPaymentField,
+} from '@/features/booking/PaymentMethodField';
 import { CountdownPill } from '@/components/patterns/Countdown';
 import { PriceBreakdown } from '@/components/patterns/PriceBreakdown';
 import { useCountdown } from '@/hooks/useUtilities';
@@ -152,11 +156,14 @@ export const PayPage: React.FC = () => {
   useDocumentTitle('Payment');
 
   const { reference } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const booking = useBooking(reference ?? null);
-  const { pay } = useBookingMutations(reference ?? undefined);
+  const { pay, initiateSslCommerz } = useBookingMutations(reference ?? undefined);
 
-  const [paymentToken, setPaymentToken] = useState('');
+  const paymentParam = searchParams.get('payment');
+  const [paymentMethod, setPaymentMethod] = useState<'sslcommerz' | 'simulated'>('sslcommerz');
+  const [paymentToken, setPaymentToken] = useState('tok_success');
   const [outcome, setOutcome] = useState<BookingResponse | null>(null);
   const [failure, setFailure] = useState<{ code: string; failureCode: string | null } | null>(null);
   const [stateNotice, setStateNotice] = useState<string | null>(null);
@@ -260,6 +267,29 @@ export const PayPage: React.FC = () => {
     }
   };
 
+  const submitSslCommerz = async () => {
+    setFailure(null);
+    setStateNotice(null);
+    setPaying(true);
+    try {
+      const res = await initiateSslCommerz.mutateAsync(stay.id);
+      if (res.status === 'SUCCESS' && res.redirectUrl) {
+        window.location.href = res.redirectUrl;
+      } else {
+        toast.error(res.failedReason || 'Failed to initialize SSLCommerz gateway');
+        setPaying(false);
+      }
+    } catch (error) {
+      const api = error instanceof ApiError ? error : null;
+      if (api?.code === 'BOOKING_EXPIRED') {
+        setFailure({ code: 'BOOKING_EXPIRED', failureCode: null });
+      } else {
+        toast.error('Could not connect to payment gateway');
+      }
+      setPaying(false);
+    }
+  };
+
   if (outcome) {
     return <PayConfirmation booking={outcome} />;
   }
@@ -345,6 +375,18 @@ export const PayPage: React.FC = () => {
           </Banner>
         )}
 
+        {paymentParam === 'failed' && (
+          <InlineAlert tone="danger">
+            Payment via SSLCommerz was declined or did not complete. Your dates are still reserved until expiry. You can retry with SSLCommerz or choose another option below.
+          </InlineAlert>
+        )}
+
+        {paymentParam === 'cancelled' && (
+          <InlineAlert tone="warning">
+            Payment session was cancelled. You can complete your booking anytime before the hold expires.
+          </InlineAlert>
+        )}
+
         {failure && failureText && (
           <InlineAlert tone={failed ? 'danger' : 'warning'}>
             {failureText}
@@ -364,9 +406,38 @@ export const PayPage: React.FC = () => {
         )}
 
         <Card className="p-4">
-          <h2 className="text-base font-semibold text-ink">Payment method</h2>
-          <div className="mt-3">
-            {ENV.PAYMENT_MODE === 'provider' ? (
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <h2 className="text-base font-semibold text-ink">Payment method</h2>
+            <div className="flex rounded-lg border border-line bg-surface-subtle p-0.5 text-xs font-medium">
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('sslcommerz')}
+                className={`rounded-md px-3 py-1 transition ${
+                  paymentMethod === 'sslcommerz'
+                    ? 'bg-surface font-semibold text-primary shadow-xs'
+                    : 'text-muted hover:text-ink'
+                }`}
+              >
+                SSLCommerz (BDT)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('simulated')}
+                className={`rounded-md px-3 py-1 transition ${
+                  paymentMethod === 'simulated'
+                    ? 'bg-surface font-semibold text-primary shadow-xs'
+                    : 'text-muted hover:text-ink'
+                }`}
+              >
+                Test Sim
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            {paymentMethod === 'sslcommerz' ? (
+              <SslCommerzPaymentField />
+            ) : ENV.PAYMENT_MODE === 'provider' ? (
               <CardPaymentField onTokenChange={setPaymentToken} />
             ) : (
               <FakePaymentField onTokenChange={setPaymentToken} />
@@ -391,10 +462,12 @@ export const PayPage: React.FC = () => {
             size="lg"
             block
             loading={paying}
-            disabled={expired || cooling || paymentToken === ''}
-            onClick={() => void submit()}
+            disabled={expired || cooling || (paymentMethod === 'simulated' && paymentToken === '')}
+            onClick={() => void (paymentMethod === 'sslcommerz' ? submitSslCommerz() : submit())}
           >
-            Pay {formatMoney(total)} and {requested ? 'send request' : 'book'}
+            {paymentMethod === 'sslcommerz'
+              ? `Pay ${formatMoney(total)} via SSLCommerz`
+              : `Pay ${formatMoney(total)} and ${requested ? 'send request' : 'book'}`}
           </Button>
 
           {failed && (

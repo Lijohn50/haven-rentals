@@ -45,6 +45,7 @@ export const ep = {
     get: (id: number) => `/bookings/${id}`,
     byReference: (reference: string) => `/bookings/reference/${encodeURIComponent(reference)}`,
     pay: (id: number) => `/bookings/${id}/pay`,
+    sslcommerzInitiate: (id: number) => `/bookings/${id}/sslcommerz/initiate`,
     cancellationPreview: (id: number) => `/bookings/${id}/cancellation-preview`,
     cancel: (id: number) => `/bookings/${id}/cancel`,
     payment: (id: number) => `/bookings/${id}/payment`,

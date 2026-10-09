@@ -53,6 +53,54 @@ export const FakePaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenCha
   );
 };
 
+export const SslCommerzPaymentField: React.FC = () => {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="rounded-xl border border-line bg-surface-subtle p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold text-base">
+              ৳
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-ink">SSLCommerz Hosted Gateway</p>
+              <p className="text-xs text-muted">Direct BDT payment via Bangladesh's payment gateway</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
+            Sandbox Active
+          </span>
+        </div>
+
+        <div className="mt-4 border-t border-line/60 pt-3">
+          <p className="mb-2 text-xs font-medium text-muted">Supported Payment Methods:</p>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="inline-flex items-center rounded-md bg-[#e2136e]/10 px-2.5 py-1 font-semibold text-[#e2136e]">
+              bKash
+            </span>
+            <span className="inline-flex items-center rounded-md bg-[#f7941d]/10 px-2.5 py-1 font-semibold text-[#f7941d]">
+              Nagad
+            </span>
+            <span className="inline-flex items-center rounded-md bg-[#8c2e8a]/10 px-2.5 py-1 font-semibold text-[#8c2e8a]">
+              Rocket
+            </span>
+            <span className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 font-semibold text-primary">
+              Visa / Mastercard
+            </span>
+            <span className="inline-flex items-center rounded-md bg-ink/5 px-2.5 py-1 font-medium text-ink">
+              DBBL Nexus & Internet Banking
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-xs text-muted">
+        When you proceed, you will be redirected to the secure SSLCommerz payment portal to complete your transaction in Bangladeshi Taka (৳).
+      </p>
+    </div>
+  );
+};
+
 type CardBrand = {
   id: string;
   label: string;

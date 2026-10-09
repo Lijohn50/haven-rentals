@@ -264,7 +264,7 @@ public class DisputeService {
                     throw new BusinessRuleException("Partial refund requires a positive refundAmount");
                 }
                 if (req.refundAmount().compareTo(remainingRefundable) > 0) {
-                    throw new BusinessRuleException("Refund amount exceeds remaining refundable balance of $" + remainingRefundable);
+                    throw new BusinessRuleException("Refund amount exceeds remaining refundable balance of ৳" + remainingRefundable);
                 }
                 refundToIssue = req.refundAmount();
             }

@@ -38,7 +38,7 @@ public class StripePaymentGateway implements PaymentGateway {
                     "app.payment.gateway=stripe requires a non-empty STRIPE_API_KEY");
         }
         Stripe.apiKey = apiKey;
-        this.currency = currency == null ? "usd" : currency.toLowerCase();
+        this.currency = currency == null ? "bdt" : currency.toLowerCase();
     }
 
     @Override

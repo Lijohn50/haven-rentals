@@ -99,10 +99,10 @@ public class PayoutJob {
                 payout.getHost(),
                 NotificationType.PAYOUT_PAID,
                 "Payout Sent",
-                "Your payout of $" + payout.getAmount() + " for booking " + b.getReference() + " has been processed.",
+                "Your payout of ৳" + payout.getAmount() + " for booking " + b.getReference() + " has been processed.",
                 "/host/payouts"
         );
 
-        log.info("Successfully released payout id={} of ${} to host id={}", payoutId, payout.getAmount(), payout.getHost().getId());
+        log.info("Successfully released payout id={} of ৳{} to host id={}", payoutId, payout.getAmount(), payout.getHost().getId());
     }
 }

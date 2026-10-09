@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Copy, MessageSquare, Printer, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApiError } from '@/api/errors';
@@ -32,6 +32,8 @@ import type { BookingHostSummary } from '@/types/api';
 
 export const TripDetailPage: React.FC = () => {
   const { reference } = useParams();
+  const [searchParams] = useSearchParams();
+  const paymentSuccess = searchParams.get('payment') === 'success';
   useDocumentTitle(reference ? `Trip ${reference}` : 'Trip');
 
   const navigate = useNavigate();
@@ -106,6 +108,12 @@ export const TripDetailPage: React.FC = () => {
   return (
     <div className="mx-auto flex max-w-narrow flex-col gap-5 px-4 py-8 sm:px-6">
       <Breadcrumbs items={[{ label: 'Trips', to: ROUTES.TRIPS }, { label: stay.reference }]} />
+
+      {paymentSuccess && (
+        <InlineAlert tone="success">
+          Payment completed successfully via SSLCommerz! Your stay is confirmed.
+        </InlineAlert>
+      )}
 
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-start justify-between gap-3">

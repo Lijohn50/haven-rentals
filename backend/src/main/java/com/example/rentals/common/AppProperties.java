@@ -23,6 +23,7 @@ public class AppProperties {
     private Storage storage = new Storage();
     private Ai ai = new Ai();
     private Mail mail = new Mail();
+    private SslCommerz sslcommerz = new SslCommerz();
 
     private String frontendUrl = "http://localhost:3000";
 
@@ -107,5 +108,32 @@ public class AppProperties {
         /** Sender shown to the recipient. Real SMTP relays reject mail without one. */
         @NotBlank
         private String from = "no-reply@haven.test";
+    }
+
+    @Getter
+    @Setter
+    public static class SslCommerz {
+        private String storeId = "testbox";
+        private String storePassword = "qwerty";
+        private boolean sandbox = true;
+        private String backendUrl = "http://localhost:8080";
+
+        public String getSessionUrl() {
+            return sandbox
+                    ? "https://sandbox.sslcommerz.com/gwprocess/v4/api.php"
+                    : "https://securepay.sslcommerz.com/gwprocess/v4/api.php";
+        }
+
+        public String getValidationUrl() {
+            return sandbox
+                    ? "https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php"
+                    : "https://securepay.sslcommerz.com/validator/api/validationserverAPI.php";
+        }
+
+        public String getRefundUrl() {
+            return sandbox
+                    ? "https://sandbox.sslcommerz.com/validator/api/merchantTransIDvalidationAPI.php"
+                    : "https://securepay.sslcommerz.com/validator/api/merchantTransIDvalidationAPI.php";
+        }
     }
 }

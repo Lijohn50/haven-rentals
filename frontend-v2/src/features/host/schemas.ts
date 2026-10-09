@@ -93,9 +93,9 @@ export const spaceSchema = z.object({
 
 export const pricingSchema = z
   .object({
-    baseNightlyPrice: money(1, 100000, 'Nightly price'),
+    baseNightlyPrice: money(50, 1000000, 'Nightly price'),
     weekendMultiplier: money(1, 3, 'Weekend multiplier'),
-    cleaningFee: money(0, 10000, 'Cleaning fee'),
+    cleaningFee: money(0, 50000, 'Cleaning fee'),
     weeklyDiscountPercent: percent(90, 'Weekly discount'),
     monthlyDiscountPercent: percent(90, 'Monthly discount'),
   })

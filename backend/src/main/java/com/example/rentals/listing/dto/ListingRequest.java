@@ -81,8 +81,8 @@ public record ListingRequest(
         BigDecimal bathrooms,
 
         @NotNull(message = "Base nightly price is required")
-        @DecimalMin(value = "1.00", message = "Base nightly price must be at least 1.00")
-        @DecimalMax(value = "100000.00", message = "Base nightly price cannot exceed 100000.00")
+        @DecimalMin(value = "50.00", message = "Base nightly price must be at least 50.00")
+        @DecimalMax(value = "1000000.00", message = "Base nightly price cannot exceed 1000000.00")
         BigDecimal baseNightlyPrice,
 
         @DecimalMin(value = "1.00", message = "Weekend multiplier must be at least 1.00")
@@ -90,7 +90,7 @@ public record ListingRequest(
         BigDecimal weekendMultiplier,
 
         @DecimalMin(value = "0.00", message = "Cleaning fee cannot be negative")
-        @DecimalMax(value = "10000.00", message = "Cleaning fee cannot exceed 10000.00")
+        @DecimalMax(value = "50000.00", message = "Cleaning fee cannot exceed 50000.00")
         BigDecimal cleaningFee,
 
         @DecimalMin(value = "0.00", message = "Weekly discount must be between 0 and 90")

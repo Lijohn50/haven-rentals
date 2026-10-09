@@ -23,6 +23,11 @@ export const bookingsApi = {
     }).then((response) => guarded('booking', bookingResponseSchema, response)),
   pay: (id: number, paymentToken: string) =>
     api<BookingResponse>(ep.bookings.pay(id), { method: 'post', data: { paymentToken } }),
+  sslcommerzInitiate: (id: number) =>
+    api<{ status: string; redirectUrl: string; sessionKey?: string; failedReason?: string }>(
+      ep.bookings.sslcommerzInitiate(id),
+      { method: 'post' }
+    ),
   mine: (status?: BookingStatus, page = 0, size = 50) =>
     api<PageResponse<BookingResponse>>(ep.bookings.mine, { params: { status, page, size } }),
   get: (id: number) => api<BookingResponse>(ep.bookings.get(id)),
@@ -151,6 +156,9 @@ export function useBookingMutations(reference?: string, listingId?: number) {
       mutationFn: ({ id, paymentToken }: { id: number; paymentToken: string }) =>
         bookingsApi.pay(id, paymentToken),
       onSuccess: (booking) => invalidate(booking),
+    }),
+    initiateSslCommerz: useMutation({
+      mutationFn: (id: number) => bookingsApi.sslcommerzInitiate(id),
     }),
     cancel: useMutation({
       mutationFn: ({ id, reason }: { id: number; reason?: string }) => bookingsApi.cancel(id, reason),
