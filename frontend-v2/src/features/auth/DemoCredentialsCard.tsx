@@ -48,7 +48,7 @@ export const DemoCredentialsCard: React.FC<DemoCredentialsCardProps> = ({ onUse,
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
 
-  //if (IS_PRODUCTION_BUILD) return null;
+  if (IS_PRODUCTION_BUILD) return null;
 
   const copy = async (value: string, key: string) => {
     try {
