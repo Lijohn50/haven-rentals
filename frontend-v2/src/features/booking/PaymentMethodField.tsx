@@ -186,7 +186,9 @@ function loadStripeJs(): Promise<StripeJs | null> {
  * Provider mode (decision C9): a real card form. When a Stripe publishable key
  * is configured, the card is tokenised by Stripe.js straight from the browser,
  * so only an opaque token is ever sent to the API. Without a key (local dev)
- * the card is validated locally and mapped to a simulated token instead.
+ * the card is validated locally and mapped to a simulated token instead. If the
+ * card service is unreachable or the key is unusable, the form degrades to that
+ * same simulated flow — and says so on screen — so a booking can still complete.
  */
 export const CardPaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenChange }) => {
   const [number, setNumber] = React.useState('');
@@ -196,6 +198,7 @@ export const CardPaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenCha
   const [touched, setTouched] = React.useState(false);
   const [tokenizing, setTokenizing] = React.useState(false);
   const [providerError, setProviderError] = React.useState<string | null>(null);
+  const [providerDown, setProviderDown] = React.useState(false);
 
   const digits = number.replace(/\D/g, '');
   const brand = detectBrand(digits);
@@ -236,6 +239,13 @@ export const CardPaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenCha
       return;
     }
 
+    // The card service was already unreachable: keep using the simulated flow
+    // instead of re-attempting (and re-failing) on every keystroke.
+    if (providerDown) {
+      onTokenChange(simulatedToken(digits));
+      return;
+    }
+
     let cancelled = false;
     setTokenizing(true);
     setProviderError(null);
@@ -258,28 +268,40 @@ export const CardPaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenCha
           return;
         }
         if (result?.error?.message) {
+          // The provider answered with a card error: surface it as-is instead
+          // of silently simulating the payment.
           setProviderError(result.error.message);
-        } else {
-          setProviderError('The card service could not be loaded.');
+          onTokenChange('');
+          return;
         }
-        onTokenChange('');
+        // The script never loaded or the call threw: the card service cannot
+        // be used, so degrade to the simulated flow and say so.
+        setProviderDown(true);
+        onTokenChange(simulatedToken(digits));
       })
       .catch(() => {
         if (cancelled) return;
         setTokenizing(false);
-        setProviderError('The card service could not be reached.');
-        onTokenChange('');
+        setProviderDown(true);
+        onTokenChange(simulatedToken(digits));
       });
     return () => {
       cancelled = true;
     };
-  }, [valid, digits, expiry, cvc, name, onTokenChange]);
+  }, [valid, digits, expiry, cvc, name, onTokenChange, providerDown]);
 
   const touchAll = () => setTouched(true);
 
   return (
     <div className="flex flex-col gap-4">
-      {ENV.STRIPE_PUBLISHABLE_KEY ? (
+      {providerDown ? (
+        <Banner tone="warning" className="items-center" title="Test mode">
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide">
+            <FlaskConical className="h-3.5 w-3.5" aria-hidden />
+            Card service unreachable — no real card is charged.
+          </span>
+        </Banner>
+      ) : ENV.STRIPE_PUBLISHABLE_KEY ? (
         <Banner tone="info" className="items-center" title="Card payment">
           <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide">
             <Lock className="h-3.5 w-3.5" aria-hidden />
@@ -392,7 +414,7 @@ export const CardPaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenCha
 
       {tokenizing && <p className="text-xs text-muted">Tokenising card…</p>}
 
-      {!ENV.STRIPE_PUBLISHABLE_KEY && (
+      {(!ENV.STRIPE_PUBLISHABLE_KEY || providerDown) && (
         <p className="text-xs text-muted">
           Test cards:{' '}
           <span className="tabular">4242 4242 4242 4242</span> succeeds,{' '}
