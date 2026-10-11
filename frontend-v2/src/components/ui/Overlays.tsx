@@ -93,7 +93,7 @@ export const PopoverContent = forwardRef<
       ref={ref}
       align={align}
       sideOffset={sideOffset}
-      className={cn('z-[100] rounded-card border border-line bg-surface p-4 shadow-pop animate-fade-in', className)}
+      className={cn('z-[120] rounded-card border border-line bg-surface p-4 shadow-pop animate-fade-in', className)}
       {...props}
     />
   </PopoverPrimitive.Portal>
@@ -115,7 +115,7 @@ export const DropdownMenuContent = forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        'z-[100] min-w-[13rem] rounded-card border border-line bg-surface p-1 shadow-pop animate-fade-in',
+        'z-[120] min-w-[13rem] rounded-card border border-line bg-surface p-1 shadow-pop animate-fade-in',
         className
       )}
       {...props}
