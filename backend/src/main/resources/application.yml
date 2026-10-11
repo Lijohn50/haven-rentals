@@ -27,6 +27,9 @@ spring:
           auth: ${MAIL_SMTP_AUTH}
           starttls:
             enable: ${MAIL_SMTP_STARTTLS}
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb+srv://loki:loki1234@spring.3lufpl6.mongodb.net/rentals?appName=spring}
   jpa:
     open-in-view: false
     hibernate:

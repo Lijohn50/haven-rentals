@@ -85,7 +85,7 @@ public class MessagingService {
 
     @Transactional(readOnly = true)
     public ConversationResponse getConversation(Long userId, Long conversationId) {
-        Conversation conv = conversationRepository.findById(conversationId)
+        Conversation conv = conversationRepository.findByIdWithDetails(conversationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Conversation not found"));
 
         validateParticipant(conv, userId);

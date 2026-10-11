@@ -9,7 +9,7 @@ spring:
       minimum-idle: 5
   data:
     mongodb:
-      uri: ${MONGO_URI}
+      uri: ${MONGO_URI:mongodb+srv://loki:loki1234@spring.3lufpl6.mongodb.net/rentals?appName=spring}
 
 server:
   forward-headers-strategy: framework

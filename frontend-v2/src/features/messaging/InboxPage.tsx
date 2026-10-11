@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApiError } from '@/api/errors';
 import { ROUTES } from '@/config/routes';
@@ -309,6 +310,13 @@ const Thread: React.FC<{
   return (
     <div className="flex flex-col overflow-hidden rounded-card border border-line bg-surface">
       <header className="flex items-center gap-3 border-b border-line p-4">
+        <Link
+          to={ROUTES.INBOX}
+          className="mr-1 -ml-1 rounded-full p-1.5 text-muted hover:bg-bg hover:text-ink lg:hidden transition-colors"
+          aria-label="Back to conversations"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
         <Avatar name={name} />
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-sm font-semibold text-ink">{name}</h2>
@@ -449,8 +457,9 @@ const Thread: React.FC<{
 export const InboxPage: React.FC = () => {
   useDocumentTitle('Inbox');
 
-  const { conversationId } = useParams();
-  const parsed = conversationId === undefined ? Number.NaN : Number(conversationId);
+  const params = useParams<{ id?: string; conversationId?: string }>();
+  const rawId = params.conversationId ?? params.id;
+  const parsed = rawId === undefined ? Number.NaN : Number(rawId);
   const activeId = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 
   const pageVisible = usePageVisible();
