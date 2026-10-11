@@ -385,42 +385,42 @@ export const PayPage: React.FC = () => {
           <div
             role="status"
             className={cn(
-              'rounded-2xl bg-surface p-4.5 shadow-card ring-1 transition-all',
+              'rounded-2xl bg-surface p-4 sm:p-5 shadow-card ring-1 transition-all',
               hold.urgent
                 ? 'ring-accent/40 bg-accent/5'
                 : 'ring-line/80'
             )}
           >
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5 min-w-0">
                 <div
                   className={cn(
-                    'grid h-11 w-11 shrink-0 place-items-center rounded-xl',
+                    'grid h-12 w-12 shrink-0 place-items-center rounded-2xl',
                     hold.urgent
                       ? 'bg-accent/15 text-accent'
                       : 'bg-primary-soft text-primary'
                   )}
                 >
-                  <Timer className="h-5 w-5" aria-hidden />
+                  <Timer className="h-6 w-6" aria-hidden />
                 </div>
                 <div className="min-w-0">
-                  <div className="font-heading text-sm font-semibold text-text">
+                  <div className="font-heading text-base font-semibold text-text">
                     Dates reserved & held for you
                   </div>
-                  <p className="mt-0.5 truncate text-xs text-muted">
-                    {stay.listing.title} · {formatDateRange(stay.checkIn, stay.checkOut)}
+                  <p className="mt-0.5 truncate text-xs sm:text-sm text-muted">
+                    <span className="font-medium text-text">{stay.listing.title}</span> · {formatDateRange(stay.checkIn, stay.checkOut)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col items-end shrink-0">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+              <div className="flex items-center sm:flex-col sm:items-end justify-between shrink-0 border-t sm:border-t-0 border-line/60 pt-2.5 sm:pt-0">
+                <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-muted">
                   Hold expires in
                 </span>
                 <span
                   aria-live="polite"
                   className={cn(
-                    'mt-0.5 inline-flex items-center rounded-pill px-3 py-0.5 font-heading text-base font-bold tabular-nums shadow-xs',
+                    'sm:mt-1 inline-flex items-center rounded-pill px-3.5 py-1 font-heading text-sm sm:text-base font-bold tabular-nums shadow-xs',
                     hold.urgent
                       ? 'bg-accent text-white animate-pulse'
                       : 'bg-primary-soft text-primary-dark ring-1 ring-primary/20'
@@ -523,27 +523,31 @@ export const PayPage: React.FC = () => {
       {/* Right Column: Trip Summary, Price Breakdown, and CTA */}
       <div className="lg:w-80 lg:shrink-0">
         <div className="flex flex-col gap-4 lg:sticky lg:top-24">
-          <div className="rounded-2xl bg-surface p-4.5 shadow-card ring-1 ring-line/70">
-            <div className="flex gap-3.5">
+          <div className="rounded-2xl bg-surface p-4 sm:p-5 shadow-card ring-1 ring-line/70">
+            <div className="flex items-start gap-3.5">
               <img
                 src={mediaUrl(stay.listing.coverPhotoUrl) ?? PLACEHOLDER_IMAGE}
                 alt={stay.listing.title}
-                className="h-20 w-24 shrink-0 rounded-xl object-cover ring-1 ring-line/70"
+                className="h-20 w-20 shrink-0 rounded-xl object-cover ring-1 ring-line/70"
               />
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
                   {stay.listing.city}, {stay.listing.country}
                 </p>
-                <h3 className="truncate font-heading text-sm font-semibold text-text">
+                <h3 className="mt-0.5 line-clamp-2 font-heading text-sm font-semibold text-text leading-snug">
                   {stay.listing.title}
                 </h3>
-                <p className="mt-0.5 text-xs text-muted">
-                  Hosted by {stay.host.displayName}
-                </p>
-                <p className="mt-1 text-xs font-medium text-text">
-                  {formatDateRange(stay.checkIn, stay.checkOut)} · {stay.nights} {stay.nights === 1 ? 'night' : 'nights'}
+                <p className="mt-1 text-xs text-muted">
+                  Hosted by <span className="font-medium text-text">{stay.host.displayName}</span>
                 </p>
               </div>
+            </div>
+
+            <div className="mt-3.5 flex items-center justify-between border-t border-line/60 pt-3 text-xs text-muted">
+              <span>{formatDateRange(stay.checkIn, stay.checkOut)}</span>
+              <span className="font-semibold text-text">
+                {stay.nights} {stay.nights === 1 ? 'night' : 'nights'}
+              </span>
             </div>
           </div>
 
