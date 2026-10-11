@@ -114,13 +114,25 @@ class BookingServiceSslPaymentTest {
     @DisplayName("Currency mismatch throws exception and fails payment (Blocker 1 fix)")
     void testCurrencyMismatchRejected() {
         assertThatThrownBy(() -> bookingService.finalizeSslCommerzPayment(
-                "BK-1-100", "VAL_1", new BigDecimal("5000.00"), "USD", "BANK_1"
+                "BK-1-100", "VAL_1", new BigDecimal("5000.00"), "EUR", "BANK_1"
         ))
                 .isInstanceOf(ApiException.class)
-                .hasMessageContaining("Payment currency must be BDT");
+                .hasMessageContaining("Payment currency must be USD");
 
         assertThat(booking.getStatus()).isEqualTo(BookingStatus.PAYMENT_FAILED);
         assertThat(payment.getStatus()).isEqualTo(PaymentStatus.FAILED);
+    }
+
+    @Test
+    @DisplayName("USD payment succeeds when currency is USD")
+    void testUsdPaymentSucceeds() {
+        Booking result = bookingService.finalizeSslCommerzPayment(
+                "BK-1-100", "VAL_USD", new BigDecimal("5000.00"), "USD", "BANK_TRX_USD"
+        );
+
+        assertThat(result.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
+        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.SUCCEEDED);
+        assertThat(payment.getProviderReference()).isEqualTo("BANK_TRX_USD");
     }
 
     @Test

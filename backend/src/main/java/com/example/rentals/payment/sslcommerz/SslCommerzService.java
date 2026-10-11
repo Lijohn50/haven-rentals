@@ -42,11 +42,16 @@ public class SslCommerzService {
         String tranId = "BK-" + booking.getId() + "-" + payment.getId();
         String backendBase = sslProps.getBackendUrl();
 
+        String configuredCurrency = sslProps.getCurrency();
+        String currency = (configuredCurrency != null && !configuredCurrency.isBlank())
+                ? configuredCurrency.trim().toUpperCase()
+                : "USD";
+
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("store_id", sslProps.getStoreId());
         body.add("store_passwd", sslProps.getStorePassword());
         body.add("total_amount", MoneyUtils.round(booking.getTotalAmount()).toPlainString());
-        body.add("currency", "BDT");
+        body.add("currency", currency);
         body.add("tran_id", tranId);
 
         body.add("success_url", backendBase + "/api/v1/payments/sslcommerz/success");
@@ -54,25 +59,36 @@ public class SslCommerzService {
         body.add("cancel_url", backendBase + "/api/v1/payments/sslcommerz/cancel");
         body.add("ipn_url", backendBase + "/api/v1/payments/sslcommerz/ipn");
 
-        // Customer details
-        String guestName = ((guest.getFirstName() != null ? guest.getFirstName() : "") + " "
-                + (guest.getLastName() != null ? guest.getLastName() : "")).trim();
-        body.add("cus_name", !guestName.isEmpty() ? guestName : "Guest");
-        body.add("cus_email", guest.getEmail());
-        body.add("cus_add1", booking.getListing().getAddressLine() != null ? booking.getListing().getAddressLine() : "Dhaka");
-        body.add("cus_city", booking.getListing().getCity() != null ? booking.getListing().getCity() : "Dhaka");
-        body.add("cus_country", "Bangladesh");
-        body.add("cus_phone", guest.getPhone() != null ? guest.getPhone() : "+8801700000000");
-
-        // Product details
-        body.add("product_name", booking.getListing().getTitle());
-        body.add("product_category", "Vacation Rental");
-        body.add("product_profile", "general");
-        body.add("shipping_method", "NO");
-        body.add("num_of_item", "1");
-
         try {
-            log.info("Initiating SSLCommerz session for booking reference={}, tranId={}", booking.getReference(), tranId);
+            // Customer details (with defensive null checks)
+            String firstName = (guest != null && guest.getFirstName() != null) ? guest.getFirstName().trim() : "";
+            String lastName = (guest != null && guest.getLastName() != null) ? guest.getLastName().trim() : "";
+            String guestName = (firstName + " " + lastName).trim();
+            body.add("cus_name", !guestName.isEmpty() ? guestName : "Guest");
+
+            String guestEmail = (guest != null && guest.getEmail() != null) ? guest.getEmail().trim() : "";
+            body.add("cus_email", !guestEmail.isEmpty() ? guestEmail : "guest@haven.test");
+
+            var listing = booking.getListing();
+            String address = (listing != null && listing.getAddressLine() != null) ? listing.getAddressLine().trim() : "";
+            body.add("cus_add1", !address.isEmpty() ? address : "Dhaka");
+
+            String city = (listing != null && listing.getCity() != null) ? listing.getCity().trim() : "";
+            body.add("cus_city", !city.isEmpty() ? city : "Dhaka");
+            body.add("cus_country", "Bangladesh");
+
+            String phone = (guest != null && guest.getPhone() != null) ? guest.getPhone().trim() : "";
+            body.add("cus_phone", !phone.isEmpty() ? phone : "+8801700000000");
+
+            // Product details
+            String title = (listing != null && listing.getTitle() != null) ? listing.getTitle().trim() : "";
+            body.add("product_name", !title.isEmpty() ? title : "Haven Stay");
+            body.add("product_category", "Vacation Rental");
+            body.add("product_profile", "general");
+            body.add("shipping_method", "NO");
+            body.add("num_of_item", "1");
+
+            log.info("Initiating SSLCommerz session for booking reference={}, tranId={}, currency={}", booking.getReference(), tranId, currency);
             String rawResponse = restClient.post()
                     .uri(sslProps.getSessionUrl())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)

@@ -59,12 +59,13 @@ app:
     # Which PaymentGateway bean is active: fake (scripted test outcomes),
     # stripe (real card charges; requires STRIPE_API_KEY), or sslcommerz.
     gateway: ${APP_PAYMENT_GATEWAY:sslcommerz}
-    currency: ${APP_PAYMENT_CURRENCY:bdt}
+    currency: ${APP_PAYMENT_CURRENCY:usd}
   sslcommerz:
     store-id: ${SSLCOMMERZ_STORE_ID:testbox}
     store-password: ${SSLCOMMERZ_STORE_PASSWORD:qwerty}
     sandbox: ${SSLCOMMERZ_SANDBOX:true}
     backend-url: ${APP_BACKEND_URL:http://localhost:8080}
+    currency: ${SSLCOMMERZ_CURRENCY:USD}
   stripe:
     api-key: ${STRIPE_API_KEY:}
   review:

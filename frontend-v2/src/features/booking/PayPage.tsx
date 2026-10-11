@@ -286,7 +286,7 @@ export const PayPage: React.FC = () => {
       if (api?.code === 'BOOKING_EXPIRED') {
         setFailure({ code: 'BOOKING_EXPIRED', failureCode: null });
       } else {
-        toast.error('Could not connect to payment gateway');
+        toast.error(api?.message || 'Could not connect to payment gateway');
       }
       setPaying(false);
     }
@@ -484,7 +484,7 @@ export const PayPage: React.FC = () => {
                     : 'text-muted hover:text-text'
                 )}
               >
-                SSLCommerz (BDT)
+                SSLCommerz
               </button>
               <button
                 type="button"

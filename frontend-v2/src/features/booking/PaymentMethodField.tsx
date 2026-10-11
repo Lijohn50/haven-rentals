@@ -63,11 +63,11 @@ export const SslCommerzPaymentField: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-primary-soft text-lg font-bold text-primary-dark">
-              ৳
+              $
             </span>
             <div>
               <p className="text-sm font-semibold text-ink">SSLCommerz Hosted Gateway</p>
-              <p className="text-xs text-muted">Direct BDT payment via Bangladesh's secure payment gateway</p>
+              <p className="text-xs text-muted">Direct USD payment via SSLCommerz secure payment gateway</p>
             </div>
           </div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success-text">
@@ -79,6 +79,9 @@ export const SslCommerzPaymentField: React.FC = () => {
         <div className="mt-4 border-t border-line pt-3">
           <p className="mb-2 text-xs font-medium text-muted">Supported payment options:</p>
           <div className="flex flex-wrap gap-2 text-xs">
+            <span className="inline-flex items-center rounded-control border border-primary/20 bg-primary-soft px-2.5 py-1 font-semibold text-primary-dark">
+              Visa / Mastercard / Amex
+            </span>
             <span className="inline-flex items-center rounded-control border border-[#e2136e]/20 bg-[#e2136e]/10 px-2.5 py-1 font-semibold text-[#e2136e]">
               bKash
             </span>
@@ -88,11 +91,8 @@ export const SslCommerzPaymentField: React.FC = () => {
             <span className="inline-flex items-center rounded-control border border-[#8c2e8a]/20 bg-[#8c2e8a]/10 px-2.5 py-1 font-semibold text-[#8c2e8a]">
               Rocket
             </span>
-            <span className="inline-flex items-center rounded-control border border-primary/20 bg-primary-soft px-2.5 py-1 font-semibold text-primary-dark">
-              Visa / Mastercard
-            </span>
             <span className="inline-flex items-center rounded-control border border-line bg-surface px-2.5 py-1 font-medium text-ink">
-              DBBL Nexus & Internet Banking
+              Internet Banking
             </span>
           </div>
         </div>
@@ -100,7 +100,7 @@ export const SslCommerzPaymentField: React.FC = () => {
 
       <div className="flex items-center gap-2 rounded-control bg-bg px-3 py-2 text-xs text-muted">
         <Lock className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
-        <span>You will be securely redirected to SSLCommerz to complete the payment in Bangladeshi Taka (৳).</span>
+        <span>You will be securely redirected to SSLCommerz to complete the payment in USD ($).</span>
       </div>
     </div>
   );

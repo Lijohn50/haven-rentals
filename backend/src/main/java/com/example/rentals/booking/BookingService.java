@@ -196,8 +196,9 @@ public class BookingService {
 
     @Transactional
     public Booking getValidPendingBooking(Long guestId, Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        Booking booking = bookingRepository.findByIdWithListingAndGuest(bookingId)
+                .orElseGet(() -> bookingRepository.findById(bookingId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Booking not found")));
 
         if (!booking.getGuest().getId().equals(guestId)) {
             throw new ResourceNotFoundException("Booking not found");
@@ -292,7 +293,9 @@ public class BookingService {
 
     @Transactional
     public Booking finalizeSslCommerzPayment(String tranId, String valId, BigDecimal amount) {
-        return finalizeSslCommerzPayment(tranId, valId, amount, "BDT", null);
+        String configuredCurrency = appProperties.getSslcommerz().getCurrency();
+        String defaultCurrency = (configuredCurrency != null && !configuredCurrency.isBlank()) ? configuredCurrency.trim().toUpperCase() : "USD";
+        return finalizeSslCommerzPayment(tranId, valId, amount, defaultCurrency, null);
     }
 
     @Transactional
@@ -307,10 +310,12 @@ public class BookingService {
         }
 
         // Amount & Currency Verification
-        if (currency == null || !"BDT".equalsIgnoreCase(currency.trim())) {
-            log.error("SSLCommerz currency mismatch for tranId={}: expected BDT, got {}", tranId, currency);
-            failSslCommerzPayment(tranId, "Currency mismatch: expected BDT but got " + currency);
-            throw new ApiException(ErrorCode.PAYMENT_FAILED, HttpStatus.BAD_REQUEST, "Payment currency must be BDT");
+        String configuredCurrency = appProperties.getSslcommerz().getCurrency();
+        String expectedCurrency = (configuredCurrency != null && !configuredCurrency.isBlank()) ? configuredCurrency.trim().toUpperCase() : "USD";
+        if (currency == null || (!expectedCurrency.equalsIgnoreCase(currency.trim()) && !"BDT".equalsIgnoreCase(currency.trim()))) {
+            log.error("SSLCommerz currency mismatch for tranId={}: expected {} or BDT, got {}", tranId, expectedCurrency, currency);
+            failSslCommerzPayment(tranId, "Currency mismatch: expected " + expectedCurrency + " but got " + currency);
+            throw new ApiException(ErrorCode.PAYMENT_FAILED, HttpStatus.BAD_REQUEST, "Payment currency must be " + expectedCurrency);
         }
 
         if (amount == null || amount.compareTo(booking.getTotalAmount()) != 0) {

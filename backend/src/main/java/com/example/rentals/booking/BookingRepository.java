@@ -22,6 +22,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
     @Query("SELECT b FROM Booking b WHERE b.id = :id")
     Optional<Booking> findByIdForUpdate(@Param("id") Long id);
 
+    @Query("SELECT b FROM Booking b JOIN FETCH b.listing JOIN FETCH b.guest WHERE b.id = :id")
+    Optional<Booking> findByIdWithListingAndGuest(@Param("id") Long id);
+
     Optional<Booking> findByReference(String reference);
 
     Optional<Booking> findByGuestIdAndIdempotencyKey(Long guestId, String idempotencyKey);

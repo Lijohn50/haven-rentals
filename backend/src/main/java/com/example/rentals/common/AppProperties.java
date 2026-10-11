@@ -117,6 +117,7 @@ public class AppProperties {
         private String storePassword = "qwerty";
         private boolean sandbox = true;
         private String backendUrl = "http://localhost:8080";
+        private String currency = "USD";
 
         public String getSessionUrl() {
             return sandbox
