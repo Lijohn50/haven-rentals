@@ -103,7 +103,7 @@ const Carousel: React.FC<{ label: string; listings: SearchResultResponse[] }> = 
         {listings.map((listing) => (
           <div
             key={listing.id}
-            className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]"
+            className="flex w-[85%] shrink-0 snap-start flex-col sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]"
           >
             <ListingCard listing={listing} layout="stack" />
           </div>
@@ -113,7 +113,7 @@ const Carousel: React.FC<{ label: string; listings: SearchResultResponse[] }> = 
         variant="outline"
         size="icon"
         className={cn(
-          'absolute -left-3.5 top-[36%] z-10 hidden -translate-y-1/2 rounded-full bg-surface shadow-card transition-opacity duration-150 md:inline-flex',
+          'absolute -left-4 top-[110px] z-10 hidden -translate-y-1/2 rounded-full bg-surface shadow-card transition-opacity duration-150 md:inline-flex',
           edges.start ? 'pointer-events-none opacity-0' : 'opacity-100'
         )}
         onClick={() => scrollBy(-1)}
@@ -126,7 +126,7 @@ const Carousel: React.FC<{ label: string; listings: SearchResultResponse[] }> = 
         variant="outline"
         size="icon"
         className={cn(
-          'absolute -right-3.5 top-[36%] z-10 hidden -translate-y-1/2 rounded-full bg-surface shadow-card transition-opacity duration-150 md:inline-flex',
+          'absolute -right-4 top-[110px] z-10 hidden -translate-y-1/2 rounded-full bg-surface shadow-card transition-opacity duration-150 md:inline-flex',
           edges.end ? 'pointer-events-none opacity-0' : 'opacity-100'
         )}
         onClick={() => scrollBy(1)}
@@ -164,7 +164,7 @@ const CardCarousel: React.FC<{
           {[0, 1, 2, 3].map((slot) => (
             <div
               key={slot}
-              className="w-[85%] shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]"
+              className="flex w-[85%] shrink-0 snap-start flex-col sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(25%-0.75rem)]"
             >
               <ListingCardSkeleton layout="stack" />
             </div>
@@ -257,8 +257,8 @@ const PropertyTypeChip: React.FC<{ type: PropertyType }> = ({ type }) => {
 };
 
 const PropertyTypeStripSection: React.FC = () => (
-  <section aria-label="Property types" className={cn(SECTION, 'py-8')}>
-    <nav className="flex gap-3 overflow-x-auto pb-1">
+  <section aria-label="Property types" className={SECTION}>
+    <nav className="flex gap-3 overflow-x-auto py-2 scrollbar-none">
       {PROPERTY_TYPE_ORDER.map((type) => (
         <PropertyTypeChip key={type} type={type} />
       ))}
@@ -295,7 +295,7 @@ const TrustBar: React.FC = () => (
   <section aria-label="Why book with us" className="border-y border-line bg-surface">
     <ul className={cn(SECTION, 'grid gap-6 py-8 sm:grid-cols-2 lg:grid-cols-4')}>
       {TRUST_ITEMS.map(({ title, body, Icon }) => (
-        <li key={title} className="flex gap-3">
+        <li key={title} className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary-soft text-primary-dark">
             <Icon className="h-5 w-5" aria-hidden />
           </span>
@@ -344,8 +344,11 @@ const PopularDestinations: React.FC = () => {
 
       {survivors.length === 0 && !allResolved && (
         <section aria-label="Popular destinations" className={SECTION}>
-          <Skeleton className="h-8 w-64" />
-          <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="mb-6 flex flex-col gap-1">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {[0, 1, 2, 3].map((slot) => (
               <Skeleton key={slot} className="h-20 w-full rounded-card" />
             ))}
@@ -403,7 +406,7 @@ const HowItWorks: React.FC = () => (
       <SectionHeader title="How it works" to={ROUTES.HOW_IT_WORKS} linkLabel="More detail" />
       <ol className="grid gap-6 md:grid-cols-3">
         {STEPS.map(({ title, body, Icon }, index) => (
-          <li key={title} className="flex gap-3">
+          <li key={title} className="flex items-start gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-white">
               <Icon className="h-5 w-5" aria-hidden />
             </span>
@@ -492,12 +495,12 @@ const FAQS: { question: string; answer: React.ReactNode }[] = [
 ];
 
 const Faq: React.FC = () => (
-  <section aria-label="Frequently asked questions" className={cn(SECTION, 'py-12')}>
+  <section aria-label="Frequently asked questions" className={SECTION}>
     <SectionHeader
       title="Questions people ask"
       sub="Common questions about booking, cancellation policies and verified reviews"
     />
-    <Accordion type="single" collapsible className="mt-4">
+    <Accordion type="single" collapsible>
       {FAQS.map((item) => (
         <AccordionItem key={item.question} value={item.question}>
           <AccordionTrigger>{item.question}</AccordionTrigger>
@@ -518,7 +521,7 @@ export const LandingPage: React.FC = () => {
   setCanonical(ROUTES.HOME);
 
   return (
-    <div className="flex flex-col gap-12 sm:gap-14 pb-16">
+    <div className="flex flex-col gap-12 sm:gap-14 pb-8 sm:pb-12">
       <Hero />
       <PropertyTypeStripSection />
       <TrustBar />

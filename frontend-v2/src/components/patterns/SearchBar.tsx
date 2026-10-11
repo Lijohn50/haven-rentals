@@ -204,7 +204,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
     <div className={cn('w-full', shell)}>
       <div className={cn('rounded-hero border border-line bg-surface p-2 shadow-pop', hero && 'sm:p-2.5')}>
         <div className="grid gap-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,0.9fr)_auto] lg:items-stretch lg:gap-0">
-          <div className={cn('relative flex min-w-0 flex-col justify-center rounded-control px-3 transition-shadow focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/30', segmentHeight)}>
+          <div className={cn('relative flex min-w-0 flex-col justify-center rounded-control px-3 py-1.5 transition-shadow focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/30 lg:py-0', segmentHeight)}>
             <label htmlFor={inputId} className={segmentLabel}>
               Where to?
             </label>
@@ -219,7 +219,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
                 aria-activedescendant={showList && active >= 0 ? `${listId}-${active}` : undefined}
                 autoComplete="off"
                 className={cn(
-                  'h-6 rounded-none border-0 bg-transparent pl-6 pr-0 leading-6 placeholder:text-muted/70 focus:border-transparent focus:ring-0 focus:outline-none',
+                  'h-6 rounded-none border-0 bg-transparent py-0 pl-6 pr-0 leading-6 placeholder:text-muted/70 focus:border-transparent focus:ring-0 focus:outline-none',
                   hero ? 'text-base' : 'text-sm'
                 )}
                 placeholder="City or town"
@@ -274,7 +274,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
               <button
                 type="button"
                 className={cn(
-                  'flex min-w-0 flex-col justify-center rounded-control lg:border-l lg:border-line px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40',
+                  'flex min-w-0 flex-col justify-center rounded-control px-3 py-1.5 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 lg:border-l lg:border-line lg:py-0',
                   segmentHeight
                 )}
               >
@@ -335,7 +335,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
               <button
                 type="button"
                 className={cn(
-                  'flex min-w-0 flex-col justify-center rounded-control lg:border-l lg:border-line px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40',
+                  'flex min-w-0 flex-col justify-center rounded-control px-3 py-1.5 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 lg:border-l lg:border-line lg:py-0',
                   segmentHeight
                 )}
               >
@@ -361,7 +361,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
             </PopoverContent>
           </Popover>
 
-          <div className="flex items-stretch lg:border-l lg:border-line lg:pl-2">
+          <div className="flex items-center justify-center lg:border-l lg:border-line lg:pl-2">
             <Button
               size={hero ? 'lg' : 'md'}
               onClick={() => submit(true)}
@@ -373,7 +373,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
           </div>
         </div>
 
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 px-1">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 px-3">
           {dateError && !datesOpen ? (
             <InlineAlert tone="warning">{dateError}</InlineAlert>
           ) : (

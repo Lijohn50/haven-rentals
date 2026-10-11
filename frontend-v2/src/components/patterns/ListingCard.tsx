@@ -215,13 +215,13 @@ export const DestinationTile: React.FC<{
 }> = ({ city, country, homes }) => (
   <Link
     to={`${ROUTES.SEARCH}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}`}
-    className="flex items-center justify-between rounded-card border border-line bg-surface p-4 transition-colors hover:border-primary"
+    className="flex items-center justify-between gap-3 rounded-card border border-line bg-surface p-4 transition-colors hover:border-primary"
   >
-    <span>
-      <span className="block text-sm font-semibold text-ink">{city}</span>
-      <span className="block text-xs text-muted">{country}</span>
+    <span className="min-w-0 pr-1">
+      <span className="block truncate text-sm font-semibold text-ink">{city}</span>
+      <span className="block truncate text-xs text-muted">{country}</span>
     </span>
-    <span className="flex items-center gap-1 text-xs text-muted">
+    <span className="flex shrink-0 items-center gap-1 text-xs text-muted">
       <MapPin className="h-3.5 w-3.5" aria-hidden />
       {homes} {homes === 1 ? 'home' : 'homes'}
     </span>
