@@ -36,10 +36,13 @@ export const FakePaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenCha
 
   return (
     <div className="flex flex-col gap-3">
-      <Banner tone="warning" className="items-center" title="Test mode">
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide">
-          <FlaskConical className="h-3.5 w-3.5" aria-hidden />
-          No real card is charged. Pick the outcome the fake gateway should return.
+      <Banner
+        tone="warning"
+        icon={<FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden />}
+        title="Test simulation mode"
+      >
+        <span className="text-xs text-muted">
+          No real card is charged. Pick the scripted outcome the test gateway should return.
         </span>
       </Banner>
 
@@ -56,47 +59,49 @@ export const FakePaymentField: React.FC<PaymentMethodFieldProps> = ({ onTokenCha
 export const SslCommerzPaymentField: React.FC = () => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-xl border border-line bg-surface-subtle p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold text-base">
+      <div className="rounded-card border border-line bg-bg/50 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-primary-soft text-lg font-bold text-primary-dark">
               ৳
             </span>
             <div>
               <p className="text-sm font-semibold text-ink">SSLCommerz Hosted Gateway</p>
-              <p className="text-xs text-muted">Direct BDT payment via Bangladesh's payment gateway</p>
+              <p className="text-xs text-muted">Direct BDT payment via Bangladesh's secure payment gateway</p>
             </div>
           </div>
-          <span className="rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success-text">
+            <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
             Sandbox Active
           </span>
         </div>
 
-        <div className="mt-4 border-t border-line/60 pt-3">
-          <p className="mb-2 text-xs font-medium text-muted">Supported Payment Methods:</p>
+        <div className="mt-4 border-t border-line pt-3">
+          <p className="mb-2 text-xs font-medium text-muted">Supported payment options:</p>
           <div className="flex flex-wrap gap-2 text-xs">
-            <span className="inline-flex items-center rounded-md bg-[#e2136e]/10 px-2.5 py-1 font-semibold text-[#e2136e]">
+            <span className="inline-flex items-center rounded-control border border-[#e2136e]/20 bg-[#e2136e]/10 px-2.5 py-1 font-semibold text-[#e2136e]">
               bKash
             </span>
-            <span className="inline-flex items-center rounded-md bg-[#f7941d]/10 px-2.5 py-1 font-semibold text-[#f7941d]">
+            <span className="inline-flex items-center rounded-control border border-[#f7941d]/20 bg-[#f7941d]/10 px-2.5 py-1 font-semibold text-[#f7941d]">
               Nagad
             </span>
-            <span className="inline-flex items-center rounded-md bg-[#8c2e8a]/10 px-2.5 py-1 font-semibold text-[#8c2e8a]">
+            <span className="inline-flex items-center rounded-control border border-[#8c2e8a]/20 bg-[#8c2e8a]/10 px-2.5 py-1 font-semibold text-[#8c2e8a]">
               Rocket
             </span>
-            <span className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 font-semibold text-primary">
+            <span className="inline-flex items-center rounded-control border border-primary/20 bg-primary-soft px-2.5 py-1 font-semibold text-primary-dark">
               Visa / Mastercard
             </span>
-            <span className="inline-flex items-center rounded-md bg-ink/5 px-2.5 py-1 font-medium text-ink">
+            <span className="inline-flex items-center rounded-control border border-line bg-surface px-2.5 py-1 font-medium text-ink">
               DBBL Nexus & Internet Banking
             </span>
           </div>
         </div>
       </div>
 
-      <p className="text-xs text-muted">
-        When you proceed, you will be redirected to the secure SSLCommerz payment portal to complete your transaction in Bangladeshi Taka (৳).
-      </p>
+      <div className="flex items-center gap-2 rounded-control bg-bg px-3 py-2 text-xs text-muted">
+        <Lock className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+        <span>You will be securely redirected to SSLCommerz to complete the payment in Bangladeshi Taka (৳).</span>
+      </div>
     </div>
   );
 };

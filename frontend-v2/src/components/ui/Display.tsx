@@ -251,11 +251,11 @@ export const StatCard: React.FC<{
 );
 
 const BANNER_TONES: Record<Tone, { wrapper: string; Icon: typeof Info }> = {
-  info: { wrapper: 'bg-info-soft text-info-text', Icon: Info },
-  warning: { wrapper: 'bg-warning-soft text-warning-text', Icon: AlertTriangle },
-  danger: { wrapper: 'bg-danger-soft text-danger-text', Icon: XCircle },
-  success: { wrapper: 'bg-success-soft text-success-text', Icon: Info },
-  neutral: { wrapper: 'bg-neutral-soft text-neutral-text', Icon: Info },
+  info: { wrapper: 'border-info/20 bg-info-soft text-info-text', Icon: Info },
+  warning: { wrapper: 'border-warning/30 bg-warning-soft text-warning-text', Icon: AlertTriangle },
+  danger: { wrapper: 'border-danger/30 bg-danger-soft text-danger-text', Icon: XCircle },
+  success: { wrapper: 'border-success/20 bg-success-soft text-success-text', Icon: Info },
+  neutral: { wrapper: 'border-neutral/20 bg-neutral-soft text-neutral-text', Icon: Info },
 };
 
 export const Banner: React.FC<{
@@ -263,12 +263,13 @@ export const Banner: React.FC<{
   title?: React.ReactNode;
   children?: React.ReactNode;
   action?: React.ReactNode;
+  icon?: React.ReactNode;
   className?: string;
-}> = ({ tone = 'info', title, children, action, className }) => {
+}> = ({ tone = 'info', title, children, action, icon, className }) => {
   const { wrapper, Icon } = BANNER_TONES[tone];
   return (
-    <div role="status" className={cn('flex flex-wrap items-center gap-3 rounded-control px-4 py-3 text-sm', wrapper, className)}>
-      <Icon className="h-4 w-4 shrink-0" aria-hidden />
+    <div role="status" className={cn('flex flex-wrap items-start gap-3 rounded-control border px-4 py-3 text-sm', wrapper, className)}>
+      {icon !== undefined ? icon : <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />}
       <div className="min-w-0 flex-1">
         {title && <p className="font-medium">{title}</p>}
         {children && <div className={cn(title && 'mt-0.5')}>{children}</div>}

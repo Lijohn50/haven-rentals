@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Copy, Timer } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Copy, Lock, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApiError } from '@/api/errors';
 import { BRAND } from '@/config/brand';
@@ -16,8 +16,10 @@ import { CountdownPill } from '@/components/patterns/Countdown';
 import { PriceBreakdown } from '@/components/patterns/PriceBreakdown';
 import { useCountdown } from '@/hooks/useUtilities';
 import { useDocumentTitle } from '@/hooks/useSeo';
+import { cn } from '@/lib/cn';
 import { formatDateRange } from '@/lib/local-date';
 import { formatMoney } from '@/lib/money';
+import { mediaUrl, PLACEHOLDER_IMAGE } from '@/lib/media-url';
 import {
   Banner,
   Button,
@@ -328,67 +330,116 @@ export const PayPage: React.FC = () => {
 
   return (
     <div className="mx-auto grid max-w-content gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-      {/* Spans both columns, for the same reason as on the checkout step: the pay button used
-          to start above the payment card instead of level with it. */}
+      {/* Page Header with Step Indicator */}
       <div className="lg:col-span-2">
         <Link
           to={ROUTES.TRIP(stay.reference)}
-          className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Back to trip {stay.reference}
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-ink">Pay for your stay</h1>
-        <p className="mt-1 text-sm text-muted">
-          <span className="text-muted">1 Review · </span>
-          <span className="font-medium text-primary-dark">2 Pay</span>
-        </p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold text-ink sm:text-3xl">Pay for your stay</h1>
+          <div className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs">
+            <span className="flex items-center gap-1 text-muted">
+              <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+              1 Review
+            </span>
+            <span className="text-muted">/</span>
+            <span className="font-semibold text-primary-dark">2 Payment</span>
+          </div>
+        </div>
       </div>
 
       <div className="flex min-w-0 flex-col gap-5">
+        {/* Reservation Hold Warning / Countdown Card */}
         {expired ? (
-          <Banner tone="danger" title="Your hold expired">
-            These dates are available to other guests again. Pick new dates or start a fresh hold.
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button asChild variant="outline" size="sm">
-                <Link to={ROUTES.LISTING(stay.listing.id)}>Back to the listing</Link>
-              </Button>
-              <Button variant="outline" size="sm" onClick={startAgain}>
-                Start again
-              </Button>
-            </div>
-          </Banner>
-        ) : (
-          <Banner
-            tone={hold.urgent ? 'warning' : 'info'}
-            title={
-              <span className="inline-flex items-center gap-2">
-                <Timer className="h-4 w-4" aria-hidden />
-                Your dates are held for{' '}
-                <span aria-live="polite" className="tabular font-semibold">
-                  {hold.label}
-                </span>
-              </span>
-            }
+          <div
+            role="alert"
+            className="flex flex-col gap-3 rounded-card border border-danger/30 bg-danger-soft/70 p-4 text-danger-text sm:flex-row sm:items-start sm:justify-between"
           >
-            {stay.listing.title} · {formatDateRange(stay.checkIn, stay.checkOut)}
-          </Banner>
+            <div className="flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-danger-soft text-danger">
+                <Timer className="h-5 w-5" aria-hidden />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-ink">Your hold has expired</h2>
+                <p className="mt-1 text-sm text-muted">
+                  These dates are available to other guests again. Pick new dates or start a fresh hold.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={ROUTES.LISTING(stay.listing.id)}>Back to the listing</Link>
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={startAgain}>
+                    Start again
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            role="status"
+            className={cn(
+              'rounded-card border p-4 transition-all',
+              hold.urgent
+                ? 'border-warning/60 bg-warning-soft/50 shadow-sm'
+                : 'border-primary/20 bg-primary-soft/30'
+            )}
+          >
+            <div className="flex items-center gap-3.5">
+              <div
+                className={cn(
+                  'grid h-10 w-10 shrink-0 place-items-center rounded-full',
+                  hold.urgent
+                    ? 'bg-warning-soft text-warning-text'
+                    : 'bg-primary-soft text-primary-dark'
+                )}
+              >
+                <Timer className="h-5 w-5" aria-hidden />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-ink">Your dates are held for</span>
+                  <span
+                    aria-live="polite"
+                    className={cn(
+                      'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold tabular tracking-wide shadow-xs',
+                      hold.urgent
+                        ? 'bg-danger text-white animate-pulse'
+                        : 'bg-primary text-white'
+                    )}
+                  >
+                    {hold.label}
+                  </span>
+                </div>
+                <p className="mt-0.5 truncate text-xs text-muted">
+                  {stay.listing.title} · {formatDateRange(stay.checkIn, stay.checkOut)}
+                </p>
+              </div>
+            </div>
+          </div>
         )}
 
         {paymentParam === 'failed' && (
-          <InlineAlert tone="danger">
-            Payment via SSLCommerz was declined or did not complete. Your dates are still reserved until expiry. You can retry with SSLCommerz or choose another option below.
+          <InlineAlert tone="danger" className="border border-danger/30">
+            <span className="block font-semibold">Payment was not completed</span>
+            Payment via SSLCommerz was declined or did not complete. Your dates are still reserved until the timer expires. You can retry with SSLCommerz or choose another option below.
           </InlineAlert>
         )}
 
         {paymentParam === 'cancelled' && (
-          <InlineAlert tone="warning">
-            Payment session was cancelled. You can complete your booking anytime before the hold expires.
+          <InlineAlert tone="warning" className="border border-warning/30">
+            <span className="block font-semibold">Payment session cancelled</span>
+            The payment session was cancelled. Your dates remain held and you can complete payment anytime before the hold expires.
           </InlineAlert>
         )}
 
         {failure && failureText && (
-          <InlineAlert tone={failed ? 'danger' : 'warning'}>
+          <InlineAlert tone={failed ? 'danger' : 'warning'} className="border border-line">
+            <span className="block font-semibold">Payment error</span>
             {failureText}
             {failed && (
               <span className="mt-1 block text-xs">
@@ -405,29 +456,35 @@ export const PayPage: React.FC = () => {
           </p>
         )}
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between border-b border-line pb-3">
-            <h2 className="text-base font-semibold text-ink">Payment method</h2>
-            <div className="flex rounded-lg border border-line bg-surface-subtle p-0.5 text-xs font-medium">
+        {/* Payment Method Selection Card */}
+        <Card className="p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-line pb-4">
+            <div>
+              <h2 className="text-base font-semibold text-ink">Payment method</h2>
+              <p className="text-xs text-muted">Select how you'd like to pay</p>
+            </div>
+            <div className="inline-flex rounded-control border border-line bg-bg p-1 text-xs font-medium">
               <button
                 type="button"
                 onClick={() => setPaymentMethod('sslcommerz')}
-                className={`rounded-md px-3 py-1 transition ${
+                className={cn(
+                  'rounded-[6px] px-3 py-1.5 transition-all',
                   paymentMethod === 'sslcommerz'
-                    ? 'bg-surface font-semibold text-primary shadow-xs'
+                    ? 'bg-surface font-semibold text-primary-dark shadow-card'
                     : 'text-muted hover:text-ink'
-                }`}
+                )}
               >
                 SSLCommerz (BDT)
               </button>
               <button
                 type="button"
                 onClick={() => setPaymentMethod('simulated')}
-                className={`rounded-md px-3 py-1 transition ${
+                className={cn(
+                  'rounded-[6px] px-3 py-1.5 transition-all',
                   paymentMethod === 'simulated'
-                    ? 'bg-surface font-semibold text-primary shadow-xs'
+                    ? 'bg-surface font-semibold text-primary-dark shadow-card'
                     : 'text-muted hover:text-ink'
-                }`}
+                )}
               >
                 Test Sim
               </button>
@@ -453,8 +510,33 @@ export const PayPage: React.FC = () => {
         )}
       </div>
 
+      {/* Right Column: Trip Summary, Price Breakdown, and CTA */}
       <div className="lg:w-80 lg:shrink-0">
-        <div className="flex flex-col gap-3 lg:sticky lg:top-24">
+        <div className="flex flex-col gap-4 lg:sticky lg:top-24">
+          <Card className="p-4">
+            <div className="flex gap-3">
+              <img
+                src={mediaUrl(stay.listing.coverPhotoUrl) ?? PLACEHOLDER_IMAGE}
+                alt={stay.listing.title}
+                className="h-20 w-24 shrink-0 rounded-control object-cover border border-line"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-wide text-muted">
+                  {stay.listing.city}, {stay.listing.country}
+                </p>
+                <h3 className="truncate text-sm font-semibold text-ink">
+                  {stay.listing.title}
+                </h3>
+                <p className="mt-0.5 text-xs text-muted">
+                  Hosted by {stay.host.displayName}
+                </p>
+                <p className="mt-1 text-xs font-medium text-ink">
+                  {formatDateRange(stay.checkIn, stay.checkOut)} · {stay.nights} {stay.nights === 1 ? 'night' : 'nights'}
+                </p>
+              </div>
+            </div>
+          </Card>
+
           <PriceBreakdown breakdown={stay.priceBreakdown} nights={stay.nights} />
 
           <Button
@@ -470,15 +552,19 @@ export const PayPage: React.FC = () => {
               : `Pay ${formatMoney(total)} and ${requested ? 'send request' : 'book'}`}
           </Button>
 
+          <div className="flex items-center justify-center gap-1.5 text-xs text-muted">
+            <Lock className="h-3.5 w-3.5 text-primary" aria-hidden />
+            <span>Guaranteed safe & secure payment</span>
+          </div>
+
           {failed && (
             <Button variant="outline" block onClick={startAgain}>
               Start again
             </Button>
           )}
 
-          <p className="text-xs text-muted">
-            The amount above is the snapshot taken when your hold was created. The browser never
-            sends an amount, only the payment token.
+          <p className="text-center text-xs text-muted">
+            The total amount is guaranteed from your reservation snapshot.
           </p>
         </div>
       </div>
