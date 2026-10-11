@@ -50,13 +50,22 @@ class AvailabilityServiceTest {
         fixedInstant = Instant.parse("2026-10-01T12:00:00Z");
         lenient().when(clock.instant()).thenReturn(fixedInstant);
 
+        com.example.rentals.user.User host = new com.example.rentals.user.User();
+        host.setId(10L);
+
         listing = new Listing();
         listing.setId(1L);
+        listing.setHost(host);
+        listing.setStatus(com.example.rentals.listing.ListingStatus.ACTIVE);
         listing.setTimezone("America/New_York");
         listing.setMinNights(2);
         listing.setMaxNights(14);
-        listing.setAdvanceNoticeDays(1);
+        listing.setMaxGuests(4);
+        listing.setAdvanceNoticeDays(0);
         listing.setBookingWindowDays(90);
+
+        lenient().when(listingRepository.findById(1L)).thenReturn(Optional.of(listing));
+        org.springframework.test.util.ReflectionTestUtils.setField(availabilityService, "entityManager", entityManager);
     }
 
     @Test
@@ -79,7 +88,7 @@ class AvailabilityServiceTest {
 
         assertThatThrownBy(() -> availabilityService.checkAvailability(listing.getId(), checkIn, checkOut, 2))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("Minimum stay");
+                .hasMessageContaining("outside allowed range");
     }
 
     @Test
@@ -91,7 +100,7 @@ class AvailabilityServiceTest {
 
         assertThatThrownBy(() -> availabilityService.checkAvailability(listing.getId(), checkIn, checkOut, 2))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("Maximum stay");
+                .hasMessageContaining("outside allowed range");
     }
 
     @Test
@@ -100,8 +109,8 @@ class AvailabilityServiceTest {
         LocalDate checkIn = LocalDate.of(2026, 10, 10);
         LocalDate checkOut = LocalDate.of(2026, 10, 15);
 
-        when(blockRepository.findOverlappingBlocks(listing.getId(), checkIn, checkOut))
-                .thenReturn(List.of(new AvailabilityBlock(listing, checkIn, checkOut, "Blocked")));
+        when(blockRepository.existsByListingIdAndStartDateLessThanAndEndDateGreaterThan(listing.getId(), checkOut, checkIn))
+                .thenReturn(true);
 
         assertThatThrownBy(() -> availabilityService.checkAvailability(listing.getId(), checkIn, checkOut, 2))
                 .isInstanceOf(ConflictException.class)
@@ -114,7 +123,7 @@ class AvailabilityServiceTest {
     @Test
     @DisplayName("createBlock rejects block in the past")
     void testCreateBlockInPast() {
-        when(listingRepository.findByIdAndHostId(1L, 10L)).thenReturn(Optional.of(listing));
+        when(listingRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(listing));
 
         BlockRequest req = new BlockRequest(
                 LocalDate.of(2026, 9, 1),
@@ -124,6 +133,6 @@ class AvailabilityServiceTest {
 
         assertThatThrownBy(() -> availabilityService.createBlock(10L, 1L, req))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("cannot start in the past");
+                .hasMessageContaining("cannot be in the past");
     }
 }

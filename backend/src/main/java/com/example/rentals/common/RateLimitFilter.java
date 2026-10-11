@@ -32,7 +32,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         return !(path.startsWith("/api/v1/auth/login") ||
                  path.startsWith("/api/v1/auth/register") ||
-                 path.startsWith("/api/v1/auth/forgot-password"));
+                 path.startsWith("/api/v1/auth/forgot-password") ||
+                 path.matches(".*/sslcommerz/initiate"));
     }
 
     @Override
@@ -41,7 +42,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String ip = getClientIp(request);
         long currentMinute = Instant.now().getEpochSecond() / 60;
-        String key = ip + ":" + currentMinute;
+        String bucket = request.getRequestURI().contains("/sslcommerz/initiate") ? "ssl" : "auth";
+        String key = ip + ":" + bucket + ":" + currentMinute;
 
         WindowCounter counter = requestCounts.computeIfAbsent(key, k -> new WindowCounter(currentMinute));
         if (counter.incrementAndGet() > MAX_REQUESTS_PER_MINUTE) {

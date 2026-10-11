@@ -228,8 +228,18 @@ public class BookingService {
             // Check if expired in the meantime
             if (booking.getExpiresAt() != null && booking.getExpiresAt().isBefore(now)) {
                 log.warn("Payment succeeded but hold expired for booking id={}", bookingId);
+                if (payment != null) {
+                    payment.setStatus(PaymentStatus.SUCCEEDED);
+                    payment.setProviderReference(result.providerReference());
+                    paymentRepository.save(payment);
+                }
+                booking.transitionTo(BookingStatus.EXPIRED, guest);
+                recordHistory(booking, BookingStatus.PENDING_PAYMENT.name(), BookingStatus.EXPIRED.name(), guestId, "SYSTEM",
+                        "Payment received after hold expired; refund has been issued");
+                booking = bookingRepository.save(booking);
+
                 refundService.issueRefund(booking, booking.getTotalAmount(), RefundReason.LATE_PAYMENT, null);
-                throw new ConflictException(ErrorCode.BOOKING_EXPIRED, "Payment received after hold expired; refund has been issued");
+                return toResponse(booking, guestId);
             }
 
             if (payment != null) {
@@ -282,6 +292,11 @@ public class BookingService {
 
     @Transactional
     public Booking finalizeSslCommerzPayment(String tranId, String valId, BigDecimal amount) {
+        return finalizeSslCommerzPayment(tranId, valId, amount, "BDT", null);
+    }
+
+    @Transactional
+    public Booking finalizeSslCommerzPayment(String tranId, String valId, BigDecimal amount, String currency, String bankTranId) {
         Long bookingId = parseBookingIdFromTranId(tranId);
         Booking booking = bookingRepository.findByIdForUpdate(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found for transaction: " + tranId));
@@ -291,22 +306,47 @@ public class BookingService {
             return booking;
         }
 
+        // Amount & Currency Verification
+        if (currency == null || !"BDT".equalsIgnoreCase(currency.trim())) {
+            log.error("SSLCommerz currency mismatch for tranId={}: expected BDT, got {}", tranId, currency);
+            failSslCommerzPayment(tranId, "Currency mismatch: expected BDT but got " + currency);
+            throw new ApiException(ErrorCode.PAYMENT_FAILED, HttpStatus.BAD_REQUEST, "Payment currency must be BDT");
+        }
+
+        if (amount == null || amount.compareTo(booking.getTotalAmount()) != 0) {
+            log.error("SSLCommerz amount mismatch for tranId={}: expected {}, got {}", tranId, booking.getTotalAmount(), amount);
+            failSslCommerzPayment(tranId, "Amount mismatch: expected " + booking.getTotalAmount() + " but got " + amount);
+            throw new ApiException(ErrorCode.PAYMENT_FAILED, HttpStatus.BAD_REQUEST, "Payment amount mismatch");
+        }
+
         Payment payment = paymentRepository.findByBookingIdForUpdate(bookingId)
                 .orElse(null);
 
         User guest = booking.getGuest();
         Instant now = clock.instant();
 
+        String providerRef = (bankTranId != null && !bankTranId.isBlank()) ? bankTranId : valId;
+
         // Check hold expiry
         if (booking.getExpiresAt() != null && booking.getExpiresAt().isBefore(now)) {
             log.warn("SSLCommerz payment succeeded but hold expired for booking id={}", bookingId);
+            if (payment != null) {
+                payment.setStatus(PaymentStatus.SUCCEEDED);
+                payment.setProviderReference(providerRef);
+                paymentRepository.save(payment);
+            }
+            booking.transitionTo(BookingStatus.EXPIRED, guest);
+            recordHistory(booking, BookingStatus.PENDING_PAYMENT.name(), BookingStatus.EXPIRED.name(), guest.getId(), "SYSTEM",
+                    "Payment received after hold expired; refund has been issued (val_id: " + valId + ", bank_tran_id: " + bankTranId + ")");
+            booking = bookingRepository.save(booking);
+
             refundService.issueRefund(booking, booking.getTotalAmount(), RefundReason.LATE_PAYMENT, null);
-            throw new ConflictException(ErrorCode.BOOKING_EXPIRED, "Payment received after hold expired; refund has been issued");
+            return booking;
         }
 
         if (payment != null) {
             payment.setStatus(PaymentStatus.SUCCEEDED);
-            payment.setProviderReference(valId);
+            payment.setProviderReference(providerRef);
             paymentRepository.save(payment);
         }
 
@@ -322,7 +362,7 @@ public class BookingService {
         }
 
         recordHistory(booking, BookingStatus.PENDING_PAYMENT.name(), booking.getStatus().name(), guest.getId(), "GUEST",
-                "Payment succeeded via SSLCommerz (val_id: " + valId + ")");
+                "Payment succeeded via SSLCommerz (val_id: " + valId + ", bank_tran_id: " + bankTranId + ")");
         booking = bookingRepository.save(booking);
 
         var searchCache = cacheManager.getCache(CacheConfig.CACHE_SEARCH_RESULTS);

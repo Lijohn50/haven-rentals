@@ -55,9 +55,11 @@ public class SslCommerzService {
         body.add("ipn_url", backendBase + "/api/v1/payments/sslcommerz/ipn");
 
         // Customer details
-        body.add("cus_name", guest.getDisplayName() != null ? guest.getDisplayName() : "Guest");
+        String guestName = ((guest.getFirstName() != null ? guest.getFirstName() : "") + " "
+                + (guest.getLastName() != null ? guest.getLastName() : "")).trim();
+        body.add("cus_name", !guestName.isEmpty() ? guestName : "Guest");
         body.add("cus_email", guest.getEmail());
-        body.add("cus_add1", booking.getListing().getAddress() != null ? booking.getListing().getAddress() : "Dhaka");
+        body.add("cus_add1", booking.getListing().getAddressLine() != null ? booking.getListing().getAddressLine() : "Dhaka");
         body.add("cus_city", booking.getListing().getCity() != null ? booking.getListing().getCity() : "Dhaka");
         body.add("cus_country", "Bangladesh");
         body.add("cus_phone", guest.getPhone() != null ? guest.getPhone() : "+8801700000000");
@@ -79,7 +81,7 @@ public class SslCommerzService {
                     .body(String.class);
 
             if (rawResponse == null || rawResponse.isBlank()) {
-                throw new ApiException(ErrorCode.GATEWAY_ERROR, "Empty response from SSLCommerz session init");
+                throw new ApiException(ErrorCode.SERVICE_UNAVAILABLE, "Empty response from SSLCommerz session init");
             }
 
             Map<String, Object> respMap = objectMapper.readValue(rawResponse, new TypeReference<>() {});
@@ -99,7 +101,7 @@ public class SslCommerzService {
             throw e;
         } catch (Exception e) {
             log.error("Exception calling SSLCommerz session init for tranId={}", tranId, e);
-            throw new ApiException(ErrorCode.GATEWAY_ERROR, "Failed to connect to SSLCommerz: " + e.getMessage());
+            throw new ApiException(ErrorCode.SERVICE_UNAVAILABLE, "Failed to connect to SSLCommerz: " + e.getMessage());
         }
     }
 

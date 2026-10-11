@@ -42,7 +42,9 @@ class PricingRulesTest {
     }
 
     private PricingContext context(LocalDate checkIn, LocalDate checkOut, List<SeasonalRate> rates) {
-        return new PricingContext(listing, rates, commissionSetting, checkIn, checkOut, 2);
+        PricingContext ctx = new PricingContext(listing, rates, commissionSetting, checkIn, checkOut, 2);
+        new SeasonalRateRule().apply(ctx);
+        return ctx;
     }
 
     @Test

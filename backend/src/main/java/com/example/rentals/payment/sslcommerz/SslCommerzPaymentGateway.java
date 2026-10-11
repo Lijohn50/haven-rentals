@@ -1,5 +1,6 @@
 package com.example.rentals.payment.sslcommerz;
 
+import com.example.rentals.common.AppProperties;
 import com.example.rentals.payment.PaymentGateway;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +21,19 @@ import java.util.UUID;
 public class SslCommerzPaymentGateway implements PaymentGateway {
 
     private final SslCommerzService sslCommerzService;
+    private final AppProperties appProperties;
 
     @Override
     public ChargeResult charge(String token, BigDecimal amount, String idempotencyKey) {
         log.info("Direct charge requested on SSLCommerz gateway with token: {}", token);
+
+        if (!appProperties.getSslcommerz().isSandbox()) {
+            log.warn("Direct charge is disabled in production for SSLCommerz. Hosted redirect flow must be used.");
+            return new ChargeResult(false, null, "DIRECT_CHARGE_NOT_SUPPORTED");
+        }
+
         // SSLCommerz is predominantly a hosted redirect gateway.
-        // For test/sandbox tokens or direct charges:
+        // For test/sandbox tokens in simulation mode:
         if ("tok_success".equalsIgnoreCase(token)) {
             return new ChargeResult(true, "ssl_sim_" + UUID.randomUUID(), null);
         } else if ("tok_decline".equalsIgnoreCase(token)) {
@@ -36,9 +44,8 @@ public class SslCommerzPaymentGateway implements PaymentGateway {
             return new ChargeResult(false, null, "GATEWAY_TIMEOUT");
         }
 
-        // When a real redirect is used, payment is initiated via SslCommerzController
-        // and finalized on the callback validation.
-        return new ChargeResult(true, "ssl_ch_" + UUID.randomUUID(), null);
+        log.warn("Unknown token rejected on SSLCommerz gateway: {}", token);
+        return new ChargeResult(false, null, "INVALID_TOKEN");
     }
 
     @Override

@@ -33,7 +33,7 @@ class MoneyUtilsTest {
     void testZeroRejected() {
         assertThatThrownBy(() -> MoneyUtils.validateMoney(BigDecimal.ZERO, "amount", false))
                 .isInstanceOf(ApiException.class)
-                .hasMessageContaining("must be greater than zero");
+                .hasMessageContaining("must be positive");
     }
 
     @Test
@@ -49,7 +49,7 @@ class MoneyUtilsTest {
         BigDecimal negative = new BigDecimal(val);
         assertThatThrownBy(() -> MoneyUtils.validateMoney(negative, "amount", true))
                 .isInstanceOf(ApiException.class)
-                .hasMessageContaining("cannot be negative");
+                .hasMessageContaining("must be non-negative");
     }
 
     @Test

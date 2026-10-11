@@ -36,10 +36,10 @@ public class SslCommerzController {
     }
 
     /**
-     * Public callback endpoint called by SSLCommerz gateway on successful payment.
-     * SSLCommerz POSTs form-urlencoded parameters here via browser redirect.
+     * Callback endpoint called by SSLCommerz gateway on successful payment.
+     * Supports both POST (form-urlencoded) and GET (query parameters) redirects.
      */
-    @PostMapping(value = "/api/v1/payments/sslcommerz/success", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/api/v1/payments/sslcommerz/success", method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<Void> handleSuccess(@RequestParam Map<String, String> formData) {
         String tranId = formData.get("tran_id");
         String valId = formData.get("val_id");
@@ -57,15 +57,7 @@ public class SslCommerzController {
         try {
             // Mandatory server-to-server validation
             SslCommerzValidationResponse validation = sslCommerzService.validatePayment(valId);
-            if (validation.isValid()) {
-                Booking booking = bookingService.finalizeSslCommerzPayment(tranId, valId, validation.amount());
-                log.info("Booking {} payment finalized successfully via SSLCommerz", booking.getReference());
-
-                String redirectTarget = frontendUrl + "/trips/" + booking.getReference() + "?payment=success";
-                return ResponseEntity.status(HttpStatus.SEE_OTHER)
-                        .location(URI.create(redirectTarget))
-                        .build();
-            } else {
+            if (!validation.isValid()) {
                 log.warn("SSLCommerz validation failed for tranId={}, valId={}: {}", tranId, valId, validation.error());
                 Booking booking = bookingService.failSslCommerzPayment(tranId, "Validation failed: " + validation.error());
                 String redirectTarget = frontendUrl + "/trips/" + booking.getReference() + "?payment=failed";
@@ -73,12 +65,32 @@ public class SslCommerzController {
                         .location(URI.create(redirectTarget))
                         .build();
             }
+
+            // Verify tran_id matches validation response (Blocker 2)
+            if (validation.tranId() == null || !validation.tranId().equals(tranId)) {
+                log.error("SSLCommerz transaction ID mismatch: callback tranId={}, validation tranId={}", tranId, validation.tranId());
+                Booking booking = bookingService.failSslCommerzPayment(tranId, "Transaction ID mismatch");
+                String redirectTarget = frontendUrl + "/trips/" + booking.getReference() + "?payment=failed";
+                return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                        .location(URI.create(redirectTarget))
+                        .build();
+            }
+
+            Booking booking = bookingService.finalizeSslCommerzPayment(
+                    tranId, valId, validation.amount(), validation.currency(), validation.bankTranId());
+            log.info("Booking {} payment finalized successfully via SSLCommerz (status={})", booking.getReference(), booking.getStatus());
+
+            String paymentQueryParam = (booking.getStatus() == com.example.rentals.booking.BookingStatus.EXPIRED) ? "expired" : "success";
+            String redirectTarget = frontendUrl + "/trips/" + booking.getReference() + "?payment=" + paymentQueryParam;
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                    .location(URI.create(redirectTarget))
+                    .build();
         } catch (Exception e) {
             log.error("Exception handling SSLCommerz success callback for tranId={}", tranId, e);
             try {
                 Booking booking = bookingService.getBookingForTranId(tranId);
                 return ResponseEntity.status(HttpStatus.SEE_OTHER)
-                        .location(URI.create(frontendUrl + "/trips/" + booking.getReference() + "?payment=error"))
+                        .location(URI.create(frontendUrl + "/trips/" + booking.getReference() + "?payment=failed"))
                         .build();
             } catch (Exception ignored) {
                 return ResponseEntity.status(HttpStatus.SEE_OTHER)
@@ -89,9 +101,10 @@ public class SslCommerzController {
     }
 
     /**
-     * Public callback endpoint called by SSLCommerz on failed payment.
+     * Callback endpoint called by SSLCommerz on failed payment.
+     * Supports both POST (form-urlencoded) and GET (query parameters) redirects.
      */
-    @PostMapping(value = "/api/v1/payments/sslcommerz/fail", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/api/v1/payments/sslcommerz/fail", method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<Void> handleFail(@RequestParam Map<String, String> formData) {
         String tranId = formData.get("tran_id");
         String error = formData.getOrDefault("error", "Payment failed or was declined by provider");
@@ -113,9 +126,10 @@ public class SslCommerzController {
     }
 
     /**
-     * Public callback endpoint called by SSLCommerz on user cancellation.
+     * Callback endpoint called by SSLCommerz on user cancellation.
+     * Supports both POST (form-urlencoded) and GET (query parameters) redirects.
      */
-    @PostMapping(value = "/api/v1/payments/sslcommerz/cancel", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/api/v1/payments/sslcommerz/cancel", method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<Void> handleCancel(@RequestParam Map<String, String> formData) {
         String tranId = formData.get("tran_id");
         log.info("SSLCommerz cancel callback received for tran_id={}", tranId);
@@ -138,7 +152,7 @@ public class SslCommerzController {
     /**
      * Instant Payment Notification (IPN) webhook called asynchronously by SSLCommerz server.
      */
-    @PostMapping(value = "/api/v1/payments/sslcommerz/ipn", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/api/v1/payments/sslcommerz/ipn", method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<String> handleIpn(@RequestParam Map<String, String> formData) {
         String tranId = formData.get("tran_id");
         String valId = formData.get("val_id");
@@ -150,14 +164,22 @@ public class SslCommerzController {
 
         try {
             SslCommerzValidationResponse validation = sslCommerzService.validatePayment(valId);
-            if (validation.isValid()) {
-                bookingService.finalizeSslCommerzPayment(tranId, valId, validation.amount());
-                log.info("IPN validated and booking finalized for tranId={}", tranId);
-                return ResponseEntity.ok("IPN PROCESSED");
-            } else {
+            if (!validation.isValid()) {
                 bookingService.failSslCommerzPayment(tranId, "IPN Validation failed: " + validation.error());
                 return ResponseEntity.ok("IPN FAILED");
             }
+
+            // Verify tran_id matches validation response (Blocker 2)
+            if (validation.tranId() == null || !validation.tranId().equals(tranId)) {
+                log.error("SSLCommerz IPN tran_id mismatch: IPN tranId={}, validation tranId={}", tranId, validation.tranId());
+                bookingService.failSslCommerzPayment(tranId, "IPN Transaction ID mismatch");
+                return ResponseEntity.badRequest().body("Transaction ID mismatch");
+            }
+
+            bookingService.finalizeSslCommerzPayment(
+                    tranId, valId, validation.amount(), validation.currency(), validation.bankTranId());
+            log.info("IPN validated and booking finalized for tranId={}", tranId);
+            return ResponseEntity.ok("IPN PROCESSED");
         } catch (Exception e) {
             log.error("Exception processing SSLCommerz IPN for tranId={}", tranId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("IPN ERROR");
