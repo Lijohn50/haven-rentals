@@ -64,6 +64,9 @@ const holdFailureMessage = (code: string | null, failure: unknown): string => {
     return 'Someone changed these dates a moment ago. Try again.';
   if (code === 'BUSINESS_RULE_VIOLATION')
     return failure instanceof ApiError ? failure.detail : 'A booking rule stopped this request.';
+  if (code === 'VALIDATION_ERROR' && failure instanceof ApiError && failure.fieldErrors.length > 0) {
+    return failure.fieldErrors.map((f) => f.message).join('. ');
+  }
   return failure instanceof ApiError ? failure.detail : 'We could not hold these dates. Try again.';
 };
 
@@ -200,8 +203,12 @@ export const CheckoutPage: React.FC = () => {
             (name, text) => form.setError(name as keyof CheckoutValues, { message: text }),
             ['message']
           );
-          if (unmatched.length > 0) messageRef.current?.focus();
-          else setFailure(error);
+          if (unmatched.length > 0) {
+            setFailure(error);
+          }
+          if (form.getFieldState('message').invalid) {
+            messageRef.current?.focus();
+          }
           break;
         }
         default:

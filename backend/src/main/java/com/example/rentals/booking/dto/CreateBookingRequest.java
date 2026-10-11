@@ -24,7 +24,7 @@ public record CreateBookingRequest(
 
         @NotNull(message = "Expected total is required")
         @DecimalMin(value = "0.01", message = "Expected total must be positive")
-        @DecimalMax(value = "100000.00", message = "Expected total cannot exceed 100000.00")
+        @DecimalMax(value = "100000000.00", message = "Expected total cannot exceed 100000000.00")
         BigDecimal expectedTotal,
 
         @Size(max = 1000, message = "Message must not exceed 1000 characters")
