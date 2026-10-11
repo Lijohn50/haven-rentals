@@ -3,12 +3,20 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
   BarChart3,
   CalendarDays,
+  CalendarSearch,
   CircleDollarSign,
+  ClipboardCheck,
+  History,
   Inbox,
   LayoutDashboard,
   LogOut,
   MessageSquare,
+  Percent,
   Plane,
+  Scale,
+  Sparkles,
+  Star,
+  Users,
   Home as HomeIcon,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -140,17 +148,17 @@ export const StaffShell: React.FC = () => {
       <div className="mx-auto flex w-full max-w-content flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row">
         <aside className="lg:w-60 lg:shrink-0 no-print">
           <nav aria-label="Operations" className="flex flex-col gap-1">
-            <SidebarLink to={ROUTES.SUPPORT_DISPUTES} icon={<Inbox className="h-4 w-4" />} label="Dispute queue" />
+            <SidebarLink to={ROUTES.SUPPORT_DISPUTES} icon={<Scale className="h-4 w-4" />} label="Dispute queue" />
             {isAdmin && (
               <>
                 <SidebarLink to={ROUTES.ADMIN_HOME} icon={<BarChart3 className="h-4 w-4" />} label="Platform summary" />
-                <SidebarLink to={ROUTES.ADMIN_LISTINGS} icon={<HomeIcon className="h-4 w-4" />} label="Moderation queue" />
-                <SidebarLink to={ROUTES.ADMIN_USERS} icon={<HomeIcon className="h-4 w-4" />} label="Users" />
-                <SidebarLink to={ROUTES.ADMIN_BOOKINGS} icon={<HomeIcon className="h-4 w-4" />} label="Booking lookup" />
-                <SidebarLink to={ROUTES.ADMIN_REVIEWS} icon={<MessageSquare className="h-4 w-4" />} label="Review moderation" />
-                <SidebarLink to={ROUTES.ADMIN_COMMISSION} icon={<CircleDollarSign className="h-4 w-4" />} label="Commission" />
-                <SidebarLink to={ROUTES.ADMIN_AMENITIES} icon={<HomeIcon className="h-4 w-4" />} label="Amenities" />
-                <SidebarLink to={ROUTES.ADMIN_AUDIT} icon={<BarChart3 className="h-4 w-4" />} label="Audit log" />
+                <SidebarLink to={ROUTES.ADMIN_LISTINGS} icon={<ClipboardCheck className="h-4 w-4" />} label="Moderation queue" />
+                <SidebarLink to={ROUTES.ADMIN_USERS} icon={<Users className="h-4 w-4" />} label="Users" />
+                <SidebarLink to={ROUTES.ADMIN_BOOKINGS} icon={<CalendarSearch className="h-4 w-4" />} label="Booking lookup" />
+                <SidebarLink to={ROUTES.ADMIN_REVIEWS} icon={<Star className="h-4 w-4" />} label="Review moderation" />
+                <SidebarLink to={ROUTES.ADMIN_COMMISSION} icon={<Percent className="h-4 w-4" />} label="Commission" />
+                <SidebarLink to={ROUTES.ADMIN_AMENITIES} icon={<Sparkles className="h-4 w-4" />} label="Amenities" />
+                <SidebarLink to={ROUTES.ADMIN_AUDIT} icon={<History className="h-4 w-4" />} label="Audit log" />
               </>
             )}
           </nav>
