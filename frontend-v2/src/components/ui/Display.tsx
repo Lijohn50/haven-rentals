@@ -208,7 +208,7 @@ export const Avatar: React.FC<{
   <span
     aria-hidden
     className={cn(
-      'inline-flex shrink-0 items-center justify-center rounded-full bg-primary-soft font-semibold uppercase text-primary-dark',
+      'inline-flex shrink-0 items-center justify-center rounded-full bg-brand font-semibold uppercase text-white shadow-sm ring-2 ring-white/80',
       size === 'sm' && 'h-8 w-8 text-xs',
       size === 'md' && 'h-10 w-10 text-sm',
       size === 'lg' && 'h-14 w-14 text-lg',
@@ -220,7 +220,7 @@ export const Avatar: React.FC<{
 );
 
 export const Skeleton: React.FC<{ className?: string }> = ({ className }) => (
-  <div className={cn('skeleton rounded-control bg-neutral-soft', className)} aria-hidden />
+  <div className={cn('skeleton rounded-control bg-sand', className)} aria-hidden />
 );
 
 export const Spinner: React.FC<{ className?: string; label?: string }> = ({ className, label }) => (

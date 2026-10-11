@@ -340,14 +340,16 @@ export const PayPage: React.FC = () => {
           Back to trip {stay.reference}
         </Link>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-ink sm:text-3xl">Pay for your stay</h1>
-          <div className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs">
-            <span className="flex items-center gap-1 text-muted">
-              <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+          <h1 className="font-heading text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+            Pay for your stay
+          </h1>
+          <div className="inline-flex items-center gap-2 rounded-pill bg-sand px-3.5 py-1 text-xs font-medium">
+            <span className="flex items-center gap-1 text-primary font-semibold">
+              <CheckCircle2 className="h-3.5 w-3.5" />
               1 Review
             </span>
-            <span className="text-muted">/</span>
-            <span className="font-semibold text-primary-dark">2 Payment</span>
+            <span className="text-muted/40">/</span>
+            <span className="font-bold text-text">2 Payment</span>
           </div>
         </div>
       </div>
@@ -357,22 +359,22 @@ export const PayPage: React.FC = () => {
         {expired ? (
           <div
             role="alert"
-            className="flex flex-col gap-3 rounded-card border border-danger/30 bg-danger-soft/70 p-4 text-danger-text sm:flex-row sm:items-start sm:justify-between"
+            className="flex flex-col gap-3 rounded-2xl bg-surface p-5 shadow-card ring-1 ring-danger/40 sm:flex-row sm:items-start sm:justify-between"
           >
-            <div className="flex items-start gap-3">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-danger-soft text-danger">
+            <div className="flex items-start gap-3.5">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-danger-soft text-danger">
                 <Timer className="h-5 w-5" aria-hidden />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-ink">Your hold has expired</h2>
+                <h2 className="font-heading text-base font-semibold text-text">Your hold has expired</h2>
                 <p className="mt-1 text-sm text-muted">
                   These dates are available to other guests again. Pick new dates or start a fresh hold.
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Button asChild variant="outline" size="sm">
+                <div className="mt-3.5 flex flex-wrap gap-2">
+                  <Button asChild variant="outline" size="sm" className="rounded-pill">
                     <Link to={ROUTES.LISTING(stay.listing.id)}>Back to the listing</Link>
                   </Button>
-                  <Button variant="outline" size="sm" onClick={startAgain}>
+                  <Button variant="outline" size="sm" className="rounded-pill" onClick={startAgain}>
                     Start again
                   </Button>
                 </div>
@@ -383,41 +385,49 @@ export const PayPage: React.FC = () => {
           <div
             role="status"
             className={cn(
-              'rounded-card border p-4 transition-all',
+              'rounded-2xl bg-surface p-4.5 shadow-card ring-1 transition-all',
               hold.urgent
-                ? 'border-warning/60 bg-warning-soft/50 shadow-sm'
-                : 'border-primary/20 bg-primary-soft/30'
+                ? 'ring-accent/40 bg-accent/5'
+                : 'ring-line/80'
             )}
           >
-            <div className="flex items-center gap-3.5">
-              <div
-                className={cn(
-                  'grid h-10 w-10 shrink-0 place-items-center rounded-full',
-                  hold.urgent
-                    ? 'bg-warning-soft text-warning-text'
-                    : 'bg-primary-soft text-primary-dark'
-                )}
-              >
-                <Timer className="h-5 w-5" aria-hidden />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-semibold text-ink">Your dates are held for</span>
-                  <span
-                    aria-live="polite"
-                    className={cn(
-                      'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold tabular tracking-wide shadow-xs',
-                      hold.urgent
-                        ? 'bg-danger text-white animate-pulse'
-                        : 'bg-primary text-white'
-                    )}
-                  >
-                    {hold.label}
-                  </span>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div
+                  className={cn(
+                    'grid h-11 w-11 shrink-0 place-items-center rounded-xl',
+                    hold.urgent
+                      ? 'bg-accent/15 text-accent'
+                      : 'bg-primary-soft text-primary'
+                  )}
+                >
+                  <Timer className="h-5 w-5" aria-hidden />
                 </div>
-                <p className="mt-0.5 truncate text-xs text-muted">
-                  {stay.listing.title} · {formatDateRange(stay.checkIn, stay.checkOut)}
-                </p>
+                <div className="min-w-0">
+                  <div className="font-heading text-sm font-semibold text-text">
+                    Dates reserved & held for you
+                  </div>
+                  <p className="mt-0.5 truncate text-xs text-muted">
+                    {stay.listing.title} · {formatDateRange(stay.checkIn, stay.checkOut)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end shrink-0">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+                  Hold expires in
+                </span>
+                <span
+                  aria-live="polite"
+                  className={cn(
+                    'mt-0.5 inline-flex items-center rounded-pill px-3 py-0.5 font-heading text-base font-bold tabular-nums shadow-xs',
+                    hold.urgent
+                      ? 'bg-accent text-white animate-pulse'
+                      : 'bg-primary-soft text-primary-dark ring-1 ring-primary/20'
+                  )}
+                >
+                  {hold.label}
+                </span>
               </div>
             </div>
           </div>
@@ -457,21 +467,21 @@ export const PayPage: React.FC = () => {
         )}
 
         {/* Payment Method Selection Card */}
-        <Card className="p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-line pb-4">
+        <div className="rounded-2xl bg-surface p-6 shadow-card ring-1 ring-line/70">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-line/70 pb-4">
             <div>
-              <h2 className="text-base font-semibold text-ink">Payment method</h2>
+              <h2 className="font-heading text-lg font-semibold text-text">Payment method</h2>
               <p className="text-xs text-muted">Select how you'd like to pay</p>
             </div>
-            <div className="inline-flex rounded-control border border-line bg-bg p-1 text-xs font-medium">
+            <div className="inline-flex rounded-pill bg-sand p-1 text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setPaymentMethod('sslcommerz')}
                 className={cn(
-                  'rounded-[6px] px-3 py-1.5 transition-all',
+                  'rounded-pill px-4 py-1.5 transition-all',
                   paymentMethod === 'sslcommerz'
-                    ? 'bg-surface font-semibold text-primary-dark shadow-card'
-                    : 'text-muted hover:text-ink'
+                    ? 'bg-surface font-semibold text-primary shadow-sm ring-1 ring-line/40'
+                    : 'text-muted hover:text-text'
                 )}
               >
                 SSLCommerz (BDT)
@@ -480,10 +490,10 @@ export const PayPage: React.FC = () => {
                 type="button"
                 onClick={() => setPaymentMethod('simulated')}
                 className={cn(
-                  'rounded-[6px] px-3 py-1.5 transition-all',
+                  'rounded-pill px-4 py-1.5 transition-all',
                   paymentMethod === 'simulated'
-                    ? 'bg-surface font-semibold text-primary-dark shadow-card'
-                    : 'text-muted hover:text-ink'
+                    ? 'bg-surface font-semibold text-primary shadow-sm ring-1 ring-line/40'
+                    : 'text-muted hover:text-text'
                 )}
               >
                 Test Sim
@@ -491,7 +501,7 @@ export const PayPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-5">
             {paymentMethod === 'sslcommerz' ? (
               <SslCommerzPaymentField />
             ) : ENV.PAYMENT_MODE === 'provider' ? (
@@ -500,7 +510,7 @@ export const PayPage: React.FC = () => {
               <FakePaymentField onTokenChange={setPaymentToken} />
             )}
           </div>
-        </Card>
+        </div>
 
         {requested && !expired && (
           <Banner tone="info" title="This is a request to book">
@@ -513,52 +523,52 @@ export const PayPage: React.FC = () => {
       {/* Right Column: Trip Summary, Price Breakdown, and CTA */}
       <div className="lg:w-80 lg:shrink-0">
         <div className="flex flex-col gap-4 lg:sticky lg:top-24">
-          <Card className="p-4">
-            <div className="flex gap-3">
+          <div className="rounded-2xl bg-surface p-4.5 shadow-card ring-1 ring-line/70">
+            <div className="flex gap-3.5">
               <img
                 src={mediaUrl(stay.listing.coverPhotoUrl) ?? PLACEHOLDER_IMAGE}
                 alt={stay.listing.title}
-                className="h-20 w-24 shrink-0 rounded-control object-cover border border-line"
+                className="h-20 w-24 shrink-0 rounded-xl object-cover ring-1 ring-line/70"
               />
               <div className="min-w-0 flex-1">
-                <p className="text-xs uppercase tracking-wide text-muted">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
                   {stay.listing.city}, {stay.listing.country}
                 </p>
-                <h3 className="truncate text-sm font-semibold text-ink">
+                <h3 className="truncate font-heading text-sm font-semibold text-text">
                   {stay.listing.title}
                 </h3>
                 <p className="mt-0.5 text-xs text-muted">
                   Hosted by {stay.host.displayName}
                 </p>
-                <p className="mt-1 text-xs font-medium text-ink">
+                <p className="mt-1 text-xs font-medium text-text">
                   {formatDateRange(stay.checkIn, stay.checkOut)} · {stay.nights} {stay.nights === 1 ? 'night' : 'nights'}
                 </p>
               </div>
             </div>
-          </Card>
+          </div>
 
           <PriceBreakdown breakdown={stay.priceBreakdown} nights={stay.nights} />
 
-          <Button
-            variant="accent"
-            size="lg"
-            block
-            loading={paying}
-            disabled={expired || cooling || (paymentMethod === 'simulated' && paymentToken === '')}
+          <button
+            type="button"
+            disabled={expired || cooling || (paymentMethod === 'simulated' && paymentToken === '') || paying}
             onClick={() => void (paymentMethod === 'sslcommerz' ? submitSslCommerz() : submit())}
+            className="flex w-full items-center justify-center rounded-2xl bg-accent py-3.5 text-base font-semibold text-white shadow-[0_10px_24px_-8px_rgb(217_92_46/0.7)] transition-all hover:bg-accent-dark active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-sand disabled:text-muted disabled:shadow-none"
           >
-            {paymentMethod === 'sslcommerz'
-              ? `Pay ${formatMoney(total)} via SSLCommerz`
-              : `Pay ${formatMoney(total)} and ${requested ? 'send request' : 'book'}`}
-          </Button>
+            {paying
+              ? 'Processing...'
+              : paymentMethod === 'sslcommerz'
+                ? `Pay ${formatMoney(total)} via SSLCommerz`
+                : `Pay ${formatMoney(total)} and ${requested ? 'send request' : 'book'}`}
+          </button>
 
-          <div className="flex items-center justify-center gap-1.5 text-xs text-muted">
+          <div className="flex items-center justify-center gap-1.5 text-xs font-medium text-muted">
             <Lock className="h-3.5 w-3.5 text-primary" aria-hidden />
             <span>Guaranteed safe & secure payment</span>
           </div>
 
           {failed && (
-            <Button variant="outline" block onClick={startAgain}>
+            <Button variant="outline" block className="rounded-2xl" onClick={startAgain}>
               Start again
             </Button>
           )}

@@ -23,6 +23,7 @@ import {
   Umbrella,
   Waves,
   WashingMachine,
+  Wifi,
   Wind,
   Wrench,
   type LucideIcon,
@@ -34,8 +35,8 @@ import {
  * (architecture 6.7).
  */
 const ICONS: Record<string, LucideIcon> = {
-  wifi: Wind,
-  'wifi-free': Wind,
+  wifi: Wifi,
+  'wifi-free': Wifi,
   kitchen: ChefHat,
   kitchenette: ChefHat,
   coffee: ChefHat,

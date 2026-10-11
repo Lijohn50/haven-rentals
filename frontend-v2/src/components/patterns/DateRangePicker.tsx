@@ -73,11 +73,11 @@ export const DateRangePicker: React.FC<{
             days.find((day) => day.date === fromPickerDate(date))?.reason === 'BLOCKED',
         }}
         modifiersClassNames={{
-          unavailable: 'text-muted/50 line-through',
-          booked: 'text-muted/50 line-through',
-          blocked: 'text-muted/50 line-through',
+          unavailable: 'text-muted/35 font-normal',
+          booked: 'text-muted/35 font-normal',
+          blocked: 'text-muted/35 font-normal',
         }}
-        className="[--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-highlight))] [--rdp-range_middle-color:rgb(var(--color-text))] [--rdp-day-width:2.5rem] [--rdp-day-height:2.5rem]"
+        className="[--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.35rem] [--rdp-day-height:2.35rem]"
       />
       <p className="mt-2 border-t border-line pt-2 text-xs text-muted">
         {value.from && value.to

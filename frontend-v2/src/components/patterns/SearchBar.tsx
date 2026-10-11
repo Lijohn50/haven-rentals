@@ -194,22 +194,21 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
   };
 
   const hero = variant === 'hero';
-  const shell = hero ? 'max-w-[52rem]' : 'max-w-[46rem]';
-  const segmentHeight = hero ? 'lg:h-[4.25rem]' : 'lg:h-16';
-  const segmentLabel = 'text-[0.6875rem] font-semibold uppercase leading-4 tracking-wide text-muted';
-  const segmentValue = 'flex items-center gap-2 truncate text-sm font-medium leading-6 text-ink';
+  const shell = hero ? 'max-w-[56rem]' : 'max-w-[48rem]';
+  const segmentLabel = 'text-[11px] font-semibold uppercase tracking-[.12em] text-text';
+  const segmentValue = 'mt-0.5 flex items-center gap-2 truncate text-sm font-medium text-muted';
   const datesLabel = checkIn && checkOut ? formatDateRange(checkIn, checkOut) : 'Add dates';
 
   return (
     <div className={cn('w-full', shell)}>
-      <div className={cn('rounded-hero border border-line bg-surface p-2 shadow-pop', hero && 'sm:p-2.5')}>
-        <div className="grid gap-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,0.9fr)_auto] lg:items-stretch lg:gap-0">
-          <div className={cn('relative flex min-w-0 flex-col justify-center rounded-control px-3 py-1.5 transition-shadow focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary/30 lg:py-0', segmentHeight)}>
+      <div className="rounded-[20px] bg-surface/95 p-2 shadow-search ring-1 ring-black/5 backdrop-blur sm:p-2.5">
+        <div className="grid gap-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,0.9fr)_auto] lg:items-center">
+          <div className="relative flex min-w-0 flex-col justify-center rounded-2xl px-4 py-2.5 transition-colors hover:bg-sand focus-within:bg-surface focus-within:shadow-card focus-within:ring-1 focus-within:ring-primary/30">
             <label htmlFor={inputId} className={segmentLabel}>
               Where to?
             </label>
-            <div className="relative">
-              <MapPin className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+            <div className="relative mt-0.5">
+              <MapPin className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" aria-hidden />
               <Input
                 id={inputId}
                 role="combobox"
@@ -218,10 +217,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
                 aria-autocomplete="list"
                 aria-activedescendant={showList && active >= 0 ? `${listId}-${active}` : undefined}
                 autoComplete="off"
-                className={cn(
-                  'h-6 rounded-none border-0 bg-transparent py-0 pl-6 pr-0 leading-6 placeholder:text-muted/70 focus:border-transparent focus:ring-0 focus:outline-none',
-                  hero ? 'text-base' : 'text-sm'
-                )}
+                className="h-7 rounded-none border-0 bg-transparent py-0 pl-6 pr-0 text-[15px] font-medium leading-6 text-text placeholder:text-muted/60 focus:border-transparent focus:outline-none focus:ring-0"
                 placeholder="City or town"
                 value={destination}
                 onChange={(event) => {
@@ -238,7 +234,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
                 id={listId}
                 role="listbox"
                 aria-label="Destination suggestions"
-                className="absolute left-0 right-0 top-full z-40 mt-2 max-h-64 overflow-auto rounded-card border border-line bg-surface p-1 shadow-pop"
+                className="absolute left-0 right-0 top-full z-40 mt-2 max-h-64 overflow-auto rounded-2xl bg-surface p-1.5 shadow-pop ring-1 ring-line"
               >
                 {options.map((option, index) => (
                   <li
@@ -247,8 +243,8 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
                     role="option"
                     aria-selected={index === active}
                     className={cn(
-                      'flex cursor-pointer items-center justify-between gap-3 rounded-control px-3 py-2 text-sm',
-                      index === active ? 'bg-primary-soft text-primary-dark' : 'text-ink'
+                      'flex cursor-pointer items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
+                      index === active ? 'bg-primary-soft text-primary' : 'text-text hover:bg-sand'
                     )}
                     onMouseEnter={() => setActive(index)}
                     onMouseDown={(event) => {
@@ -256,11 +252,16 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
                       choose(option);
                     }}
                   >
-                    <span>
-                      {option.city}
-                      <span className="block text-xs text-muted">{option.country}</span>
-                    </span>
-                    <span className="text-xs text-muted">
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary" aria-hidden>
+                        <MapPin className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <span className="font-semibold text-text">{option.city}</span>
+                        <span className="block text-xs text-muted">{option.country}</span>
+                      </div>
+                    </div>
+                    <span className="rounded-pill bg-sand px-2 py-0.5 text-xs text-muted">
                       {option.listingCount} {option.listingCount === 1 ? 'home' : 'homes'}
                     </span>
                   </li>
@@ -273,20 +274,17 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className={cn(
-                  'flex min-w-0 flex-col justify-center rounded-control px-3 py-1.5 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 lg:border-l lg:border-line lg:py-0',
-                  segmentHeight
-                )}
+                className="flex min-w-0 flex-col justify-center rounded-2xl px-4 py-2.5 text-left transition-colors hover:bg-sand focus-within:bg-surface focus-within:shadow-card focus-within:ring-1 focus-within:ring-primary/30"
               >
                 <span className={segmentLabel}>Dates</span>
                 <span className={segmentValue}>
-                  <CalendarDays className="h-4 w-4 shrink-0 text-muted" aria-hidden />
-                  {datesLabel}
+                  <CalendarDays className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                  <span className="truncate">{datesLabel}</span>
                 </span>
               </button>
             </PopoverTrigger>
             <PopoverContent align="start" className="w-auto max-w-[min(94vw,40rem)]">
-              <p className="mb-2 text-sm font-semibold text-ink">
+              <p className="mb-2 text-sm font-semibold text-text">
                 {checkIn && checkOut
                   ? formatDateRange(checkIn, checkOut)
                   : checkIn
@@ -302,7 +300,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
                   setRange(next ?? { from: undefined, to: undefined });
                 }}
                 disabled={datesDisabled}
-                className="[--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-highlight))] [--rdp-range_middle-color:rgb(var(--color-text))]"
+                className="[--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))]"
               />
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
                 <button
@@ -334,15 +332,14 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className={cn(
-                  'flex min-w-0 flex-col justify-center rounded-control px-3 py-1.5 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40 lg:border-l lg:border-line lg:py-0',
-                  segmentHeight
-                )}
+                className="flex min-w-0 flex-col justify-center rounded-2xl px-4 py-2.5 text-left transition-colors hover:bg-sand focus-within:bg-surface focus-within:shadow-card focus-within:ring-1 focus-within:ring-primary/30"
               >
                 <span className={segmentLabel}>Guests</span>
                 <span className={segmentValue}>
-                  <Users className="h-4 w-4 shrink-0 text-muted" aria-hidden />
-                  {guests} {guests === 1 ? 'guest' : 'guests'}
+                  <Users className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                  <span>
+                    {guests} {guests === 1 ? 'guest' : 'guests'}
+                  </span>
                 </span>
               </button>
             </PopoverTrigger>
@@ -361,19 +358,19 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
             </PopoverContent>
           </Popover>
 
-          <div className="flex items-center justify-center lg:border-l lg:border-line lg:pl-2">
-            <Button
-              size={hero ? 'lg' : 'md'}
+          <div className="flex items-center justify-center p-1">
+            <button
+              type="button"
               onClick={() => submit(true)}
-              className="w-full shrink-0 lg:w-auto"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 font-semibold text-white shadow-[0_8px_20px_-6px_rgb(13_115_107/.6)] transition-all hover:bg-primary-dark active:scale-[0.98] lg:w-auto"
             >
-              <Search className="h-4 w-4" aria-hidden />
-              Search
-            </Button>
+              <Search className="h-5 w-5" aria-hidden />
+              <span className="hidden sm:inline">Search</span>
+            </button>
           </div>
         </div>
 
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 px-3">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-line/40 px-3 pt-2">
           {dateError && !datesOpen ? (
             <InlineAlert tone="warning">{dateError}</InlineAlert>
           ) : (
@@ -385,7 +382,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
           )}
           <button
             type="button"
-            className="shrink-0 rounded-control px-1 text-sm font-medium text-primary underline underline-offset-4 transition-colors hover:text-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            className="shrink-0 text-sm font-semibold text-primary underline-offset-4 hover:underline"
             onClick={() => submit(false)}
           >
             Search without dates

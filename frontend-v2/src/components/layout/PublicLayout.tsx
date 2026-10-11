@@ -54,15 +54,15 @@ const VerifyEmailBanner: React.FC = () => {
  * One height for every control in the bar. The previous mix of 32px avatar, 36px text links
  * and 44px icon buttons on a 64px bar is what read as misalignment.
  */
-const CONTROL = 'inline-flex h-10 items-center rounded-control text-sm font-medium transition-colors';
-const CONTROL_GAP = 'gap-2 px-3';
+const CONTROL = 'inline-flex h-10 items-center rounded-pill text-sm font-medium transition-colors';
+const CONTROL_GAP = 'gap-2 px-3.5';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
     CONTROL,
     CONTROL_GAP,
     'shrink-0',
-    isActive ? 'bg-primary-soft text-primary-dark' : 'text-ink hover:bg-bg'
+    isActive ? 'bg-primary-soft text-primary font-semibold' : 'text-text hover:bg-sand'
   );
 
 export const SiteHeader: React.FC = () => {
@@ -71,7 +71,7 @@ export const SiteHeader: React.FC = () => {
   const entries = primaryNav({ isAuthenticated, isHost, isStaff, isAdmin });
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur no-print">
+    <header className="sticky top-0 z-40 border-b border-line/60 bg-surface/85 backdrop-blur-md no-print">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-50 focus:rounded-control focus:bg-primary focus:px-3 focus:py-2 focus:text-white"
@@ -81,15 +81,15 @@ export const SiteHeader: React.FC = () => {
       <div className="mx-auto flex h-16 max-w-content items-center gap-2 px-4 sm:gap-4 sm:px-6">
         <Link
           to={ROUTES.HOME}
-          className="flex shrink-0 items-center gap-2 font-heading text-lg font-semibold text-primary-dark"
+          className="flex shrink-0 items-center gap-2 font-heading text-lg font-semibold text-text"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-control bg-primary text-white" aria-hidden>
+          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand text-white shadow-sm" aria-hidden>
             {BRAND.name.charAt(0)}
           </span>
           {BRAND.name}
         </Link>
 
-        <nav aria-label="Main" className="hidden min-w-0 items-center gap-1 md:flex">
+        <nav aria-label="Main" className="hidden min-w-0 items-center gap-1.5 md:flex">
           {entries.map((entry) => (
             <NavLink key={entry.to} to={entry.to} className={navLinkClass}>
               {entry.label}
@@ -97,13 +97,13 @@ export const SiteHeader: React.FC = () => {
           ))}
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
           {isAuthenticated && (
             <NavLink to={ROUTES.INBOX} className={navLinkClass}>
               <span className="relative">
                 <Inbox className="h-5 w-5" aria-hidden />
                 {Boolean(unreadMessages.data?.total) && (
-                  <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-accent" aria-hidden />
+                  <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-accent ring-2 ring-surface" aria-hidden />
                 )}
               </span>
               <span className="hidden sm:inline">Inbox</span>
@@ -122,69 +122,69 @@ export const SiteFooter: React.FC = () => (
   // The mobile tab bar is fixed to the bottom edge and the footer is the last block in
   // the document flow, so the footer needs its own bottom padding or the copyright line
   // sits underneath the bar.
-  <footer className="mt-16 border-t border-line bg-surface pb-16 no-print sm:pb-0">
-    <div className="mx-auto grid max-w-content gap-8 px-4 py-10 sm:px-6 md:grid-cols-4">
+  <footer className="mt-16 rounded-t-hero bg-ink text-white/70 pb-16 no-print sm:pb-0">
+    <div className="mx-auto grid max-w-content gap-8 px-4 py-12 sm:px-6 md:grid-cols-4">
       <div>
-        <p className="font-heading text-lg font-semibold text-primary-dark">{BRAND.name}</p>
-        <p className="mt-1 text-sm text-muted">{BRAND.tagline}</p>
+        <p className="font-heading text-xl font-semibold text-white">{BRAND.name}</p>
+        <p className="mt-2 text-sm text-white/60 leading-relaxed">{BRAND.tagline}</p>
       </div>
       <nav aria-label="Explore">
-        <h2 className="text-sm font-semibold text-ink">Explore</h2>
-        <ul className="mt-2 space-y-1 text-sm text-muted">
+        <h2 className="text-sm font-semibold text-white">Explore</h2>
+        <ul className="mt-3 space-y-2 text-sm text-white/70">
           <li>
-            <Link className="hover:text-primary" to={ROUTES.SEARCH}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.SEARCH}>
               Search homes
             </Link>
           </li>
           <li>
-            <Link className="hover:text-primary" to={ROUTES.HOW_IT_WORKS}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.HOW_IT_WORKS}>
               How it works
             </Link>
           </li>
         </ul>
       </nav>
       <nav aria-label="Hosting">
-        <h2 className="text-sm font-semibold text-ink">Hosting</h2>
-        <ul className="mt-2 space-y-1 text-sm text-muted">
+        <h2 className="text-sm font-semibold text-white">Hosting</h2>
+        <ul className="mt-3 space-y-2 text-sm text-white/70">
           <li>
-            <Link className="hover:text-primary" to={ROUTES.BECOME_HOST}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.BECOME_HOST}>
               List your property
             </Link>
           </li>
           <li>
-            <Link className="hover:text-primary" to={ROUTES.HOST_DASHBOARD}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.HOST_DASHBOARD}>
               Host dashboard
             </Link>
           </li>
         </ul>
       </nav>
       <nav aria-label="Support">
-        <h2 className="text-sm font-semibold text-ink">Support</h2>
-        <ul className="mt-2 space-y-1 text-sm text-muted">
+        <h2 className="text-sm font-semibold text-white">Support</h2>
+        <ul className="mt-3 space-y-2 text-sm text-white/70">
           <li>
-            <Link className="hover:text-primary" to={ROUTES.HELP}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.HELP}>
               Help
             </Link>
           </li>
           <li>
-            <Link className="hover:text-primary" to={ROUTES.CANCELLATION_POLICIES}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.CANCELLATION_POLICIES}>
               Cancellation policies
             </Link>
           </li>
           <li>
-            <Link className="hover:text-primary" to={ROUTES.TERMS}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.TERMS}>
               Terms
             </Link>
           </li>
           <li>
-            <Link className="hover:text-primary" to={ROUTES.PRIVACY}>
+            <Link className="hover:text-white transition-colors" to={ROUTES.PRIVACY}>
               Privacy
             </Link>
           </li>
         </ul>
       </nav>
     </div>
-    <div className="border-t border-line px-4 py-4 text-center text-xs text-muted">
+    <div className="border-t border-white/10 px-4 py-6 text-center text-xs text-white/50">
       © {new Date().getFullYear()} {BRAND.name}. Demo build connected to the rentals REST API.
     </div>
   </footer>

@@ -30,14 +30,21 @@ export const AmenityGroup: React.FC<{ amenities: AmenityResponse[] }> = ({ ameni
     <div className="flex flex-col gap-6">
       {Object.entries(groups).map(([category, items]) => (
         <div key={category}>
-          <h4 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">{category}</h4>
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <h4 className="mb-2.5 text-[11px] font-semibold uppercase tracking-[.14em] text-muted">
+            {category}
+          </h4>
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {items.map((amenity) => {
               const Icon = amenityIcon(amenity.icon);
               return (
-                <li key={amenity.id} className="flex items-center gap-2 text-sm text-ink">
-                  <Icon className="h-5 w-5 text-primary" aria-hidden />
-                  {amenity.name}
+                <li
+                  key={amenity.id}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-text transition-colors hover:bg-sand"
+                >
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-sand text-primary">
+                    <Icon className="h-4 w-4" aria-hidden />
+                  </span>
+                  <span className="font-medium">{amenity.name}</span>
                 </li>
               );
             })}

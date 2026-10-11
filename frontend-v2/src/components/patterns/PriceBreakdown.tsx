@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Tag } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { formatMoney } from '@/lib/money';
 import { formatDate } from '@/lib/local-date';
@@ -32,11 +32,17 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
   const [expanded, setExpanded] = useState(false);
   const hasDiscount = Number(breakdown.discountTotal) > 0;
 
-  const row = (label: React.ReactNode, value: React.ReactNode, options?: { muted?: boolean; strong?: boolean }) => (
+  const row = (label: React.ReactNode, value: React.ReactNode, options?: { muted?: boolean; strong?: boolean; success?: boolean }) => (
     <div
       className={cn(
         'flex items-baseline justify-between gap-4 py-1.5 text-sm',
-        options?.strong ? 'font-semibold text-ink' : options?.muted ? 'text-muted' : 'text-ink'
+        options?.strong
+          ? 'font-heading text-lg font-semibold text-text'
+          : options?.success
+            ? 'font-medium text-success'
+            : options?.muted
+              ? 'text-muted'
+              : 'text-text'
       )}
     >
       <span>{label}</span>
@@ -45,38 +51,46 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
   );
 
   return (
-    <div className={cn('rounded-card border border-line bg-surface p-4', className)}>
+    <div className={cn('rounded-2xl bg-surface p-4.5 ring-1 ring-line/70 shadow-sm', className)}>
       <button
         type="button"
         onClick={() => setExpanded((value) => !value)}
         aria-expanded={expanded}
-        className="flex w-full items-center justify-between text-sm font-medium text-ink"
+        className="flex w-full items-center justify-between rounded-xl bg-sand px-4 py-3 text-sm font-semibold text-text transition-colors hover:bg-sand/80"
       >
         <span>
           {formatMoney(breakdown.totalAmount)} total · {nights} {nights === 1 ? 'night' : 'nights'}
         </span>
         <ChevronDown
-          className={cn('h-4 w-4 transition-transform', expanded && 'rotate-180')}
+          className={cn('h-4 w-4 text-muted transition-transform', expanded && 'rotate-180')}
           aria-hidden
         />
       </button>
 
       {expanded && breakdown.nightLines && breakdown.nightLines.length > 0 && (
-        <ul className="mt-2 border-l-2 border-line pl-3">
+        <ul className="mt-3 space-y-1.5 border-l-2 border-line/80 pl-3">
           {breakdown.nightLines.map((line) => (
-            <li key={line.date} className="flex items-baseline justify-between gap-3 py-0.5 text-xs text-muted">
-              <span>
+            <li key={line.date} className="flex items-baseline justify-between gap-3 text-xs text-muted">
+              <span className="flex items-center gap-1.5">
                 {formatDate(line.date)}
-                {line.isSeasonal && line.seasonName ? ` · ${line.seasonName}` : ''}
-                {line.isWeekend ? ' · weekend' : ''}
+                {line.isSeasonal && line.seasonName && (
+                  <span className="rounded-pill bg-sand px-1.5 py-0.5 text-[10px] text-text">
+                    {line.seasonName}
+                  </span>
+                )}
+                {line.isWeekend && (
+                  <span className="rounded-pill bg-highlight px-1.5 py-0.5 text-[10px] font-semibold text-accent-dark">
+                    weekend
+                  </span>
+                )}
               </span>
-              <span className="tabular">{formatMoney(line.rate)}</span>
+              <span className="tabular font-medium text-text">{formatMoney(line.rate)}</span>
             </li>
           ))}
         </ul>
       )}
 
-      <div className="mt-3 divide-y divide-line border-t border-line pt-2">
+      <div className="mt-3 divide-y divide-line/60 border-t border-line/70 pt-2">
         {row(
           `${nights} ${nights === 1 ? 'night' : 'nights'}`,
           formatMoney(breakdown.nightlySubtotal),
@@ -85,9 +99,12 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
         {hasDiscount && (
           <>
             {row(
-              `Length-of-stay discount${breakdown.discountPercent ? ` (${breakdown.discountPercent}%)` : ''}`,
+              <span className="inline-flex items-center gap-1">
+                <Tag className="h-3.5 w-3.5 text-success" />
+                Length-of-stay discount{breakdown.discountPercent ? ` (${breakdown.discountPercent}%)` : ''}
+              </span>,
               `−${formatMoney(breakdown.discountTotal)}`,
-              { muted: true }
+              { success: true }
             )}
             {row('Accommodation total', formatMoney(breakdown.accommodationTotal))}
           </>
@@ -98,7 +115,9 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
         {viewer === 'admin' && row('Service fee', formatMoney(breakdown.serviceFee))}
         {row('Taxes', formatMoney(breakdown.taxTotal))}
         {viewer !== 'guest' && row('Platform commission', formatMoney(breakdown.hostCommission))}
-        {row('Total', formatMoney(breakdown.totalAmount), { strong: true })}
+        <div className="mt-2 border-t-2 border-dashed border-line pt-2">
+          {row('Total', formatMoney(breakdown.totalAmount), { strong: true })}
+        </div>
         {viewer === 'host' && (
           <div className="mt-1 border-t border-line pt-1.5">
             {row('Your payout', formatMoney(breakdown.hostPayoutAmount), { strong: true })}

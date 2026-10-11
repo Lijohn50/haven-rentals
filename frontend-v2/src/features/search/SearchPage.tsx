@@ -224,12 +224,12 @@ const FilterChip: React.FC<{ filter: ActiveFilter; onRemove: (filter: ActiveFilt
   filter,
   onRemove,
 }) => (
-  <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface py-1 pl-3 pr-1 text-sm text-ink">
+  <span className="inline-flex items-center gap-1.5 rounded-pill bg-primary-soft py-1 pl-3 pr-1 text-sm font-medium text-primary shadow-sm">
     {filter.label}
     <button
       type="button"
       onClick={() => onRemove(filter)}
-      className="grid h-7 w-7 place-items-center rounded-full text-muted hover:bg-bg"
+      className="grid h-5 w-5 place-items-center rounded-full text-primary transition-colors hover:bg-primary/20"
       aria-label={`Remove filter: ${filter.label}`}
     >
       <X className="h-3.5 w-3.5" aria-hidden />
@@ -297,10 +297,18 @@ const AllFilters: React.FC<{
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant={filters.amenityIds.length > 0 ? 'primary' : 'outline'} size="sm">
-          <SlidersHorizontal className="h-4 w-4" aria-hidden />
+        <Button
+          variant={filters.amenityIds.length > 0 ? 'primary' : 'outline'}
+          size="sm"
+          className="rounded-pill px-3.5 h-9"
+        >
+          <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" aria-hidden />
           All filters
-          {filters.amenityIds.length > 0 && ` (${filters.amenityIds.length})`}
+          {filters.amenityIds.length > 0 && (
+            <span className="ml-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-white px-1">
+              {filters.amenityIds.length}
+            </span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="max-h-[80vh] w-[min(94vw,26rem)] overflow-y-auto">
@@ -574,14 +582,21 @@ export const SearchPage: React.FC = () => {
           </InlineAlert>
         )}
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted" aria-live="polite">
-            {query.data
-              ? `${pluralize(query.data.totalElements, 'home')}`
-              : query.isPending
-                ? 'Searching…'
-                : 'No results yet'}
-          </p>
+        <div className="mt-6 flex flex-wrap items-baseline justify-between gap-3 border-b border-line/60 pb-4">
+          <div>
+            <h1 className="font-heading text-xl font-semibold text-text">
+              {query.data
+                ? `${pluralize(query.data.totalElements, 'home')}`
+                : query.isPending
+                  ? 'Searching…'
+                  : 'No results yet'}
+              {filters.city && (
+                <span className="ml-1.5 text-base font-normal text-muted">
+                  in {filters.city}
+                </span>
+              )}
+            </h1>
+          </div>
           <div className="w-56">
             <label htmlFor="search-sort" className="sr-only">
               Sort results
@@ -667,9 +682,9 @@ export const SearchPage: React.FC = () => {
           </>
         )}
 
-        <p className="mt-6 text-xs text-muted">
+        <div className="mt-10 rounded-2xl border border-dashed border-line bg-surface/50 p-4 text-center text-xs text-muted">
           Stays are limited to {BRAND.maxNights} nights and {BRAND.maxGuests} guests per booking.
-        </p>
+        </div>
       </div>
     </div>
   );

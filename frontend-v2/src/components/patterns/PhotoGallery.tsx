@@ -41,19 +41,19 @@ export const PhotoGallery: React.FC<{
 
   return (
     <section aria-label={`Photos of ${title}`} className="relative">
-      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-4 sm:grid-rows-2 sm:gap-2">
+      <div className="grid grid-cols-1 gap-2 overflow-hidden rounded-hero shadow-card ring-1 ring-line/60 sm:h-[420px] sm:grid-cols-4 sm:grid-rows-2">
         <button
           type="button"
           onClick={() => {
             setIndex(0);
             setOpen(true);
           }}
-          className="group relative col-span-1 aspect-[16/9] overflow-hidden rounded-l-card sm:col-span-2 sm:row-span-2 sm:aspect-auto"
+          className="group relative col-span-1 aspect-[16/9] overflow-hidden sm:col-span-2 sm:row-span-2 sm:aspect-auto"
         >
           <img
             src={mediaUrl(cover.url) ?? PLACEHOLDER_IMAGE}
             alt={`${title} photo 1`}
-            className="h-full w-full object-cover"
+            className="h-full w-full cursor-zoom-in object-cover transition duration-300 hover:brightness-95"
           />
         </button>
         {small.map((photo, indexInGrid) => (
@@ -70,16 +70,15 @@ export const PhotoGallery: React.FC<{
               src={mediaUrl(photo.url) ?? PLACEHOLDER_IMAGE}
               alt={`${title} photo ${indexInGrid + 2}`}
               loading="lazy"
-              className="h-full w-full object-cover"
+              className="h-full w-full cursor-zoom-in object-cover transition duration-300 hover:brightness-95"
             />
           </button>
         ))}
       </div>
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="absolute bottom-4 right-4 bg-surface"
+      <button
+        type="button"
+        className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 rounded-pill bg-white/95 px-4 py-2 text-sm font-semibold text-text shadow-pop ring-1 ring-black/10 backdrop-blur transition-all hover:bg-white active:scale-95"
         onClick={() => {
           setIndex(0);
           setOpen(true);
@@ -87,7 +86,7 @@ export const PhotoGallery: React.FC<{
       >
         <Expand className="h-4 w-4" aria-hidden />
         Show all {photos.length} photos
-      </Button>
+      </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent hideClose className="max-w-4xl bg-surface p-4">

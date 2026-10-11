@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { Eye, Pencil, Sparkles } from 'lucide-react';
+import { Eye, Pencil, Sparkles, Users, Bed, BedSingle, Bath, Info, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApiError } from '@/api/errors';
 import { ROUTES } from '@/config/routes';
@@ -79,12 +79,12 @@ const ReviewSummary: React.FC<{ listing: ListingResponse }> = ({ listing }) => {
   if (summary.isPending || summary.isError || isAiUnavailable(summary.error) || !summary.data) return null;
 
   return (
-    <div className="rounded-card border border-line bg-primary-soft/40 p-4">
-      <p className="flex items-center gap-2 text-sm font-semibold text-primary-dark">
+    <div className="rounded-card border border-line bg-primary-soft/40 p-5 ring-1 ring-line/60">
+      <p className="flex items-center gap-2 text-sm font-semibold text-primary">
         <Sparkles className="h-4 w-4" aria-hidden />
         What guests say
       </p>
-      <p className="mt-1 whitespace-pre-line text-sm text-ink">{summary.data.summary}</p>
+      <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-text">{summary.data.summary}</p>
       <p className="mt-2 text-xs text-muted">
         Generated from {pluralize(summary.data.reviewCount, 'review')}.
       </p>
@@ -93,51 +93,60 @@ const ReviewSummary: React.FC<{ listing: ListingResponse }> = ({ listing }) => {
 };
 
 const HouseRules: React.FC<{ listing: ListingResponse }> = ({ listing }) => (
-  <section aria-label="House rules and times" className="rounded-card border border-line bg-surface p-5">
-    <h2 className="text-lg font-semibold text-ink">House rules and times</h2>
+  <section aria-label="House rules and times" className="rounded-card bg-surface p-6 shadow-card ring-1 ring-line/70 sm:p-7">
+    <h2 className="font-heading text-xl font-semibold text-text">House rules & times</h2>
     {listing.houseRules.length > 0 && (
-      <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-ink">
+      <ul className="mt-4 space-y-2 text-sm text-text">
         {[...listing.houseRules]
           .sort((a, b) => a.sortOrder - b.sortOrder)
           .map((rule) => (
-            <li key={`${rule.sortOrder}-${rule.text}`}>{rule.text}</li>
+            <li key={`${rule.sortOrder}-${rule.text}`} className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+              <span>{rule.text}</span>
+            </li>
           ))}
       </ul>
     )}
-    <dl className="mt-4 grid gap-2 border-t border-line pt-3 text-sm sm:grid-cols-2">
-      <div className="flex justify-between gap-3">
-        <dt className="text-muted">Check-in</dt>
-        <dd className="font-medium text-ink">{localTimeToDisplay(listing.checkInTime)}</dd>
+    <div className="mt-5 grid grid-cols-2 gap-3 border-t border-line/70 pt-5">
+      <div className="rounded-2xl bg-sand p-4 text-center">
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted">Check-in</div>
+        <div className="mt-1 font-heading text-xl font-semibold text-text">{localTimeToDisplay(listing.checkInTime)}</div>
       </div>
-      <div className="flex justify-between gap-3">
-        <dt className="text-muted">Check-out</dt>
-        <dd className="font-medium text-ink">{localTimeToDisplay(listing.checkOutTime)}</dd>
+      <div className="rounded-2xl bg-sand p-4 text-center">
+        <div className="text-xs font-semibold uppercase tracking-wider text-muted">Check-out</div>
+        <div className="mt-1 font-heading text-xl font-semibold text-text">{localTimeToDisplay(listing.checkOutTime)}</div>
       </div>
-    </dl>
-    <p className="mt-2 text-xs text-muted">Times are local to {listing.timezone}.</p>
+    </div>
+    <p className="mt-3 text-xs text-muted">Times are local to {listing.timezone}.</p>
   </section>
 );
 
 const HostBlock: React.FC<{ listing: ListingResponse }> = ({ listing }) => {
   const name = listing.hostDisplayName ?? 'Your host';
-  const body = listing.hostId ? (
-    <Link
-      to={ROUTES.HOST_PROFILE(listing.hostId)}
-      className="text-sm font-medium text-primary underline underline-offset-4"
-    >
-      See host profile
-    </Link>
-  ) : (
-    <p className="text-xs text-muted">Hosted by a verified owner.</p>
-  );
 
   return (
-    <section aria-label="Your host" className="rounded-card border border-line bg-surface p-5">
-      <h2 className="text-lg font-semibold text-ink">Hosted by {name}</h2>
-      <p className="mt-1 text-sm text-muted">
-        Message {name.split(' ')[0]} before you book; questions are answered in the inbox.
-      </p>
-      <div className="mt-3">{body}</div>
+    <section aria-label="Your host" className="rounded-card bg-surface p-6 shadow-card ring-1 ring-line/70 sm:p-7">
+      <div className="flex items-center gap-4">
+        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-brand text-lg font-semibold text-white shadow-sm ring-2 ring-white">
+          {name.slice(0, 2).toUpperCase()}
+        </div>
+        <div>
+          <h2 className="font-heading text-xl font-semibold text-text">Hosted by {name}</h2>
+          <p className="mt-0.5 text-sm text-muted">
+            Message {name.split(' ')[0]} before you book; questions are answered in the inbox.
+          </p>
+        </div>
+      </div>
+      {listing.hostId && (
+        <div className="mt-4 border-t border-line/70 pt-4">
+          <Link
+            to={ROUTES.HOST_PROFILE(listing.hostId)}
+            className="inline-flex items-center gap-1 rounded-pill border border-line bg-surface px-4 py-2 text-sm font-semibold text-text shadow-sm transition-colors hover:border-primary hover:text-primary"
+          >
+            See host profile →
+          </Link>
+        </div>
+      )}
     </section>
   );
 };
@@ -307,7 +316,7 @@ const AnchorNav: React.FC<{ reviewCount: number }> = ({ reviewCount }) => {
   ];
 
   return (
-    <nav aria-label="Sections on this page" className="flex gap-1 overflow-x-auto border-b border-line">
+    <nav aria-label="Sections on this page" className="flex gap-2 overflow-x-auto border-b border-line/70 pb-1">
       {links.map((link) => {
         const isActive = active === link.href;
         return (
@@ -316,8 +325,10 @@ const AnchorNav: React.FC<{ reviewCount: number }> = ({ reviewCount }) => {
             href={link.href}
             onClick={() => setActive(link.href)}
             className={cn(
-              'shrink-0 border-b-2 px-3 py-2 text-sm font-medium transition-colors',
-              isActive ? 'border-primary text-primary' : 'border-transparent text-muted hover:border-primary hover:text-primary'
+              'relative shrink-0 px-3.5 py-2 text-sm font-medium transition-colors',
+              isActive
+                ? 'font-semibold text-primary after:absolute after:inset-x-2 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-primary'
+                : 'text-muted hover:text-primary'
             )}
           >
             {link.label}
@@ -479,37 +490,84 @@ export const ListingPage: React.FC = () => {
 
         <PhotoGallery photos={listing.photos} title={listing.title} />
 
-        <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
+        <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-sm uppercase tracking-wide text-muted">
+            <p className="flex items-center gap-1 text-xs font-semibold uppercase tracking-[.12em] text-muted">
+              <MapPin className="h-3.5 w-3.5 text-primary" aria-hidden />
               {propertyTypeLabels[listing.propertyType]} · {listing.city}, {listing.country}
             </p>
-            <h1 className="font-heading text-2xl font-semibold text-ink sm:text-3xl">{listing.title}</h1>
+            <h1 className="mt-1 font-heading text-3xl font-semibold tracking-tight text-text sm:text-4xl">
+              {listing.title}
+            </h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge tone="neutral">
-              {listing.reviewCount > 0
-                ? `${formatRating(listing.averageRating)} (${listing.reviewCount})`
-                : 'New'}
-            </Badge>
+            {listing.reviewCount > 0 ? (
+              <span className="inline-flex items-center gap-1 rounded-pill bg-sand px-3 py-1 text-xs font-semibold text-text">
+                ★ <span className="tabular">{formatRating(listing.averageRating)}</span> ({listing.reviewCount})
+              </span>
+            ) : (
+              <span className="rounded-pill bg-highlight px-3 py-1 text-xs font-semibold text-accent-dark">
+                New
+              </span>
+            )}
             {topRated && <Badge tone="success">Top rated</Badge>}
-            {listing.instantBook && <Badge tone="info">Instant Book</Badge>}
+            {listing.instantBook && (
+              <span className="inline-flex items-center gap-1 rounded-pill bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
+                ⚡ Instant Book
+              </span>
+            )}
           </div>
         </div>
 
-        <p className="mt-2 text-sm text-muted">
-          Sleeps {listing.maxGuests} · {pluralize(listing.bedrooms, 'bedroom')} ·{' '}
-          {pluralize(listing.beds, 'bed')} · {formatBathrooms(listing.bathrooms)} bathrooms
-        </p>
+        {/* 4 Stat tiles */}
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="flex items-center gap-3.5 rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-line/70">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+              <Users className="h-5 w-5" aria-hidden />
+            </div>
+            <div>
+              <div className="font-heading text-lg font-semibold text-text">{listing.maxGuests}</div>
+              <div className="text-xs text-muted">Sleeps</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3.5 rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-line/70">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+              <Bed className="h-5 w-5" aria-hidden />
+            </div>
+            <div>
+              <div className="font-heading text-lg font-semibold text-text">{listing.bedrooms}</div>
+              <div className="text-xs text-muted">{listing.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3.5 rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-line/70">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+              <BedSingle className="h-5 w-5" aria-hidden />
+            </div>
+            <div>
+              <div className="font-heading text-lg font-semibold text-text">{listing.beds}</div>
+              <div className="text-xs text-muted">{listing.beds === 1 ? 'Bed' : 'Beds'}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3.5 rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-line/70">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+              <Bath className="h-5 w-5" aria-hidden />
+            </div>
+            <div>
+              <div className="font-heading text-lg font-semibold text-text">{formatBathrooms(listing.bathrooms)}</div>
+              <div className="text-xs text-muted">Bathrooms</div>
+            </div>
+          </div>
+        </div>
 
-        <div className="mt-4">
+        <div className="mt-6">
           <AnchorNav reviewCount={listing.reviewCount} />
         </div>
       </div>
 
       <div className="mx-auto mt-6 grid max-w-content gap-6 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
         <div className="flex min-w-0 flex-col gap-8">
-          <section id="overview" aria-label="About this home" className="scroll-mt-32">
+          <section id="overview" aria-label="About this home" className="scroll-mt-32 rounded-card bg-surface p-6 shadow-card ring-1 ring-line/70 sm:p-7">
+            <h2 className="mb-3 font-heading text-xl font-semibold text-text">Overview</h2>
             <Description text={listing.description} />
             {listing.rejectionReason && showOwnerBar && (
               <InlineAlert tone="danger" className="mt-3">
@@ -520,18 +578,17 @@ export const ListingPage: React.FC = () => {
 
           <HostBlock listing={listing} />
 
-          <div className="rounded-card border border-line bg-surface p-5">
-            <p className="text-sm text-muted">
-              From {formatMoney(listing.baseNightlyPrice)}{' '}
-              <span className="font-semibold text-ink tabular">per night</span>, plus the cleaning fee, service fee
-              and taxes shown before you pay.
+          <div className="flex items-center gap-3 rounded-2xl bg-primary-soft/60 p-4 ring-1 ring-primary/20">
+            <Info className="h-5 w-5 shrink-0 text-primary" aria-hidden />
+            <p className="text-sm text-primary-dark">
+              From <span className="font-semibold tabular">{formatMoney(listing.baseNightlyPrice)}</span> per night, plus the cleaning fee, service fee and taxes shown before you pay.
             </p>
           </div>
 
           <ReviewSummary listing={listing} />
 
-          <section id="amenities" aria-label="Amenities" className="scroll-mt-32">
-            <h2 className="mb-3 text-lg font-semibold text-ink">
+          <section id="amenities" aria-label="Amenities" className="scroll-mt-32 rounded-card bg-surface p-6 shadow-card ring-1 ring-line/70 sm:p-7">
+            <h2 className="mb-4 font-heading text-xl font-semibold text-text">
               What this home offers {listing.amenities.length > 0 && `(${listing.amenities.length})`}
             </h2>
             {listing.amenities.length > 0 ? (
@@ -555,12 +612,12 @@ export const ListingPage: React.FC = () => {
             />
           </div>
 
-          <section id="location" aria-label="Location" className="scroll-mt-32">
-            <h2 className="mb-3 text-lg font-semibold text-ink">Where you will be</h2>
-            <p className="mb-3 text-sm text-muted">
+          <section id="location" aria-label="Location" className="scroll-mt-32 rounded-card bg-surface p-6 shadow-card ring-1 ring-line/70 sm:p-7">
+            <h2 className="mb-2 font-heading text-xl font-semibold text-text">Where you will be</h2>
+            <p className="mb-4 text-sm text-muted">
               The map shows an approximate area in {listing.city}. The exact address is shared after you book.
             </p>
-            <div className="h-72 w-full overflow-hidden rounded-card border border-line">
+            <div className="h-80 w-full overflow-hidden rounded-2xl ring-1 ring-line/70">
               <MapView latitude={listing.latitude} longitude={listing.longitude} label={listing.city} />
             </div>
           </section>

@@ -20,7 +20,10 @@ const config: Config = {
         },
         bg: 'rgb(var(--color-bg) / <alpha-value>)',
         surface: 'rgb(var(--color-surface) / <alpha-value>)',
-        ink: 'rgb(var(--color-text) / <alpha-value>)',
+        text: 'rgb(var(--color-text) / <alpha-value>)',
+        sand: 'rgb(var(--color-sand) / <alpha-value>)',
+        ink: 'rgb(var(--color-ink) / <alpha-value>)',
+        star: 'rgb(var(--color-star) / <alpha-value>)',
         muted: 'rgb(var(--color-muted) / <alpha-value>)',
         line: 'rgb(var(--color-border) / <alpha-value>)',
         highlight: 'rgb(var(--color-highlight) / <alpha-value>)',
@@ -54,6 +57,7 @@ const config: Config = {
         control: 'var(--radius-control)',
         card: 'var(--radius-card)',
         hero: 'var(--radius-hero)',
+        pill: 'var(--radius-pill)',
       },
       fontFamily: {
         sans: 'var(--font-sans)',
@@ -61,13 +65,29 @@ const config: Config = {
       },
       boxShadow: {
         card: 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
         pop: 'var(--shadow-pop)',
+        search: 'var(--shadow-search)',
+      },
+      backgroundImage: {
+        'hero-scrim': 'var(--gradient-hero)',
+        brand: 'var(--gradient-brand)',
+      },
+      transitionTimingFunction: {
+        out: 'var(--ease-out)',
       },
       maxWidth: {
         content: '1200px',
         narrow: '1040px',
       },
       keyframes: {
+        'fade-up': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'none' },
+        },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
         'fade-in': {
           from: { opacity: '0' },
           to: { opacity: '1' },
@@ -82,6 +102,8 @@ const config: Config = {
         },
       },
       animation: {
+        'fade-up': 'fade-up .5s var(--ease-out) both',
+        shimmer: 'shimmer 1.4s infinite',
         'fade-in': 'fade-in 180ms ease-out',
         'zoom-in': 'zoom-in 160ms ease-out',
         skeleton: 'skeleton-pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite',

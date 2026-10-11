@@ -46,7 +46,7 @@ export const PolicyCard: React.FC<{ policy: CancellationPolicy; description: str
         </div>
       </div>
 
-      <ol className="mt-4 grid gap-3 sm:grid-cols-3">
+      <ol className="mt-6 grid gap-4 sm:grid-cols-3 pt-2">
         {STAGES.map((stage) => {
           const isActive = stage.policy === policy;
           return (
@@ -54,17 +54,25 @@ export const PolicyCard: React.FC<{ policy: CancellationPolicy; description: str
               key={stage.policy}
               aria-current={isActive ? 'true' : undefined}
               className={cn(
-                'rounded-control border p-3 text-sm',
-                isActive ? 'border-primary bg-primary-soft/40' : 'border-line bg-bg'
+                'relative rounded-2xl p-4 text-sm transition-all',
+                isActive
+                  ? 'bg-primary-soft/40 ring-2 ring-primary shadow-sm'
+                  : 'bg-sand/60 ring-1 ring-line/70'
               )}
             >
-              <p className={cn('font-semibold', isActive ? 'text-primary-dark' : 'text-ink')}>
+              {isActive && (
+                <span className="absolute -top-3 left-4 rounded-pill bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-sm">
+                  Your policy
+                </span>
+              )}
+              <p className={cn('font-semibold text-base', isActive ? 'text-primary font-bold' : 'text-text')}>
                 {cancellationPolicyLabels[stage.policy]}
-                {isActive && <span className="ml-1 text-xs font-normal text-primary-dark">your policy</span>}
               </p>
-              <p className="mt-1 text-muted">{stage.full}</p>
-              <p className="text-muted">{stage.partial}</p>
-              <p className="text-muted">{stage.late}</p>
+              <div className="mt-2 space-y-1 text-xs text-muted">
+                <p className="font-medium text-text">{stage.full}</p>
+                <p>{stage.partial}</p>
+                <p>{stage.late}</p>
+              </div>
             </li>
           );
         })}

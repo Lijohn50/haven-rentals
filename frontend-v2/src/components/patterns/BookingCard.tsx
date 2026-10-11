@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MessageSquare, Pencil } from 'lucide-react';
+import { cn } from '@/lib/cn';
 import { ROUTES } from '@/config/routes';
 import { BRAND } from '@/config/brand';
 import { useAuth } from '@/providers/AuthProvider';
@@ -122,17 +123,22 @@ useEffect(() => {
   const ctaDisabled = !range.from || !range.to || Boolean(rangeProblem);
 
   return (
-    <aside aria-label="Booking" className="rounded-card border border-line bg-surface p-5 shadow-card">
-      <p className="tabular text-2xl font-semibold text-ink">
-        {formatMoney(listing.baseNightlyPrice)}{' '}
-        <span className="text-sm font-normal text-muted">per night</span>
-      </p>
-      <p className="text-xs text-muted">
-        {pluralize(listing.minNights, 'night')} minimum
-        {listing.maxNights < BRAND.maxNights
-          ? ` · ${pluralize(listing.maxNights, 'night')} maximum`
-          : ''}
-      </p>
+    <aside
+      aria-label="Booking"
+      className="max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain rounded-hero bg-surface p-6 shadow-pop ring-1 ring-line/60"
+    >
+      <div className="flex items-baseline justify-between">
+        <p className="font-heading text-3xl font-semibold tabular-nums text-text">
+          {formatMoney(listing.baseNightlyPrice)}{' '}
+          <span className="text-sm font-normal text-muted">/ night</span>
+        </p>
+        <span className="rounded-pill bg-sand px-2.5 py-0.5 text-xs font-medium text-muted">
+          {pluralize(listing.minNights, 'night')} min
+          {listing.maxNights < BRAND.maxNights
+            ? ` · ${pluralize(listing.maxNights, 'night')} max`
+            : ''}
+        </span>
+      </div>
 
       <div className="mt-4 flex flex-col gap-3">
         {calendar.isPending && <Skeleton className="h-64 w-full" />}
@@ -150,7 +156,7 @@ useEffect(() => {
 
       {rangeProblem && <InlineAlert tone="warning" className="mt-3">{rangeProblem}</InlineAlert>}
 
-      <div className="mt-3 border-t border-line pt-3">
+      <div className="mt-3 border-t border-line/70 pt-3">
         <Stepper
           label="Guests"
           value={guests}
@@ -159,7 +165,7 @@ useEffect(() => {
           onChange={setGuests}
           suffix={guests === 1 ? ' guest' : ' guests'}
         />
-        <p className="text-xs text-muted">This home sleeps up to {listing.maxGuests}.</p>
+        <p className="mt-1 text-xs text-muted">This home sleeps up to {listing.maxGuests}.</p>
       </div>
 
       <div className="mt-4 flex flex-col gap-2">
@@ -177,16 +183,19 @@ useEffect(() => {
         {canQuote && quote.isError && <BookingError error={quote.error} />}
       </div>
 
-      <Button
-        variant="accent"
-        size="lg"
-        block
-        className="mt-4"
+      <button
+        type="button"
         disabled={ctaDisabled}
         onClick={cta}
+        className={cn(
+          'mt-4 flex w-full items-center justify-center rounded-2xl py-3.5 text-base font-semibold transition-all',
+          ctaDisabled
+            ? 'cursor-not-allowed bg-sand text-muted'
+            : 'bg-accent text-white shadow-[0_10px_24px_-8px_rgb(217_92_46/0.7)] hover:bg-accent-dark active:scale-[0.99]'
+        )}
       >
         {ctaLabel}
-      </Button>
+      </button>
       {!listing.instantBook && (
         <p className="mt-2 text-xs text-muted">
           You will be charged now. The host has {BRAND.hostResponseHours} hours to respond; if they decline or do

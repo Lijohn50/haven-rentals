@@ -6,17 +6,24 @@
    alpha, so every `bg-primary/30`-style class was silently dropped from the build. Any
    direct `var(--color-x)` outside Tailwind must therefore be wrapped in `rgb()` too. */
 :root {
-  --color-primary: 15 118 110;
-  --color-primary-dark: 17 94 89;
-  --color-primary-soft: 204 251 241;
-  --color-accent: 194 65 12;
-  --color-accent-dark: 154 52 18;
-  --color-bg: 248 250 252;
+  --color-primary: 13 115 107;
+  --color-primary-dark: 10 82 77;
+  --color-primary-soft: 221 243 239;
+  --color-accent: 217 92 46;
+  --color-accent-dark: 176 68 30;
+  --color-bg: 250 247 242;
   --color-surface: 255 255 255;
-  --color-text: 15 23 42;
-  --color-muted: 71 85 105;
-  --color-border: 226 232 240;
-  --color-highlight: 204 251 241;
+  --color-text: 28 25 23;
+  --color-muted: 100 94 86;
+  --color-border: 234 227 216;
+  --color-highlight: 255 237 213;
+
+  --color-sand: 244 237 226;
+  --color-ink: 20 34 38;
+  --color-star: 234 160 32;
+  --color-overlay: 12 20 22;
+  --gradient-hero: linear-gradient(180deg, rgb(12 20 22 / 0.10) 0%, rgb(12 20 22 / 0.55) 100%);
+  --gradient-brand: linear-gradient(135deg, rgb(13 115 107) 0%, rgb(20 150 135) 100%);
 
   --color-success: 21 128 61;
   --color-success-text: 22 101 52;
@@ -34,12 +41,21 @@
   --color-neutral-text: 51 65 85;
   --color-neutral-soft: 226 232 240;
 
-  --radius-control: 8px;
-  --radius-card: 12px;
-  --radius-hero: 16px;
+  --radius-control: 10px;
+  --radius-card: 18px;
+  --radius-hero: 24px;
+  --radius-pill: 999px;
 
-  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-pop: 0 16px 40px -16px rgba(15, 23, 42, 0.18);
+  --shadow-card: 0 1px 2px rgb(28 25 23 / 0.04), 0 4px 12px -2px rgb(28 25 23 / 0.06);
+  --shadow-card-hover: 0 2px 4px rgb(28 25 23 / 0.05), 0 18px 36px -12px rgb(28 25 23 / 0.22);
+  --shadow-pop: 0 24px 48px -16px rgb(28 25 23 / 0.28);
+  --shadow-search: 0 10px 30px -8px rgb(12 20 22 / 0.35);
+  --shadow-inset-line: inset 0 0 0 1px rgb(var(--color-border));
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 500ms;
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-heading: 'Poppins', 'Inter', system-ui, sans-serif;
