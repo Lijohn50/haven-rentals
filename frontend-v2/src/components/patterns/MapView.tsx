@@ -22,7 +22,7 @@ function LeafletMap({ latitude, longitude, label, className }: MapViewProps) {
       center={[latitude, longitude]}
       zoom={12}
       scrollWheelZoom={false}
-      className={className}
+      className={cn('relative isolate z-0', className)}
       style={{ width: '100%', height: '100%' }}
     >
       <TileLayer url={ENV.MAP_TILE_URL} attribution={ENV.MAP_ATTRIBUTION} />

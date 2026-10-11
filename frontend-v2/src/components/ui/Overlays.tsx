@@ -19,11 +19,11 @@ export const DialogContent = forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { hideClose?: boolean }
 >(({ className, children, hideClose, ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/45 animate-fade-in" />
+    <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-ink/45 animate-fade-in" />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-1/2 top-1/2 z-50 max-h-[90vh] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-card border border-line bg-surface p-6 shadow-pop animate-zoom-in',
+        'fixed left-1/2 top-1/2 z-[100] max-h-[90vh] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-card border border-line bg-surface p-6 shadow-pop animate-zoom-in',
         className
       )}
       {...props}
@@ -62,11 +62,11 @@ export const DrawerContent = forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/45 animate-fade-in" />
+    <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-ink/45 animate-fade-in" />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-hero border-t border-line bg-surface p-5 animate-fade-in lg:hidden',
+        'fixed inset-x-0 bottom-0 z-[100] max-h-[85vh] overflow-y-auto rounded-t-hero border-t border-line bg-surface p-5 animate-fade-in lg:hidden',
         className
       )}
       {...props}
@@ -93,7 +93,7 @@ export const PopoverContent = forwardRef<
       ref={ref}
       align={align}
       sideOffset={sideOffset}
-      className={cn('z-50 rounded-card border border-line bg-surface p-4 shadow-pop animate-fade-in', className)}
+      className={cn('z-[100] rounded-card border border-line bg-surface p-4 shadow-pop animate-fade-in', className)}
       {...props}
     />
   </PopoverPrimitive.Portal>
@@ -115,7 +115,7 @@ export const DropdownMenuContent = forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        'z-50 min-w-[13rem] rounded-card border border-line bg-surface p-1 shadow-pop animate-fade-in',
+        'z-[100] min-w-[13rem] rounded-card border border-line bg-surface p-1 shadow-pop animate-fade-in',
         className
       )}
       {...props}
@@ -246,7 +246,7 @@ export const Tooltip: React.FC<{
       <TooltipPrimitive.Content
         side={side}
         sideOffset={6}
-        className="z-50 max-w-xs rounded-control bg-ink px-3 py-1.5 text-xs text-white shadow-pop"
+        className="z-[110] max-w-xs rounded-control bg-ink px-3 py-1.5 text-xs text-white shadow-pop"
       >
         {content}
       </TooltipPrimitive.Content>

@@ -62,6 +62,12 @@
     filter: grayscale(0.35) contrast(0.96) brightness(1.02);
   }
 
+  /* isolate Leaflet map so controls and tiles never bleed over modals */
+  .leaflet-container {
+    z-index: 0 !important;
+    isolation: isolate;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

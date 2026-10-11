@@ -627,7 +627,7 @@ export const ListingPage: React.FC = () => {
             <p className="mb-4 text-sm text-muted">
               The map shows an approximate area in {listing.city}. The exact address is shared after you book.
             </p>
-            <div className="h-80 w-full overflow-hidden rounded-2xl ring-1 ring-line/70">
+            <div className="relative isolate z-0 h-80 w-full overflow-hidden rounded-2xl ring-1 ring-line/70">
               <MapView latitude={listing.latitude} longitude={listing.longitude} label={listing.city} />
             </div>
           </section>

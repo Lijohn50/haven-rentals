@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Copy, Lock, Timer } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Copy, Lock, MessageSquare, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 import { ApiError } from '@/api/errors';
 import { BRAND } from '@/config/brand';
@@ -14,6 +14,7 @@ import {
 } from '@/features/booking/PaymentMethodField';
 import { CountdownPill } from '@/components/patterns/Countdown';
 import { PriceBreakdown } from '@/components/patterns/PriceBreakdown';
+import { ContactHostDialog } from '@/components/patterns/ContactHostDialog';
 import { useCountdown } from '@/hooks/useUtilities';
 import { useDocumentTitle } from '@/hooks/useSeo';
 import { cn } from '@/lib/cn';
@@ -43,6 +44,7 @@ function newAttemptKey(): string {
 
 const PayConfirmation: React.FC<{ booking: BookingResponse }> = ({ booking }) => {
   const navigate = useNavigate();
+  const [contactOpen, setContactOpen] = useState(false);
   const requested = booking.status === 'PENDING_APPROVAL';
 
   return (
@@ -146,10 +148,17 @@ const PayConfirmation: React.FC<{ booking: BookingResponse }> = ({ booking }) =>
         <Button asChild>
           <Link to={ROUTES.TRIP(booking.reference)}>View trip</Link>
         </Button>
-        <Button asChild variant="outline">
-          <Link to={ROUTES.INBOX}>Message host</Link>
+        <Button variant="outline" onClick={() => setContactOpen(true)}>
+          <MessageSquare className="h-4 w-4" aria-hidden />
+          Message host
         </Button>
       </div>
+
+      <ContactHostDialog
+        listingId={booking.listing.id}
+        open={contactOpen}
+        onOpenChange={setContactOpen}
+      />
     </div>
   );
 };

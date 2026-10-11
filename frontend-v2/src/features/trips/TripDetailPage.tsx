@@ -10,6 +10,7 @@ import { useListing } from '@/features/listings/api';
 import { isAiUnavailable, useTripPlan } from '@/features/ai/api';
 import { BookingTimeline } from '@/components/patterns/BookingTimeline';
 import { CancelBookingDialog } from '@/components/patterns/CancelBookingDialog';
+import { ContactHostDialog } from '@/components/patterns/ContactHostDialog';
 import { CountdownPill } from '@/components/patterns/Countdown';
 import { PriceBreakdown } from '@/components/patterns/PriceBreakdown';
 import { Breadcrumbs } from '@/components/layout/MobileTabBar';
@@ -43,6 +44,7 @@ export const TripDetailPage: React.FC = () => {
   const listing = useListing(booking.data?.listing.id ?? null);
   const tripPlan = useTripPlan();
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
   const stay = booking.data;
   const timeZone = listing.data?.timezone ?? null;
@@ -157,7 +159,7 @@ export const TripDetailPage: React.FC = () => {
           </Button>
         )}
         {actions.includes('MESSAGE') && (
-          <Button variant="outline" onClick={() => navigate(ROUTES.INBOX)}>
+          <Button variant="outline" onClick={() => setContactOpen(true)}>
             <MessageSquare className="h-4 w-4" aria-hidden />
             Message host
           </Button>
@@ -378,6 +380,14 @@ export const TripDetailPage: React.FC = () => {
         onOpenChange={setCancelOpen}
         onCancelled={() => void booking.refetch()}
       />
+
+      {stay && (
+        <ContactHostDialog
+          listingId={stay.listing.id}
+          open={contactOpen}
+          onOpenChange={setContactOpen}
+        />
+      )}
     </div>
   );
 };
