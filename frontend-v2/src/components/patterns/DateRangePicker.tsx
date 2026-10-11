@@ -47,13 +47,16 @@ export const DateRangePicker: React.FC<{
   const reasonFor = (date: Date): string | null => {
     const iso = fromPickerDate(date);
     if (value.from && !value.to) {
+      if (iso <= value.from) {
+        return isCheckInSelectable(days, iso, listing).reason ?? null;
+      }
       return isCheckOutSelectable(days, value.from, iso, listing).reason ?? null;
     }
     return isCheckInSelectable(days, iso, listing).reason ?? null;
   };
 
   return (
-    <div className={cn('overflow-hidden rounded-2xl border border-line/70 bg-surface p-3 shadow-sm', className)}>
+    <div className={cn('overflow-hidden rounded-2xl border border-line/70 bg-surface p-4 shadow-sm', className)}>
       {listing.advanceNoticeDays > 0 && (
         <div className="mb-2 rounded-lg bg-sand/80 px-2.5 py-1 text-xs text-muted">
           ⓘ Advance notice: reservations require at least {listing.advanceNoticeDays}{' '}
@@ -64,16 +67,35 @@ export const DateRangePicker: React.FC<{
         mode="range"
         numberOfMonths={months}
         selected={selected}
-        onSelect={(range, triggerDate) => {
-          if (value.from && value.to && triggerDate) {
-            const nextCheckIn = fromPickerDate(triggerDate);
-            onChange({ from: nextCheckIn, to: undefined });
+        onSelect={(_range, triggerDate) => {
+          if (!triggerDate) return;
+          const clicked = fromPickerDate(triggerDate);
+
+          // 1. If both from and to are already set: start a new selection
+          if (value.from && value.to) {
+            onChange({ from: clicked, to: undefined });
             return;
           }
-          onChange({
-            from: range?.from ? fromPickerDate(range.from) : undefined,
-            to: range?.to ? fromPickerDate(range.to) : undefined,
-          });
+
+          // 2. If check-in is set and check-out is not:
+          if (value.from && !value.to) {
+            if (clicked === value.from) {
+              // Clicking the check-in date again clears the selection
+              onChange({ from: undefined, to: undefined });
+              return;
+            }
+            if (clicked < value.from) {
+              // Clicking an earlier date moves check-in
+              onChange({ from: clicked, to: undefined });
+              return;
+            }
+            // Clicking a date after check-in selects check-out!
+            onChange({ from: value.from, to: clicked });
+            return;
+          }
+
+          // 3. No dates set: select check-in
+          onChange({ from: clicked, to: undefined });
         }}
         disabled={(date: Date) => reasonFor(date) !== null}
         modifiers={{
@@ -97,7 +119,22 @@ export const DateRangePicker: React.FC<{
             return <DayButton {...props} title={tooltip} aria-label={tooltip} />;
           },
         }}
-        className="mx-auto flex w-full justify-center [--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.2rem] [--rdp-day-height:2.2rem] [&_.rdp-month]:w-full [&_.rdp-month]:max-w-full [&_.rdp-month_grid]:w-full [&_.rdp-table]:w-full [&_.rdp-weeks]:w-full [&_.rdp-weekdays]:w-full [&_.rdp-month_caption]:px-2 [&_.rdp-month_caption]:pb-2.5 [&_.rdp-caption_label]:text-base [&_.rdp-caption_label]:font-heading [&_.rdp-caption_label]:font-semibold [&_.rdp-caption_label]:text-text [&_.rdp-nav]:pr-1.5"
+        classNames={{
+          months: 'w-full',
+          month: 'w-full',
+          month_caption: 'flex items-center justify-between px-2.5 pb-2.5',
+          caption_label: 'text-base font-heading font-semibold text-text tracking-tight pl-0.5',
+          nav: 'flex items-center gap-1 pr-1',
+          button_previous: 'p-1 hover:bg-sand rounded-lg text-text transition-colors',
+          button_next: 'p-1 hover:bg-sand rounded-lg text-text transition-colors',
+          month_grid: 'w-full border-collapse',
+          weekdays: 'w-full',
+          weekday: 'text-xs font-medium text-muted text-center py-1.5',
+          weeks: 'w-full',
+          day: 'text-center p-0',
+          day_button: 'w-9 h-9 mx-auto rounded-full text-sm font-medium transition-colors',
+        }}
+        className="mx-auto flex w-full justify-center [--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.2rem] [--rdp-day-height:2.2rem] [&_.rdp-month]:w-full [&_.rdp-month]:max-w-full [&_.rdp-month\_grid]:w-full [&_.rdp-table]:w-full [&_.rdp-weeks]:w-full [&_.rdp-weekdays]:w-full [&_.rdp-month\_caption]:px-2.5 [&_.rdp-month\_caption]:pb-2.5 [&_.rdp-caption\_label]:text-base [&_.rdp-caption\_label]:font-heading [&_.rdp-caption\_label]:font-semibold [&_.rdp-caption\_label]:text-text [&_.rdp-nav]:pr-1"
       />
       <div className="mt-2.5 flex items-center justify-between border-t border-line/60 pt-2 text-xs">
         <div className="min-w-0 font-medium text-text">
