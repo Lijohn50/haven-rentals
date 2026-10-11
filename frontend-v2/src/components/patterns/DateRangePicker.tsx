@@ -57,6 +57,57 @@ export const DateRangePicker: React.FC<{
 
   return (
     <div className={cn('overflow-hidden rounded-2xl border border-line/70 bg-surface p-4 shadow-sm', className)}>
+      <style>{`
+        .rdp-month_caption {
+          padding-left: 0.625rem;
+          padding-right: 0.625rem;
+          padding-bottom: 0.5rem;
+          display: flex;
+          align-items: center;
+          height: 2.5rem;
+        }
+        .rdp-caption_label {
+          font-size: 1.05rem;
+          font-weight: 600;
+          color: rgb(var(--color-text));
+          font-family: var(--font-heading);
+        }
+        .rdp-nav {
+          position: absolute;
+          top: 0;
+          right: 0.25rem;
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          height: 2.5rem;
+        }
+        .rdp-button_previous, .rdp-button_next {
+          width: 2rem;
+          height: 2rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 0.5rem;
+          transition: background-color 0.15s;
+        }
+        .rdp-button_previous:hover, .rdp-button_next:hover {
+          background-color: rgb(var(--color-sand));
+        }
+        .rdp-selected .rdp-day_button,
+        .rdp-range_start .rdp-day_button,
+        .rdp-range_end .rdp-day_button {
+          background-color: rgb(var(--color-primary)) !important;
+          color: #ffffff !important;
+          border-radius: 9999px !important;
+          font-weight: 600 !important;
+        }
+        .rdp-range_middle {
+          background-color: rgb(var(--color-primary-soft)) !important;
+        }
+        .rdp-range_middle .rdp-day_button {
+          color: rgb(var(--color-primary-dark)) !important;
+        }
+      `}</style>
       {listing.advanceNoticeDays > 0 && (
         <div className="mb-2 rounded-lg bg-sand/80 px-2.5 py-1 text-xs text-muted">
           ⓘ Advance notice: reservations require at least {listing.advanceNoticeDays}{' '}
@@ -119,22 +170,7 @@ export const DateRangePicker: React.FC<{
             return <DayButton {...props} title={tooltip} aria-label={tooltip} />;
           },
         }}
-        classNames={{
-          months: 'w-full',
-          month: 'w-full',
-          month_caption: 'flex items-center justify-between px-2.5 pb-2.5',
-          caption_label: 'text-base font-heading font-semibold text-text tracking-tight pl-0.5',
-          nav: 'flex items-center gap-1 pr-1',
-          button_previous: 'p-1 hover:bg-sand rounded-lg text-text transition-colors',
-          button_next: 'p-1 hover:bg-sand rounded-lg text-text transition-colors',
-          month_grid: 'w-full border-collapse',
-          weekdays: 'w-full',
-          weekday: 'text-xs font-medium text-muted text-center py-1.5',
-          weeks: 'w-full',
-          day: 'text-center p-0',
-          day_button: 'w-9 h-9 mx-auto rounded-full text-sm font-medium transition-colors',
-        }}
-        className="mx-auto flex w-full justify-center [--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.2rem] [--rdp-day-height:2.2rem] [&_.rdp-month]:w-full [&_.rdp-month]:max-w-full [&_.rdp-month\_grid]:w-full [&_.rdp-table]:w-full [&_.rdp-weeks]:w-full [&_.rdp-weekdays]:w-full [&_.rdp-month\_caption]:px-2.5 [&_.rdp-month\_caption]:pb-2.5 [&_.rdp-caption\_label]:text-base [&_.rdp-caption\_label]:font-heading [&_.rdp-caption\_label]:font-semibold [&_.rdp-caption\_label]:text-text [&_.rdp-nav]:pr-1"
+        className="mx-auto flex w-full justify-center [--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day-width:2.2rem] [--rdp-day-height:2.2rem] [&_.rdp-month]:w-full [&_.rdp-month]:max-w-full [&_.rdp-table]:w-full [&_.rdp-weeks]:w-full [&_.rdp-weekdays]:w-full"
       />
       <div className="mt-2.5 flex items-center justify-between border-t border-line/60 pt-2 text-xs">
         <div className="min-w-0 font-medium text-text">
