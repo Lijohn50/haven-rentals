@@ -35,7 +35,7 @@ export const DateRangePicker: React.FC<{
   onChange: (value: DateRangeValue) => void;
   months?: 1 | 2;
   className?: string;
-}> = ({ days, listing, value, onChange, months = 2, className }) => {
+}> = ({ days, listing, value, onChange, months = 1, className }) => {
   const selected = useMemo(
     () =>
       value.from
@@ -53,9 +53,9 @@ export const DateRangePicker: React.FC<{
   };
 
   return (
-    <div className={cn('rounded-card border border-line bg-surface p-3', className)}>
+    <div className={cn('overflow-hidden rounded-2xl border border-line/70 bg-surface p-3 shadow-sm', className)}>
       {listing.advanceNoticeDays > 0 && (
-        <div className="mb-2 rounded bg-sand/60 px-2.5 py-1 text-xs text-muted">
+        <div className="mb-2 rounded-lg bg-sand/80 px-2.5 py-1 text-xs text-muted">
           ⓘ Advance notice: reservations require at least {listing.advanceNoticeDays}{' '}
           {listing.advanceNoticeDays === 1 ? 'day' : 'days'} lead time.
         </div>
@@ -97,35 +97,35 @@ export const DateRangePicker: React.FC<{
             return <DayButton {...props} title={tooltip} aria-label={tooltip} />;
           },
         }}
-        className="[--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.35rem] [--rdp-day-height:2.35rem]"
+        className="mx-auto flex w-full justify-center [--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.2rem] [--rdp-day-height:2.2rem] [&_.rdp-month]:w-full [&_.rdp-month]:max-w-full [&_.rdp-month_grid]:w-full [&_.rdp-table]:w-full [&_.rdp-weeks]:w-full [&_.rdp-weekdays]:w-full [&_.rdp-caption_label]:text-sm [&_.rdp-caption_label]:font-semibold [&_.rdp-caption_label]:text-text"
       />
-      <div className="mt-2 flex items-center justify-between border-t border-line pt-2 text-xs text-muted">
-        <span>
+      <div className="mt-2.5 flex items-center justify-between border-t border-line/60 pt-2 text-xs text-muted">
+        <span className="truncate">
           {value.from && value.to
-            ? `${formatDateRange(value.from, value.to)} · check-out day is not charged`
+            ? `${formatDateRange(value.from, value.to)} · checkout not charged`
             : value.from
               ? 'Select check-out date'
-              : 'Check-in and check-out are both required to quote a stay.'}
+              : 'Pick check-in & check-out dates'}
         </span>
         {(value.from || value.to) && (
           <button
             type="button"
             onClick={() => onChange({ from: undefined, to: undefined })}
-            className="ml-2 shrink-0 font-medium text-primary hover:underline"
+            className="ml-2 shrink-0 font-semibold text-primary hover:underline"
           >
             Clear dates
           </button>
         )}
       </div>
-      <div className="mt-2 flex items-center gap-3 border-t border-line/40 pt-1.5 text-[11px] text-muted">
-        <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-primary" /> Selected
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line/40 pt-1.5 text-[11px] text-muted">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-primary" aria-hidden /> Selected
         </span>
-        <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full border border-line bg-surface" /> Available
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full border border-line bg-surface" aria-hidden /> Available
         </span>
-        <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-sand" /> Unavailable (hover for reason)
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-sand" aria-hidden /> Unavailable
         </span>
       </div>
     </div>

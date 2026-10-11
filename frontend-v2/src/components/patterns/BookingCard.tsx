@@ -143,25 +143,40 @@ useEffect(() => {
       aria-label="Booking"
       className="max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain rounded-hero bg-surface p-6 shadow-pop ring-1 ring-line/60"
     >
-      <div className="flex items-baseline justify-between">
-        <div>
-          <p className="font-heading text-3xl font-semibold tabular-nums text-text">
-            {formatMoney(listing.baseNightlyPrice)}{' '}
-            <span className="text-sm font-normal text-muted">/ night</span>
-          </p>
-          {Number(listing.weekendMultiplier) > 1 && (
-            <p className="mt-0.5 text-xs text-muted">
-              Weekend: {formatMoney(Number(listing.baseNightlyPrice) * Number(listing.weekendMultiplier))} / night (Fri–Sat)
-            </p>
-          )}
+      {/* Nightly price & stay rule badges */}
+      <div className="border-b border-line/60 pb-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-heading text-3xl font-bold tracking-tight tabular-nums text-text">
+              {formatMoney(listing.baseNightlyPrice)}
+            </span>
+            <span className="text-sm font-medium text-muted">/ night</span>
+          </div>
+          <span className="inline-flex items-center rounded-pill bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+            {pluralize(listing.minNights, 'night')} min stay
+          </span>
         </div>
-        <span className="rounded-pill bg-sand px-2.5 py-0.5 text-xs font-medium text-muted">
-          {pluralize(listing.minNights, 'night')} min
-          {listing.maxNights < BRAND.maxNights
-            ? ` · ${pluralize(listing.maxNights, 'night')} max`
-            : ''}
-          {listing.advanceNoticeDays > 0 ? ` · ${pluralize(listing.advanceNoticeDays, 'day')} notice` : ''}
-        </span>
+
+        {/* Supplementary Badges: Weekend & Lead Time */}
+        {(Number(listing.weekendMultiplier) > 1 || listing.advanceNoticeDays > 0 || listing.maxNights < BRAND.maxNights) && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+            {Number(listing.weekendMultiplier) > 1 && (
+              <span className="inline-flex items-center rounded-md bg-sand px-2 py-0.5 font-medium text-text">
+                Weekend: {formatMoney(Number(listing.baseNightlyPrice) * Number(listing.weekendMultiplier))}/night (Fri–Sat)
+              </span>
+            )}
+            {listing.advanceNoticeDays > 0 && (
+              <span className="inline-flex items-center rounded-md bg-sand px-2 py-0.5 text-muted">
+                {pluralize(listing.advanceNoticeDays, 'day')} lead notice
+              </span>
+            )}
+            {listing.maxNights < BRAND.maxNights && (
+              <span className="inline-flex items-center rounded-md bg-sand px-2 py-0.5 text-muted">
+                Max {pluralize(listing.maxNights, 'night')}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="mt-4 flex flex-col gap-3">
@@ -174,7 +189,7 @@ useEffect(() => {
           />
         )}
         {calendar.data && (
-          <DateRangePicker days={days} listing={listing} value={range} onChange={setRange} months={2} />
+          <DateRangePicker days={days} listing={listing} value={range} onChange={setRange} months={1} />
         )}
       </div>
 
