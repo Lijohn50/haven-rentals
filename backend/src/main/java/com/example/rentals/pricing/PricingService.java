@@ -86,7 +86,7 @@ public class PricingService {
         BigDecimal hostPayout = subtotal.subtract(discount).add(cleaning).subtract(hostCommission);
         hostPayout = MoneyUtils.round(hostPayout);
 
-        BigDecimal accommodationTotal = total.subtract(service);
+        BigDecimal accommodationTotal = MoneyUtils.round(subtotal.subtract(discount));
 
         // Sanity checks
         if (total.compareTo(BigDecimal.ZERO) <= 0) {

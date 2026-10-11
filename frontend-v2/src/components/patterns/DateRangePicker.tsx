@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { DayPicker } from 'react-day-picker';
+import { DayPicker, DayButton } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import { cn } from '@/lib/cn';
 import { formatDateRange } from '@/lib/local-date';
@@ -54,16 +54,27 @@ export const DateRangePicker: React.FC<{
 
   return (
     <div className={cn('rounded-card border border-line bg-surface p-3', className)}>
+      {listing.advanceNoticeDays > 0 && (
+        <div className="mb-2 rounded bg-sand/60 px-2.5 py-1 text-xs text-muted">
+          ⓘ Advance notice: reservations require at least {listing.advanceNoticeDays}{' '}
+          {listing.advanceNoticeDays === 1 ? 'day' : 'days'} lead time.
+        </div>
+      )}
       <DayPicker
         mode="range"
         numberOfMonths={months}
         selected={selected}
-        onSelect={(range) =>
+        onSelect={(range, triggerDate) => {
+          if (value.from && value.to && triggerDate) {
+            const nextCheckIn = fromPickerDate(triggerDate);
+            onChange({ from: nextCheckIn, to: undefined });
+            return;
+          }
           onChange({
             from: range?.from ? fromPickerDate(range.from) : undefined,
             to: range?.to ? fromPickerDate(range.to) : undefined,
-          })
-        }
+          });
+        }}
         disabled={(date: Date) => reasonFor(date) !== null}
         modifiers={{
           unavailable: (date: Date) => reasonFor(date) !== null,
@@ -77,13 +88,46 @@ export const DateRangePicker: React.FC<{
           booked: 'text-muted/35 font-normal',
           blocked: 'text-muted/35 font-normal',
         }}
+        components={{
+          DayButton: (props) => {
+            const date = props.day.date;
+            const reason = reasonFor(date);
+            const dateStr = fromPickerDate(date);
+            const tooltip = reason ? `${dateStr}: ${reason}` : dateStr;
+            return <DayButton {...props} title={tooltip} aria-label={tooltip} />;
+          },
+        }}
         className="[--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.35rem] [--rdp-day-height:2.35rem]"
       />
-      <p className="mt-2 border-t border-line pt-2 text-xs text-muted">
-        {value.from && value.to
-          ? `${formatDateRange(value.from, value.to)} · check-out day is not charged`
-          : 'Check-in and check-out are both required to quote a stay.'}
-      </p>
+      <div className="mt-2 flex items-center justify-between border-t border-line pt-2 text-xs text-muted">
+        <span>
+          {value.from && value.to
+            ? `${formatDateRange(value.from, value.to)} · check-out day is not charged`
+            : value.from
+              ? 'Select check-out date'
+              : 'Check-in and check-out are both required to quote a stay.'}
+        </span>
+        {(value.from || value.to) && (
+          <button
+            type="button"
+            onClick={() => onChange({ from: undefined, to: undefined })}
+            className="ml-2 shrink-0 font-medium text-primary hover:underline"
+          >
+            Clear dates
+          </button>
+        )}
+      </div>
+      <div className="mt-2 flex items-center gap-3 border-t border-line/40 pt-1.5 text-[11px] text-muted">
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-primary" /> Selected
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full border border-line bg-surface" /> Available
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-sand" /> Unavailable (hover for reason)
+        </span>
+      </div>
     </div>
   );
 };

@@ -132,13 +132,16 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
   };
 
   const submit = (withDates: boolean) => {
+    setDismissed(true);
+    setActive(-1);
     if (withDates && Boolean(range.from) !== Boolean(range.to)) {
       setDateError('Choose both dates or search without dates');
       setDatesOpen(true);
       return;
     }
     const params = new URLSearchParams();
-    if (city.trim()) params.set('city', city.trim());
+    const effectiveCity = (city || destination).trim();
+    if (effectiveCity) params.set('city', effectiveCity);
     if (country.trim()) params.set('country', country.trim());
     if (withDates && checkIn && checkOut) {
       params.set('checkIn', checkIn);
@@ -146,7 +149,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
     }
     params.set('guests', String(guests));
     rememberSearch({
-      city: city.trim(),
+      city: effectiveCity,
       country: country.trim(),
       checkIn: withDates ? checkIn : undefined,
       checkOut: withDates ? checkOut : undefined,
@@ -227,6 +230,9 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
                 }}
                 onKeyDown={onKeyDown}
                 onFocus={() => setDismissed(false)}
+                onBlur={() => {
+                  setTimeout(() => setDismissed(true), 150);
+                }}
               />
             </div>
             {showList && options.length > 0 && (

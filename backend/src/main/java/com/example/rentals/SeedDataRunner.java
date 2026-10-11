@@ -102,7 +102,6 @@ public class SeedDataRunner implements ApplicationRunner {
 
         // 2. Fetch reference amenities
         List<Amenity> allAmenities = amenityRepository.findAll();
-        Set<Amenity> popularAmenities = new HashSet<>(allAmenities.stream().limit(10).toList());
 
         // 3. Listings (12 listings across 4 cities: New York, Miami, San Francisco, Austin)
         // Status distribution: 8 ACTIVE, 2 PENDING_REVIEW, 1 DRAFT, 1 PAUSED
@@ -114,7 +113,8 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.APARTMENT, ListingStatus.ACTIVE, "120 Broadway", "New York", "NY", "US", "10005",
                 new BigDecimal("40.7078"), new BigDecimal("-74.0119"), "America/New_York", 4, 2, 2, new BigDecimal("2.0"),
                 new BigDecimal("5500.00"), new BigDecimal("1.15"), new BigDecimal("1200.00"),
-                new BigDecimal("10.00"), new BigDecimal("20.00"), 2, 30, CancellationPolicyType.FLEXIBLE, true, popularAmenities);
+                new BigDecimal("10.00"), new BigDecimal("20.00"), 2, 30, CancellationPolicyType.FLEXIBLE, true,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 4L, 10L, 11L, 20L, 24L));
         seededListings.add(l1);
 
         // Listing 2: Central Park Brownstone Oasis (ACTIVE, REQUEST, MODERATE)
@@ -123,7 +123,8 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.HOUSE, ListingStatus.ACTIVE, "240 W 73rd St", "New York", "NY", "US", "10023",
                 new BigDecimal("40.7794"), new BigDecimal("-73.9818"), "America/New_York", 6, 3, 3, new BigDecimal("2.5"),
                 new BigDecimal("7500.00"), new BigDecimal("1.20"), new BigDecimal("1500.00"),
-                new BigDecimal("12.00"), new BigDecimal("25.00"), 3, 60, CancellationPolicyType.MODERATE, false, popularAmenities);
+                new BigDecimal("12.00"), new BigDecimal("25.00"), 3, 60, CancellationPolicyType.MODERATE, false,
+                pickAmenities(allAmenities, 1L, 2L, 4L, 5L, 6L, 10L, 17L, 18L));
         seededListings.add(l2);
 
         // Listing 3: South Beach Oceanfront Villa (ACTIVE, INSTANT, STRICT)
@@ -132,7 +133,8 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.VILLA, ListingStatus.ACTIVE, "1020 Ocean Dr", "Miami", "FL", "US", "33139",
                 new BigDecimal("25.7806"), new BigDecimal("-80.1303"), "America/New_York", 8, 4, 5, new BigDecimal("4.0"),
                 new BigDecimal("14500.00"), new BigDecimal("1.25"), new BigDecimal("2500.00"),
-                new BigDecimal("15.00"), new BigDecimal("30.00"), 3, 90, CancellationPolicyType.STRICT, true, popularAmenities);
+                new BigDecimal("15.00"), new BigDecimal("30.00"), 3, 90, CancellationPolicyType.STRICT, true,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 7L, 8L, 9L, 17L, 19L));
         seededListings.add(l3);
 
         // Listing 4: Modern Brickell High-Rise Condo (ACTIVE, INSTANT, MODERATE)
@@ -141,7 +143,8 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.CONDO, ListingStatus.ACTIVE, "1451 Brickell Ave", "Miami", "FL", "US", "33131",
                 new BigDecimal("25.7590"), new BigDecimal("-80.1925"), "America/New_York", 3, 1, 2, new BigDecimal("1.5"),
                 new BigDecimal("4800.00"), new BigDecimal("1.10"), new BigDecimal("1000.00"),
-                new BigDecimal("8.00"), new BigDecimal("15.00"), 1, 30, CancellationPolicyType.MODERATE, true, popularAmenities);
+                new BigDecimal("8.00"), new BigDecimal("15.00"), 1, 30, CancellationPolicyType.MODERATE, true,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 8L, 10L, 11L, 16L, 20L));
         seededListings.add(l4);
 
         // Listing 5: SF Victorian Pacific Heights (ACTIVE, REQUEST, STRICT)
@@ -150,7 +153,8 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.HOUSE, ListingStatus.ACTIVE, "2100 Vallejo St", "San Francisco", "CA", "US", "94123",
                 new BigDecimal("37.7946"), new BigDecimal("-122.4312"), "America/Los_Angeles", 5, 3, 3, new BigDecimal("2.0"),
                 new BigDecimal("9500.00"), new BigDecimal("1.20"), new BigDecimal("1800.00"),
-                new BigDecimal("10.00"), new BigDecimal("20.00"), 2, 45, CancellationPolicyType.STRICT, false, popularAmenities);
+                new BigDecimal("10.00"), new BigDecimal("20.00"), 2, 45, CancellationPolicyType.STRICT, false,
+                pickAmenities(allAmenities, 1L, 2L, 4L, 5L, 6L, 7L, 10L, 14L));
         seededListings.add(l5);
 
         // Listing 6: SoMa Designer Loft (ACTIVE, INSTANT, FLEXIBLE)
@@ -159,7 +163,8 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.APARTMENT, ListingStatus.ACTIVE, "450 4th St", "San Francisco", "CA", "US", "94107",
                 new BigDecimal("37.7818"), new BigDecimal("-122.3996"), "America/Los_Angeles", 2, 1, 1, new BigDecimal("1.0"),
                 new BigDecimal("5200.00"), new BigDecimal("1.05"), new BigDecimal("1000.00"),
-                new BigDecimal("5.00"), new BigDecimal("15.00"), 1, 30, CancellationPolicyType.FLEXIBLE, true, popularAmenities);
+                new BigDecimal("5.00"), new BigDecimal("15.00"), 1, 30, CancellationPolicyType.FLEXIBLE, true,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 4L, 10L, 11L, 24L));
         seededListings.add(l6);
 
         // Listing 7: South Congress Hip Bungalow (ACTIVE, INSTANT, MODERATE)
@@ -168,7 +173,8 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.HOUSE, ListingStatus.ACTIVE, "1600 S Congress Ave", "Austin", "TX", "US", "78704",
                 new BigDecimal("30.2492"), new BigDecimal("-97.7497"), "America/Chicago", 4, 2, 2, new BigDecimal("1.5"),
                 new BigDecimal("4200.00"), new BigDecimal("1.15"), new BigDecimal("900.00"),
-                new BigDecimal("10.00"), new BigDecimal("20.00"), 2, 60, CancellationPolicyType.MODERATE, true, popularAmenities);
+                new BigDecimal("10.00"), new BigDecimal("20.00"), 2, 60, CancellationPolicyType.MODERATE, true,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 7L, 10L, 15L, 17L));
         seededListings.add(l7);
 
         // Listing 8: Lake Austin Hill Country Retreat (ACTIVE, REQUEST, STRICT)
@@ -177,16 +183,18 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.CABIN, ListingStatus.ACTIVE, "3800 Westlake Dr", "Austin", "TX", "US", "78746",
                 new BigDecimal("30.3340"), new BigDecimal("-97.7950"), "America/Chicago", 10, 5, 6, new BigDecimal("4.5"),
                 new BigDecimal("18500.00"), new BigDecimal("1.30"), new BigDecimal("3000.00"),
-                new BigDecimal("15.00"), new BigDecimal("25.00"), 3, 120, CancellationPolicyType.STRICT, false, popularAmenities);
+                new BigDecimal("15.00"), new BigDecimal("25.00"), 3, 120, CancellationPolicyType.STRICT, false,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 7L, 9L, 17L, 18L));
         seededListings.add(l8);
 
         // Listing 9: Pending Review 1 (PENDING_REVIEW)
         Listing l9 = createListing(host1, "Sunlit Brooklyn Heights Studio",
                 "Cozy quiet studio on tree-lined street near the Promenade.",
-                PropertyType.APARTMENT, ListingStatus.PENDING_REVIEW, "55 Pierrepont St", "New York", "NY", "US", "11201",
+                PropertyType.STUDIO, ListingStatus.PENDING_REVIEW, "55 Pierrepont St", "New York", "NY", "US", "11201",
                 new BigDecimal("40.6950"), new BigDecimal("-73.9950"), "America/New_York", 2, 1, 1, new BigDecimal("1.0"),
                 new BigDecimal("3500.00"), new BigDecimal("1.00"), new BigDecimal("800.00"),
-                BigDecimal.ZERO, BigDecimal.ZERO, 1, 30, CancellationPolicyType.FLEXIBLE, false, popularAmenities);
+                BigDecimal.ZERO, BigDecimal.ZERO, 1, 30, CancellationPolicyType.FLEXIBLE, false,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 4L, 10L, 11L));
         seededListings.add(l9);
 
         // Listing 10: Pending Review 2 (PENDING_REVIEW)
@@ -195,25 +203,28 @@ public class SeedDataRunner implements ApplicationRunner {
                 PropertyType.APARTMENT, ListingStatus.PENDING_REVIEW, "250 NW 24th St", "Miami", "FL", "US", "33127",
                 new BigDecimal("25.8000"), new BigDecimal("-80.1980"), "America/New_York", 4, 2, 2, new BigDecimal("2.0"),
                 new BigDecimal("4500.00"), new BigDecimal("1.10"), new BigDecimal("1000.00"),
-                BigDecimal.ZERO, BigDecimal.ZERO, 2, 30, CancellationPolicyType.MODERATE, false, popularAmenities);
+                BigDecimal.ZERO, BigDecimal.ZERO, 2, 30, CancellationPolicyType.MODERATE, false,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 10L, 20L, 24L));
         seededListings.add(l10);
 
         // Listing 11: Draft (DRAFT)
         Listing l11 = createListing(host1, "Marina District Studio in Progress",
                 "Work in progress draft description.",
-                PropertyType.APARTMENT, ListingStatus.DRAFT, "3100 Fillmore St", "San Francisco", "CA", "US", "94123",
+                PropertyType.STUDIO, ListingStatus.DRAFT, "3100 Fillmore St", "San Francisco", "CA", "US", "94123",
                 new BigDecimal("37.8000"), new BigDecimal("-122.4350"), "America/Los_Angeles", 2, 1, 1, new BigDecimal("1.0"),
                 new BigDecimal("3800.00"), new BigDecimal("1.00"), new BigDecimal("700.00"),
-                BigDecimal.ZERO, BigDecimal.ZERO, 1, 30, CancellationPolicyType.FLEXIBLE, false, popularAmenities);
+                BigDecimal.ZERO, BigDecimal.ZERO, 1, 30, CancellationPolicyType.FLEXIBLE, false,
+                pickAmenities(allAmenities, 1L, 2L, 4L, 10L, 11L));
         seededListings.add(l11);
 
         // Listing 12: Paused (PAUSED)
         Listing l12 = createListing(host2, "Downtown Austin Studio (Temporarily Paused)",
                 "Currently paused for scheduled winter renovations.",
-                PropertyType.APARTMENT, ListingStatus.PAUSED, "800 Brazos St", "Austin", "TX", "US", "78701",
+                PropertyType.STUDIO, ListingStatus.PAUSED, "800 Brazos St", "Austin", "TX", "US", "78701",
                 new BigDecimal("30.2700"), new BigDecimal("-97.7400"), "America/Chicago", 2, 1, 1, new BigDecimal("1.0"),
                 new BigDecimal("6800.00"), new BigDecimal("1.10"), new BigDecimal("1200.00"),
-                BigDecimal.ZERO, BigDecimal.ZERO, 1, 30, CancellationPolicyType.MODERATE, false, popularAmenities);
+                BigDecimal.ZERO, BigDecimal.ZERO, 1, 30, CancellationPolicyType.MODERATE, false,
+                pickAmenities(allAmenities, 1L, 2L, 3L, 10L));
         seededListings.add(l12);
 
         // Seasonal Rate for Miami Villa (Winter high season)
@@ -405,6 +416,20 @@ public class SeedDataRunner implements ApplicationRunner {
     private void createHostProfile(User host, String displayName, String bio) {
         HostProfile hp = new HostProfile(host, displayName, bio);
         hostProfileRepository.save(hp);
+    }
+
+    private Set<Amenity> pickAmenities(List<Amenity> all, long... ids) {
+        Set<Long> idSet = new HashSet<>();
+        for (long id : ids) {
+            idSet.add(id);
+        }
+        Set<Amenity> result = new HashSet<>();
+        for (Amenity a : all) {
+            if (idSet.contains(a.getId())) {
+                result.add(a);
+            }
+        }
+        return result;
     }
 
     private Listing createListing(

@@ -118,46 +118,50 @@ export const SiteHeader: React.FC = () => {
   );
 };
 
-export const SiteFooter: React.FC = () => (
-  // The mobile tab bar is fixed to the bottom edge and the footer is the last block in
-  // the document flow, so the footer needs its own bottom padding or the copyright line
-  // sits underneath the bar.
-  <footer className="mt-16 rounded-t-hero bg-ink text-white/70 pb-16 no-print sm:pb-0">
-    <div className="mx-auto grid max-w-content gap-8 px-4 py-12 sm:px-6 md:grid-cols-4">
-      <div>
-        <p className="font-heading text-xl font-semibold text-white">{BRAND.name}</p>
-        <p className="mt-2 text-sm text-white/60 leading-relaxed">{BRAND.tagline}</p>
-      </div>
-      <nav aria-label="Explore">
-        <h2 className="text-sm font-semibold text-white">Explore</h2>
-        <ul className="mt-3 space-y-2 text-sm text-white/70">
-          <li>
-            <Link className="hover:text-white transition-colors" to={ROUTES.SEARCH}>
-              Search homes
-            </Link>
-          </li>
-          <li>
-            <Link className="hover:text-white transition-colors" to={ROUTES.HOW_IT_WORKS}>
-              How it works
-            </Link>
-          </li>
-        </ul>
-      </nav>
-      <nav aria-label="Hosting">
-        <h2 className="text-sm font-semibold text-white">Hosting</h2>
-        <ul className="mt-3 space-y-2 text-sm text-white/70">
-          <li>
-            <Link className="hover:text-white transition-colors" to={ROUTES.BECOME_HOST}>
-              List your property
-            </Link>
-          </li>
-          <li>
-            <Link className="hover:text-white transition-colors" to={ROUTES.HOST_DASHBOARD}>
-              Host dashboard
-            </Link>
-          </li>
-        </ul>
-      </nav>
+export const SiteFooter: React.FC = () => {
+  const { isHost } = useAuth();
+  return (
+    // The mobile tab bar is fixed to the bottom edge and the footer is the last block in
+    // the document flow, so the footer needs its own bottom padding or the copyright line
+    // sits underneath the bar.
+    <footer className="mt-16 rounded-t-hero bg-ink text-white/70 pb-16 no-print sm:pb-0">
+      <div className="mx-auto grid max-w-content gap-8 px-4 py-12 sm:px-6 md:grid-cols-4">
+        <div>
+          <p className="font-heading text-xl font-semibold text-white">{BRAND.name}</p>
+          <p className="mt-2 text-sm text-white/60 leading-relaxed">{BRAND.tagline}</p>
+        </div>
+        <nav aria-label="Explore">
+          <h2 className="text-sm font-semibold text-white">Explore</h2>
+          <ul className="mt-3 space-y-2 text-sm text-white/70">
+            <li>
+              <Link className="hover:text-white transition-colors" to={ROUTES.SEARCH}>
+                Search homes
+              </Link>
+            </li>
+            <li>
+              <Link className="hover:text-white transition-colors" to={ROUTES.HOW_IT_WORKS}>
+                How it works
+              </Link>
+            </li>
+          </ul>
+        </nav>
+        <nav aria-label="Hosting">
+          <h2 className="text-sm font-semibold text-white">Hosting</h2>
+          <ul className="mt-3 space-y-2 text-sm text-white/70">
+            <li>
+              <Link className="hover:text-white transition-colors" to={ROUTES.BECOME_HOST}>
+                List your property
+              </Link>
+            </li>
+            {isHost && (
+              <li>
+                <Link className="hover:text-white transition-colors" to={ROUTES.HOST_DASHBOARD}>
+                  Host dashboard
+                </Link>
+              </li>
+            )}
+          </ul>
+        </nav>
       <nav aria-label="Support">
         <h2 className="text-sm font-semibold text-white">Support</h2>
         <ul className="mt-3 space-y-2 text-sm text-white/70">
@@ -188,7 +192,8 @@ export const SiteFooter: React.FC = () => (
       © {new Date().getFullYear()} {BRAND.name}. Demo build connected to the rentals REST API.
     </div>
   </footer>
-);
+  );
+};
 
 export const PublicLayout: React.FC = () => (
   <div className="flex min-h-screen flex-col">

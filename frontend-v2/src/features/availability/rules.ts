@@ -1,5 +1,6 @@
 import type { CalendarDayResponse, CalendarResponse, ListingResponse } from '@/types/api';
 import { addDays, nightsBetween, todayIn, type LocalDate } from '@/lib/local-date';
+import { pluralize } from '@/lib/format';
 
 export type CalendarDay = CalendarDayResponse;
 
@@ -56,10 +57,10 @@ export function isCheckOutSelectable(
 ): SelectableResult {
   const nights = nightsBetween(checkIn, candidate);
   if (nights < listing.minNights) {
-    return { ok: false, reason: `Minimum stay is ${listing.minNights} nights` };
+    return { ok: false, reason: `Minimum stay is ${pluralize(listing.minNights, 'night')}` };
   }
   if (nights > listing.maxNights) {
-    return { ok: false, reason: `Maximum stay is ${listing.maxNights} nights` };
+    return { ok: false, reason: `Maximum stay is ${pluralize(listing.maxNights, 'night')}` };
   }
   const limit = maxCheckOut(days, checkIn);
   if (limit && candidate > limit) {

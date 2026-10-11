@@ -51,6 +51,9 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   const instantBook = 'instantBook' in listing ? listing.instantBook : false;
   const maxGuests = 'maxGuests' in listing ? listing.maxGuests : null;
   const bedrooms = 'bedrooms' in listing ? listing.bedrooms : null;
+  const weekendMultiplier = 'weekendMultiplier' in listing ? Number(listing.weekendMultiplier) : null;
+  const hasWeekendRate = weekendMultiplier !== null && weekendMultiplier > 1;
+  const weekendPrice = hasWeekendRate ? listing.baseNightlyPrice * weekendMultiplier : null;
   const topRated =
     (listing.averageRating ?? 0) >= TOP_RATED_RATING && listing.reviewCount >= TOP_RATED_REVIEWS;
 
@@ -159,12 +162,19 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                 </span>
               </div>
             ) : (
-              <div className="flex items-baseline gap-1">
-                <span className="text-xs text-muted">From</span>
-                <span className="font-heading text-base font-semibold tabular-nums text-text">
-                  {formatMoney(listing.baseNightlyPrice)}
-                </span>
-                <span className="text-xs text-muted">/ night</span>
+              <div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs text-muted">From</span>
+                  <span className="font-heading text-base font-semibold tabular-nums text-text">
+                    {formatMoney(listing.baseNightlyPrice)}
+                  </span>
+                  <span className="text-xs text-muted">/ night</span>
+                </div>
+                {hasWeekendRate && (
+                  <div className="text-[10px] text-muted">
+                    Weekend: {formatMoney(weekendPrice!)} (Fri–Sat)
+                  </div>
+                )}
               </div>
             )}
             {total === null && (
@@ -300,6 +310,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                 {formatMoney(listing.baseNightlyPrice)}{' '}
                 <span className="text-xs font-normal text-muted">/ night</span>
               </div>
+              {hasWeekendRate && (
+                <div className="mt-0.5 text-[11px] text-muted">
+                  Weekend: {formatMoney(weekendPrice!)}/night (Fri–Sat)
+                </div>
+              )}
             </div>
           )}
 

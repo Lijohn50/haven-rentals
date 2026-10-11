@@ -14,6 +14,7 @@ import {
   Laptop,
   PawPrint,
   Shield,
+  Shirt,
   Snowflake,
   Sofa,
   Sparkles,
@@ -40,6 +41,7 @@ const ICONS: Record<string, LucideIcon> = {
   kitchen: ChefHat,
   kitchenette: ChefHat,
   coffee: ChefHat,
+  ac: Snowflake,
   snowflake: Snowflake,
   'air-conditioning': Snowflake,
   'air-conditioning-central': Snowflake,
@@ -48,7 +50,7 @@ const ICONS: Record<string, LucideIcon> = {
   'washing-machine': WashingMachine,
   washer: WashingMachine,
   laundry: WashingMachine,
-  dryer: Wind,
+  dryer: Shirt,
   tv: Tv,
   desk: Laptop,
   workspace: Laptop,
@@ -58,23 +60,31 @@ const ICONS: Record<string, LucideIcon> = {
   pool: Waves,
   'pool-shared': Waves,
   'hot-tub': Bath,
+  hot_tub: Bath,
   bbq: Flame,
   barbecue: Flame,
   fireplace: Flame,
   balcony: Umbrella,
   beach: Footprints,
   'beach-access': Footprints,
+  alarm: Shield,
   'smoke-alarm': Shield,
+  sensor: Shield,
   'co-alarm': Shield,
+  first_aid: Shield,
   'first-aid': Shield,
+  extinguisher: Wrench,
   'fire-extinguisher': Wrench,
+  pets: PawPrint,
   paw: PawPrint,
   crib: Baby,
   'high-chair': Baby,
+  gym: Dumbbell,
   dumbbell: Dumbbell,
   elevator: Sofa,
   'hair-dryer': Wind,
   iron: Sofa,
+  keypad: Key,
   key: Key,
   garden: Trees,
   view: Sparkles,
@@ -85,10 +95,14 @@ const ICONS: Record<string, LucideIcon> = {
 
 export function amenityIcon(key: string | null | undefined): LucideIcon {
   if (!key) return Check;
-  return ICONS[key.trim().toLowerCase()] ?? Check;
+  const raw = key.trim().toLowerCase();
+  const normalized = raw.replace(/_/g, '-');
+  return ICONS[raw] ?? ICONS[normalized] ?? Check;
 }
 
 export function hasAmenityIcon(key: string | null | undefined): boolean {
   if (!key) return false;
-  return key.trim().toLowerCase() in ICONS;
+  const raw = key.trim().toLowerCase();
+  const normalized = raw.replace(/_/g, '-');
+  return raw in ICONS || normalized in ICONS;
 }

@@ -141,8 +141,23 @@ public class SearchService {
         if (c.size() < 1 || c.size() > 50) {
             throw new ApiException(ErrorCode.INVALID_PAGE_SIZE, "Page size must be between 1 and 50");
         }
+        if (c.guests() < 1) {
+            throw new ApiException(ErrorCode.MALFORMED_REQUEST, "Guest count must be at least 1");
+        }
+        if (c.minPrice() != null && c.minPrice().compareTo(BigDecimal.ZERO) < 0) {
+            throw new ApiException(ErrorCode.MALFORMED_REQUEST, "minPrice cannot be negative");
+        }
+        if (c.maxPrice() != null && c.maxPrice().compareTo(BigDecimal.ZERO) < 0) {
+            throw new ApiException(ErrorCode.MALFORMED_REQUEST, "maxPrice cannot be negative");
+        }
         if (c.minPrice() != null && c.maxPrice() != null && c.minPrice().compareTo(c.maxPrice()) > 0) {
             throw new ApiException(ErrorCode.MALFORMED_REQUEST, "minPrice must be less than or equal to maxPrice");
+        }
+        if (c.minBedrooms() != null && c.minBedrooms() < 0) {
+            throw new ApiException(ErrorCode.MALFORMED_REQUEST, "minBedrooms cannot be negative");
+        }
+        if (c.minRating() != null && (c.minRating().compareTo(BigDecimal.ZERO) < 0 || c.minRating().compareTo(BigDecimal.valueOf(5)) > 0)) {
+            throw new ApiException(ErrorCode.MALFORMED_REQUEST, "minRating must be between 0 and 5");
         }
         if ((c.checkIn() != null && c.checkOut() == null) || (c.checkIn() == null && c.checkOut() != null)) {
             throw new ApiException(ErrorCode.INVALID_DATE_RANGE, "Both checkIn and checkOut must be provided together");

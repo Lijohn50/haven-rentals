@@ -473,6 +473,7 @@ export const SearchPage: React.FC = () => {
   const amenitiesQuery = useAmenities();
   const query = useSearch(toApiParams(filters));
   const repaired = useRef<string | null>(null);
+  const [repairNotice, setRepairNotice] = useState<string | null>(null);
 
   const change = useCallback(
     (patch: Record<string, string | null>, options?: { keepPage?: boolean }) => {
@@ -499,19 +500,22 @@ export const SearchPage: React.FC = () => {
     if (error.code === 'INVALID_SORT' || error.code === 'INVALID_PAGE_SIZE') {
       if (repaired.current === error.code) return;
       repaired.current = error.code;
+      setRepairNotice(`Invalid sort or page size (${error.detail}). Reset to standard view.`);
       change({ sort: null, page: null }, { keepPage: true });
       return;
     }
     if (error.code === 'INVALID_DATE_RANGE') {
       if (repaired.current === error.code) return;
       repaired.current = error.code;
+      setRepairNotice(`Invalid dates (${error.detail}). The date filter has been cleared.`);
       change({ checkIn: null, checkOut: null });
       return;
     }
     if (error.code === 'MALFORMED_REQUEST') {
       if (repaired.current === error.code) return;
       repaired.current = error.code;
-      change({ minPrice: null, maxPrice: null, minBedrooms: null, minRating: null, amenityIds: null });
+      setRepairNotice(`Invalid search parameter (${error.detail}). Invalid parameter was cleared.`);
+      change({ minPrice: null, maxPrice: null, minBedrooms: null, minRating: null, amenityIds: null, guests: null });
     }
   }, [query.error, change]);
 
@@ -576,10 +580,20 @@ export const SearchPage: React.FC = () => {
           <AllFilters filters={filters} amenities={amenitiesQuery.data ?? []} onChange={change} />
         </div>
 
-        {error && repairable && (
-          <InlineAlert tone="warning" className="mt-3">
-            A filter was not valid, so we removed it: {error.detail}
-          </InlineAlert>
+        {(repairNotice || (error && repairable)) && (
+          <div className="mt-3 flex items-center justify-between rounded-control bg-warning-soft px-3 py-2 text-sm text-warning-text">
+            <span>{repairNotice ?? `A filter was not valid, so we removed it: ${error?.detail}`}</span>
+            {repairNotice && (
+              <button
+                type="button"
+                onClick={() => setRepairNotice(null)}
+                className="ml-3 shrink-0 text-xs font-semibold hover:underline"
+                aria-label="Dismiss notice"
+              >
+                Dismiss
+              </button>
+            )}
+          </div>
         )}
 
         <div className="mt-6 flex flex-wrap items-baseline justify-between gap-3 border-b border-line/60 pb-4">

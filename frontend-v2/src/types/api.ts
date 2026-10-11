@@ -355,6 +355,7 @@ export interface SearchResultResponse {
   maxGuests: number;
   bedrooms: number;
   baseNightlyPrice: number;
+  weekendMultiplier?: number | null;
   averageRating: number | null;
   reviewCount: number;
   instantBook: boolean;

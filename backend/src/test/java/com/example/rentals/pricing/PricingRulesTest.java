@@ -162,9 +162,11 @@ class PricingRulesTest {
                 .serviceFee(ctx.getServiceFee())
                 .taxTotal(ctx.getTaxTotal())
                 .totalAmount(expectedTotal)
+                .accommodationTotal(ctx.getNightlySubtotal().subtract(ctx.getDiscountTotal()))
                 .build();
 
         assertThat(breakdown.getTotalAmount()).isEqualByComparingTo(expectedTotal);
+        assertThat(breakdown.getAccommodationTotal()).isEqualByComparingTo(ctx.getNightlySubtotal().subtract(ctx.getDiscountTotal()));
         assertThat(breakdown.getTotalAmount().scale()).isLessThanOrEqualTo(2);
         assertThat(breakdown.getServiceFee().scale()).isLessThanOrEqualTo(2);
         assertThat(breakdown.getTaxTotal().scale()).isLessThanOrEqualTo(2);

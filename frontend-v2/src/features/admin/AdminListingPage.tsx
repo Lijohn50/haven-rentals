@@ -32,7 +32,7 @@ import {
   applyFieldErrors,
 } from '@/components/ui';
 import { formatMoney } from '@/lib/money';
-import { formatDateTimeLocal, formatInstant } from '@/lib/format';
+import { formatDateTimeLocal, formatInstant, pluralize } from '@/lib/format';
 import { cancellationPolicyLabels, propertyTypeLabels } from '@/lib/status';
 import type { ReviewResponse } from '@/types/api';
 
@@ -287,9 +287,9 @@ export const AdminListingPage: React.FC = () => {
         <Panel title="Property">
           <dl className="divide-y divide-line">
             <DetailRow label="Type">{propertyTypeLabels[listing.propertyType]}</DetailRow>
-            <DetailRow label="Sleeps">{listing.maxGuests} guests</DetailRow>
+            <DetailRow label="Sleeps">{pluralize(listing.maxGuests, 'guest')}</DetailRow>
             <DetailRow label="Rooms">
-              {listing.bedrooms} bedrooms · {listing.beds} beds · {listing.bathrooms} bathrooms
+              {pluralize(listing.bedrooms, 'bedroom')} · {pluralize(listing.beds, 'bed')} · {pluralize(listing.bathrooms, 'bathroom')}
             </DetailRow>
             <DetailRow label="Stay rules">
               {listing.minNights}–{listing.maxNights} nights

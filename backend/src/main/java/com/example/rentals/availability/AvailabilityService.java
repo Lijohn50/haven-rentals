@@ -74,7 +74,8 @@ public class AvailabilityService {
 
         // 5. Min and max nights
         if (nights < listing.getMinNights() || nights > listing.getMaxNights()) {
-            throw new BusinessRuleException("Stay of " + nights + " nights is outside allowed range of " +
+            String nightsLabel = nights == 1 ? "1 night" : nights + " nights";
+            throw new BusinessRuleException("Stay of " + nightsLabel + " is outside allowed range of " +
                     listing.getMinNights() + " to " + listing.getMaxNights() + " nights");
         }
 

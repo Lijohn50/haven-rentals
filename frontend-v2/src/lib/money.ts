@@ -1,19 +1,37 @@
 /** Money is always displayed exactly as the server sent it; never recomputed here. */
-export function formatMoney(value: number | null | undefined): string {
+export function formatMoney(value: number | null | undefined, currency: string = 'USD'): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '—';
-  return `৳${Number(value).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(Number(value));
+  } catch {
+    return `$${Number(value).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
 }
 
 /** Tight spaces (cards, KPI tiles) may drop the cents when the value is whole. */
-export function formatMoneyCompact(value: number | null | undefined): string {
+export function formatMoneyCompact(value: number | null | undefined, currency: string = 'USD'): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '—';
-  return `৳${Number(value).toLocaleString('en-US', {
-    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
-    maximumFractionDigits: 2,
-  })}`;
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+      minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+      maximumFractionDigits: 2,
+    }).format(Number(value));
+  } catch {
+    return `$${Number(value).toLocaleString('en-US', {
+      minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
 }
 
 const MONEY_PATTERN = /^\d{1,9}(\.\d{1,2})?$/;

@@ -5,6 +5,7 @@ import { ROUTES } from '@/config/routes';
 import { PublicLayout, HostShell, StaffShell, RequireAuth, RequireGuest } from '@/components/layout';
 import { ErrorBoundary } from '@/components/layout/ErrorBoundary';
 import { Button, EmptyState, Spinner } from '@/components/ui';
+import { useDocumentTitle } from '@/hooks/useSeo';
 
 // Route-level code splitting: every page loads on navigation instead of
 // shipping all ~35 routes in the entry chunk.
@@ -56,33 +57,39 @@ const AdminAmenitiesPage = lazy(() => import('@/features/admin/AdminAmenitiesPag
 const AdminAuditPage = lazy(() => import('@/features/admin/AdminAuditPage').then(m => ({ default: m.AdminAuditPage })));
 const AdminReviewsPage = lazy(() => import('@/features/admin/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
 
-const NotFoundPage: React.FC = () => (
-  <div className="mx-auto max-w-narrow px-4 py-20">
-    <EmptyState
-      title="We could not find that page"
-      description="The link may be broken, or the item may have been removed."
-      action={
-        <Button asChild variant="primary">
-          <a href={ROUTES.HOME}>Back to the home page</a>
-        </Button>
-      }
-    />
-  </div>
-);
+const NotFoundPage: React.FC = () => {
+  useDocumentTitle('Page Not Found', 'The requested page could not be found.');
+  return (
+    <div className="mx-auto max-w-narrow px-4 py-20">
+      <EmptyState
+        title="We could not find that page"
+        description="The link may be broken, or the item may have been removed."
+        action={
+          <Button asChild variant="primary">
+            <a href={ROUTES.HOME}>Back to the home page</a>
+          </Button>
+        }
+      />
+    </div>
+  );
+};
 
-const ForbiddenPage: React.FC = () => (
-  <div className="mx-auto max-w-narrow px-4 py-20">
-    <EmptyState
-      title="You don't have access to this area"
-      description="Your account does not include this permission. If you think that is wrong, ask an administrator."
-      action={
-        <Button asChild variant="primary">
-          <a href={ROUTES.HOME}>Back to the home page</a>
-        </Button>
-      }
-    />
-  </div>
-);
+const ForbiddenPage: React.FC = () => {
+  useDocumentTitle('Access Denied', 'Your account does not include this permission.');
+  return (
+    <div className="mx-auto max-w-narrow px-4 py-20">
+      <EmptyState
+        title="You don't have access to this area"
+        description="Your account does not include this permission. If you think that is wrong, ask an administrator."
+        action={
+          <Button asChild variant="primary">
+            <a href={ROUTES.HOME}>Back to the home page</a>
+          </Button>
+        }
+      />
+    </div>
+  );
+};
 
 function RouteCrash() {
   const error = useRouteError() as { message?: string } | undefined;

@@ -57,7 +57,8 @@ export const BookingCard: React.FC<{ listing: ListingResponse }> = ({ listing })
   const debouncedCheckOut = useDebouncedValue(range.to, QUOTE_DEBOUNCE_MS);
   const debouncedGuests = useDebouncedValue(guests, QUOTE_DEBOUNCE_MS);
 
-  const canQuote = Boolean(debouncedCheckIn) && Boolean(debouncedCheckOut);
+  const rangeProblem = rangeUnavailableReason(days, listing, range);
+  const canQuote = Boolean(debouncedCheckIn) && Boolean(debouncedCheckOut) && !rangeProblem;
   const quote = useQuote(
     listing.id,
     { checkIn: debouncedCheckIn, checkOut: debouncedCheckOut, guests: debouncedGuests },
@@ -84,7 +85,6 @@ useEffect(() => {
     return `${ROUTES.CHECKOUT(listing.id)}${query ? `?${query}` : ''}`;
   }, [listing.id, range.from, range.to, guests]);
 
-  const rangeProblem = rangeUnavailableReason(days, listing, range);
   const freeUntil = range.from
     ? freeCancellationUntil(listing.cancellationPolicy, range.from, listing.checkInTime, listing.timezone)
     : null;
@@ -119,6 +119,22 @@ useEffect(() => {
     );
   }
 
+  if (listing.status !== 'ACTIVE') {
+    const isPaused = listing.status === 'PAUSED';
+    return (
+      <aside aria-label="Booking unavailable" className="rounded-card border border-line bg-surface p-5 shadow-card">
+        <h2 className="text-lg font-semibold text-ink">
+          {isPaused ? 'Listing Temporarily Paused' : 'Unavailable for Booking'}
+        </h2>
+        <p className="mt-2 text-sm text-muted">
+          {isPaused
+            ? 'This home is temporarily paused by the host and is not accepting bookings at this time.'
+            : 'This home is currently not available for booking.'}
+        </p>
+      </aside>
+    );
+  }
+
   const ctaLabel = listing.instantBook ? 'Book now' : 'Request to book';
   const ctaDisabled = !range.from || !range.to || Boolean(rangeProblem);
 
@@ -128,15 +144,23 @@ useEffect(() => {
       className="max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain rounded-hero bg-surface p-6 shadow-pop ring-1 ring-line/60"
     >
       <div className="flex items-baseline justify-between">
-        <p className="font-heading text-3xl font-semibold tabular-nums text-text">
-          {formatMoney(listing.baseNightlyPrice)}{' '}
-          <span className="text-sm font-normal text-muted">/ night</span>
-        </p>
+        <div>
+          <p className="font-heading text-3xl font-semibold tabular-nums text-text">
+            {formatMoney(listing.baseNightlyPrice)}{' '}
+            <span className="text-sm font-normal text-muted">/ night</span>
+          </p>
+          {Number(listing.weekendMultiplier) > 1 && (
+            <p className="mt-0.5 text-xs text-muted">
+              Weekend: {formatMoney(Number(listing.baseNightlyPrice) * Number(listing.weekendMultiplier))} / night (Fri–Sat)
+            </p>
+          )}
+        </div>
         <span className="rounded-pill bg-sand px-2.5 py-0.5 text-xs font-medium text-muted">
           {pluralize(listing.minNights, 'night')} min
           {listing.maxNights < BRAND.maxNights
             ? ` · ${pluralize(listing.maxNights, 'night')} max`
             : ''}
+          {listing.advanceNoticeDays > 0 ? ` · ${pluralize(listing.advanceNoticeDays, 'day')} notice` : ''}
         </span>
       </div>
 
@@ -180,7 +204,7 @@ useEffect(() => {
         {!canQuote && (
           <p className="text-sm text-muted">Choose your dates to see the full price, including fees and taxes.</p>
         )}
-        {canQuote && quote.isError && <BookingError error={quote.error} />}
+        {canQuote && quote.isError && !rangeProblem && <BookingError error={quote.error} />}
       </div>
 
       <button

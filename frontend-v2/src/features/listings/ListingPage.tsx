@@ -380,7 +380,13 @@ export const ListingPage: React.FC = () => {
 
   const listing = listingQuery.data;
 
-  const title = listing ? `${listing.title}, ${listing.city}` : 'Home';
+  const title = listing
+    ? `${listing.title}, ${listing.city}`
+    : notFound
+      ? 'Home Not Available'
+      : !Number.isFinite(listingId) || listingId <= 0
+        ? 'Home Not Found'
+        : 'Loading Home…';
   const description = listing ? truncate(listing.description.replace(/\s+/g, ' '), 155) : undefined;
   useDocumentTitle(title, description);
 
@@ -554,7 +560,7 @@ export const ListingPage: React.FC = () => {
             </div>
             <div>
               <div className="font-heading text-lg font-semibold text-text">{formatBathrooms(listing.bathrooms)}</div>
-              <div className="text-xs text-muted">Bathrooms</div>
+              <div className="text-xs text-muted">{listing.bathrooms === 1 ? 'Bathroom' : 'Bathrooms'}</div>
             </div>
           </div>
         </div>
@@ -581,7 +587,11 @@ export const ListingPage: React.FC = () => {
           <div className="flex items-center gap-3 rounded-2xl bg-primary-soft/60 p-4 ring-1 ring-primary/20">
             <Info className="h-5 w-5 shrink-0 text-primary" aria-hidden />
             <p className="text-sm text-primary-dark">
-              From <span className="font-semibold tabular">{formatMoney(listing.baseNightlyPrice)}</span> per night, plus the cleaning fee, service fee and taxes shown before you pay.
+              From <span className="font-semibold tabular">{formatMoney(listing.baseNightlyPrice)}</span> per night
+              {Number(listing.weekendMultiplier) > 1 ? (
+                <> (weekend rate: <span className="font-semibold tabular">{formatMoney(Number(listing.baseNightlyPrice) * Number(listing.weekendMultiplier))}</span> per night for Fri–Sat)</>
+              ) : null}
+              , plus the cleaning fee, service fee and taxes shown before you pay.
             </p>
           </div>
 
@@ -628,13 +638,18 @@ export const ListingPage: React.FC = () => {
         </div>
       </div>
 
-      {!ownListing && (
+      {!ownListing && listing.status === 'ACTIVE' && (
         <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-line bg-surface px-4 py-3 lg:hidden no-print">
           <div>
             <p className="tabular text-base font-semibold text-ink">
               {formatMoney(listing.baseNightlyPrice)}{' '}
               <span className="text-xs font-normal text-muted">per night</span>
             </p>
+            {Number(listing.weekendMultiplier) > 1 && (
+              <p className="text-[11px] text-muted">
+                Weekend: {formatMoney(Number(listing.baseNightlyPrice) * Number(listing.weekendMultiplier))}/night
+              </p>
+            )}
             <button
               type="button"
               className="text-xs font-medium text-primary underline underline-offset-4"

@@ -1,5 +1,6 @@
 package com.example.rentals.search.dto;
 
+import com.example.rentals.listing.Amenity;
 import com.example.rentals.listing.Listing;
 import com.example.rentals.listing.ListingPhoto;
 import com.example.rentals.listing.PropertyType;
@@ -7,6 +8,7 @@ import com.example.rentals.listing.dto.PhotoResponse;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public record SearchResultResponse(
@@ -19,6 +21,7 @@ public record SearchResultResponse(
         int maxGuests,
         int bedrooms,
         BigDecimal baseNightlyPrice,
+        BigDecimal weekendMultiplier,
         BigDecimal averageRating,
         int reviewCount,
         boolean instantBook,
@@ -39,7 +42,8 @@ public record SearchResultResponse(
 
         List<String> amenitiesPreview = listing.getAmenities() != null ?
                 listing.getAmenities().stream()
-                        .map(a -> a.getName())
+                        .sorted(Comparator.comparing(Amenity::getId))
+                        .map(Amenity::getName)
                         .limit(4)
                         .toList() : Collections.emptyList();
 
@@ -53,6 +57,7 @@ public record SearchResultResponse(
                 listing.getMaxGuests(),
                 listing.getBedrooms(),
                 listing.getBaseNightlyPrice(),
+                listing.getWeekendMultiplier(),
                 listing.getAverageRating(),
                 listing.getReviewCount(),
                 listing.isInstantBook(),
