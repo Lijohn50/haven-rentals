@@ -4,13 +4,14 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
-# Cache Maven dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+# Cache Maven dependencies (settings.xml mirrors Central onto the
+# Google GCS mirror to avoid Maven Central 429 rate limits)
+COPY pom.xml settings.xml ./
+RUN mvn -s settings.xml dependency:go-offline -B
 
 # Compile and package application
 COPY src src
-RUN mvn clean package -DskipTests -B
+RUN mvn -s settings.xml clean package -DskipTests -B
 
 # Stage 2: Runtime Image
 FROM eclipse-temurin:21-jre-jammy

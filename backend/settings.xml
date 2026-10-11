@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Build-time settings: mirrors Maven Central (repo.maven.apache.org and
+  repo1.maven.org) onto Google's GCS mirror. Render build hosts share
+  egress IPs and get rate-limited (HTTP 429) by Maven Central; the GCS
+  mirror serves the identical content without that throttle. Parent-POM
+  repositories that host unique artifacts (flyway, spring, gradle) are
+  intentionally NOT mirrored.
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0
+                              https://maven.apache.org/xsd/settings-1.2.0.xsd">
+  <mirrors>
+    <mirror>
+      <id>gcs-central</id>
+      <name>Google Cloud Storage mirror of Maven Central</name>
+      <url>https://maven-central.storage-download.googleapis.com/maven2</url>
+      <mirrorOf>central,maven-central</mirrorOf>
+    </mirror>
+  </mirrors>
+</settings>
