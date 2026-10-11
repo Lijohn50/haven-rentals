@@ -104,6 +104,19 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        // Permissive CORS for SSLCommerz payment callbacks & IPN webhooks
+        // SSLCommerz redirects the browser from gateway origins (e.g. sandbox.sslcommerz.com, bank OTP portals)
+        CorsConfiguration sslcommerzCors = new CorsConfiguration();
+        sslcommerzCors.setAllowedOriginPatterns(List.of("*"));
+        sslcommerzCors.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
+        sslcommerzCors.setAllowedHeaders(List.of("*"));
+        sslcommerzCors.setExposedHeaders(List.of("Location", "X-Request-Id"));
+        sslcommerzCors.setAllowCredentials(false);
+        source.registerCorsConfiguration("/api/v1/payments/sslcommerz/**", sslcommerzCors);
+
+        // Standard CORS for application frontend
         CorsConfiguration config = new CorsConfiguration();
         String originsStr = appProperties.getCors().getOrigins();
         List<String> origins = Arrays.stream(originsStr.split(","))
@@ -117,7 +130,6 @@ public class SecurityConfig {
         config.setExposedHeaders(List.of("Location", "X-Request-Id"));
         config.setAllowCredentials(false);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }

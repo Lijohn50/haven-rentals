@@ -17,6 +17,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
 @RequiredArgsConstructor
 public class SslCommerzController {
 
@@ -77,7 +78,7 @@ public class SslCommerzController {
             }
 
             Booking booking = bookingService.finalizeSslCommerzPayment(
-                    tranId, valId, validation.amount(), validation.currency(), validation.bankTranId());
+                    tranId, valId, validation.getEffectiveAmount(), validation.getEffectiveCurrency(), validation.bankTranId());
             log.info("Booking {} payment finalized successfully via SSLCommerz (status={})", booking.getReference(), booking.getStatus());
 
             String paymentQueryParam = (booking.getStatus() == com.example.rentals.booking.BookingStatus.EXPIRED) ? "expired" : "success";
@@ -177,7 +178,7 @@ public class SslCommerzController {
             }
 
             bookingService.finalizeSslCommerzPayment(
-                    tranId, valId, validation.amount(), validation.currency(), validation.bankTranId());
+                    tranId, valId, validation.getEffectiveAmount(), validation.getEffectiveCurrency(), validation.bankTranId());
             log.info("IPN validated and booking finalized for tranId={}", tranId);
             return ResponseEntity.ok("IPN PROCESSED");
         } catch (Exception e) {
