@@ -145,9 +145,9 @@ useEffect(() => {
     >
       {/* Nightly price & stay rule badges */}
       <div className="border-b border-line/60 pb-4">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-heading text-3xl font-bold tracking-tight tabular-nums text-text">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="font-heading text-2xl sm:text-3xl font-bold tracking-tight tabular-nums text-text">
               {formatMoney(listing.baseNightlyPrice)}
             </span>
             <span className="text-sm font-medium text-muted">/ night</span>

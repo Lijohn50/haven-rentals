@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { DayPicker, DayButton } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import { cn } from '@/lib/cn';
-import { formatDateRange } from '@/lib/local-date';
+import { formatDateRange, nightsBetween } from '@/lib/local-date';
 import { calendarReasonLabel, isCheckInSelectable, isCheckOutSelectable, type CalendarDay } from '@/features/availability/rules';
 import type { LocalDate } from '@/lib/local-date';
 import type { ListingResponse } from '@/types/api';
@@ -97,16 +97,23 @@ export const DateRangePicker: React.FC<{
             return <DayButton {...props} title={tooltip} aria-label={tooltip} />;
           },
         }}
-        className="mx-auto flex w-full justify-center [--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.2rem] [--rdp-day-height:2.2rem] [&_.rdp-month]:w-full [&_.rdp-month]:max-w-full [&_.rdp-month_grid]:w-full [&_.rdp-table]:w-full [&_.rdp-weeks]:w-full [&_.rdp-weekdays]:w-full [&_.rdp-caption_label]:text-sm [&_.rdp-caption_label]:font-semibold [&_.rdp-caption_label]:text-text"
+        className="mx-auto flex w-full justify-center [--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))] [--rdp-day-width:2.2rem] [--rdp-day-height:2.2rem] [&_.rdp-month]:w-full [&_.rdp-month]:max-w-full [&_.rdp-month_grid]:w-full [&_.rdp-table]:w-full [&_.rdp-weeks]:w-full [&_.rdp-weekdays]:w-full [&_.rdp-month_caption]:px-2 [&_.rdp-month_caption]:pb-2.5 [&_.rdp-caption_label]:text-base [&_.rdp-caption_label]:font-heading [&_.rdp-caption_label]:font-semibold [&_.rdp-caption_label]:text-text [&_.rdp-nav]:pr-1.5"
       />
-      <div className="mt-2.5 flex items-center justify-between border-t border-line/60 pt-2 text-xs text-muted">
-        <span className="truncate">
-          {value.from && value.to
-            ? `${formatDateRange(value.from, value.to)} · checkout not charged`
-            : value.from
-              ? 'Select check-out date'
-              : 'Pick check-in & check-out dates'}
-        </span>
+      <div className="mt-2.5 flex items-center justify-between border-t border-line/60 pt-2 text-xs">
+        <div className="min-w-0 font-medium text-text">
+          {value.from && value.to ? (
+            <span>
+              {formatDateRange(value.from, value.to)}{' '}
+              <span className="text-muted">
+                ({nightsBetween(value.from, value.to)} {nightsBetween(value.from, value.to) === 1 ? 'night' : 'nights'})
+              </span>
+            </span>
+          ) : value.from ? (
+            <span className="text-muted">Select check-out date</span>
+          ) : (
+            <span className="text-muted">Pick check-in and check-out</span>
+          )}
+        </div>
         {(value.from || value.to) && (
           <button
             type="button"
@@ -117,7 +124,7 @@ export const DateRangePicker: React.FC<{
           </button>
         )}
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line/40 pt-1.5 text-[11px] text-muted">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-1 border-t border-line/40 pt-1.5 text-[11px] text-muted">
         <span className="inline-flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-primary" aria-hidden /> Selected
         </span>

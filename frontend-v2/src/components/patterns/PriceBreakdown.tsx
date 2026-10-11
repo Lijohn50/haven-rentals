@@ -35,9 +35,9 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
   const row = (label: React.ReactNode, value: React.ReactNode, options?: { muted?: boolean; strong?: boolean; success?: boolean }) => (
     <div
       className={cn(
-        'flex items-baseline justify-between gap-4 py-1.5 text-sm',
+        'flex items-baseline justify-between gap-3 py-1.5 text-sm',
         options?.strong
-          ? 'font-heading text-lg font-semibold text-text'
+          ? 'font-heading text-base sm:text-lg font-bold text-text'
           : options?.success
             ? 'font-medium text-success'
             : options?.muted
@@ -45,24 +45,24 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
               : 'text-text'
       )}
     >
-      <span>{label}</span>
-      <span className="tabular shrink-0">{value}</span>
+      <span className="min-w-0 truncate">{label}</span>
+      <span className="tabular shrink-0 text-right font-medium">{value}</span>
     </div>
   );
 
   return (
-    <div className={cn('rounded-2xl bg-surface p-4.5 ring-1 ring-line/70 shadow-sm', className)}>
+    <div className={cn('rounded-2xl bg-surface p-4 sm:p-5 ring-1 ring-line/70 shadow-sm', className)}>
       <button
         type="button"
         onClick={() => setExpanded((value) => !value)}
         aria-expanded={expanded}
-        className="flex w-full items-center justify-between rounded-xl bg-sand px-4 py-3 text-sm font-semibold text-text transition-colors hover:bg-sand/80"
+        className="flex w-full items-center justify-between gap-2 rounded-xl bg-sand px-3.5 py-2.5 text-sm font-semibold text-text transition-colors hover:bg-sand/80"
       >
-        <span>
+        <span className="truncate">
           {formatMoney(breakdown.totalAmount)} total · {nights} {nights === 1 ? 'night' : 'nights'}
         </span>
         <ChevronDown
-          className={cn('h-4 w-4 text-muted transition-transform', expanded && 'rotate-180')}
+          className={cn('h-4 w-4 shrink-0 text-muted transition-transform', expanded && 'rotate-180')}
           aria-hidden
         />
       </button>
