@@ -95,6 +95,16 @@ public class AuthService {
         evictUserCache(user.getId());
     }
 
+    @Transactional(readOnly = true)
+    public boolean isEmailVerified(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+        return userRepository.findByEmailIgnoreCase(email.trim().toLowerCase())
+                .map(User::isEmailVerified)
+                .orElse(false);
+    }
+
     @Transactional
     public void resendVerification(String email) {
         userRepository.findByEmailIgnoreCase(email.trim().toLowerCase()).ifPresent(user -> {

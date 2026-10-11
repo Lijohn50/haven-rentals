@@ -71,6 +71,7 @@ public class SecurityConfig {
                 ).permitAll()
                 // Public browse
                 .requestMatchers(HttpMethod.GET,
+                    "/api/v1/auth/verification-status",
                     "/api/v1/listings/**",
                     "/api/v1/search/**",
                     "/api/v1/amenities",

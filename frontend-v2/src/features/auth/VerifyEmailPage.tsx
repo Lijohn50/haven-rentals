@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { BRAND } from '@/config/brand';
 import { ROUTES } from '@/config/routes';
 import { useAuth } from '@/providers/AuthProvider';
-import { useResendVerification, useVerifyEmail } from '@/features/auth/api';
+import { authApi, useResendVerification, useVerifyEmail } from '@/features/auth/api';
 import { emailSchema } from '@/features/auth/schemas';
 import { useDocumentTitle } from '@/hooks/useSeo';
 import { ApiError } from '@/api/errors';
@@ -26,11 +26,15 @@ export const VerifyEmailPage: React.FC = () => {
 
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const verify = useVerifyEmail();
   const resend = useResendVerification();
 
-  const [state, setState] = useState<State>(token ? 'verifying' : 'idle');
+  const [state, setState] = useState<State>(() => {
+    if (token) return 'verifying';
+    if (user?.emailVerified) return 'success';
+    return 'idle';
+  });
   const [error, setError] = useState<unknown>(null);
   const [email, setEmail] = useState(user?.email ?? '');
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -39,8 +43,15 @@ export const VerifyEmailPage: React.FC = () => {
   const failureCode = error instanceof ApiError ? error.code : null;
 
   useEffect(() => {
+    if (user?.emailVerified) {
+      setState('success');
+    }
+  }, [user?.emailVerified]);
+
+  // When a token is provided in the URL, verify it directly
+  useEffect(() => {
     if (!token) {
-      setState('idle');
+      if (!user?.emailVerified) setState('idle');
       return;
     }
     // The token is single use: a second POST would burn it and show a false failure.
@@ -48,7 +59,10 @@ export const VerifyEmailPage: React.FC = () => {
     started.current = true;
     setState('verifying');
     verify.mutate(token, {
-      onSuccess: () => setState('success'),
+      onSuccess: async () => {
+        if (user) await refreshUser();
+        setState('success');
+      },
       onError: (cause) => {
         setError(cause);
         setState('expired');
@@ -56,6 +70,53 @@ export const VerifyEmailPage: React.FC = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Auto-detection polling: If this device is waiting on the "Check your email" screen (idle),
+  // poll verification status so that if the user clicks the verification link on their phone
+  // (or any other device), this screen automatically flips to "Your email is confirmed" without
+  // requiring a manual page refresh.
+  useEffect(() => {
+    if (state !== 'idle') return;
+
+    let active = true;
+    const checkStatus = async () => {
+      // 1. If signed in, refresh user profile directly
+      if (user) {
+        const me = await refreshUser();
+        if (!active) return;
+        if (me?.emailVerified) {
+          setState('success');
+          toast.success('Your email is confirmed! Welcome to Haven.');
+          return;
+        }
+      }
+
+      // 2. Also check public verification status endpoint by email
+      const targetEmail = (user?.email || email).trim();
+      if (targetEmail) {
+        try {
+          const res = await authApi.checkVerificationStatus(targetEmail);
+          if (!active) return;
+          if (res.verified) {
+            if (user) await refreshUser();
+            setState('success');
+            toast.success('Your email is confirmed! Welcome to Haven.');
+          }
+        } catch {
+          // ignore network hiccups during background polling
+        }
+      }
+    };
+
+    // Run immediate check and then every 2.5 seconds
+    void checkStatus();
+    const interval = setInterval(checkStatus, 2500);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [state, user, email, refreshUser]);
 
   const sendResend = async () => {
     const parsed = emailSchema.safeParse(email.trim());
@@ -131,7 +192,7 @@ export const VerifyEmailPage: React.FC = () => {
             <p className="text-sm text-muted">
               {user ? (
                 <>
-                  We sent a confirmation link to <span className="font-medium">{user.email}</span>.
+                  We sent a confirmation link to <span className="font-semibold text-text">{user.email}</span>.
                   Booking needs a confirmed address, so follow the link before you reserve a home.
                 </>
               ) : (
@@ -141,6 +202,16 @@ export const VerifyEmailPage: React.FC = () => {
                 </>
               )}
             </p>
+
+            <div className="mt-1 flex items-center gap-2.5 rounded-2xl border border-primary/20 bg-primary-soft/50 px-3.5 py-2.5 text-xs text-primary-dark">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary"></span>
+              </span>
+              <span>
+                <strong>Waiting for confirmation…</strong> You can click the link on your phone or any device, and this screen will update automatically.
+              </span>
+            </div>
           </div>
         )}
 

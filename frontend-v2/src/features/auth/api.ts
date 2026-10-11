@@ -37,6 +37,9 @@ export const authApi = {
   verifyEmail: (token: string) =>
     api<void>(ep.auth.verifyEmail, { method: 'post', data: { token } }),
 
+  checkVerificationStatus: (email: string) =>
+    api<{ verified: boolean }>(ep.auth.verificationStatus(email), { method: 'get' }),
+
   resendVerification: (email: string) =>
     api<void>(ep.auth.resendVerification, { method: 'post', data: { email } }),
 

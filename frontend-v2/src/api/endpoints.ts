@@ -9,6 +9,7 @@ export const ep = {
     refresh: '/auth/refresh',
     logout: '/auth/logout',
     verifyEmail: '/auth/verify-email',
+    verificationStatus: (email: string) => `/auth/verification-status?email=${encodeURIComponent(email)}`,
     resendVerification: '/auth/resend-verification',
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -29,6 +30,12 @@ public class AuthController {
     public ResponseEntity<Void> verifyEmail(@Valid @RequestBody VerifyEmailRequest req) {
         authService.verifyEmail(req.token());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/verification-status")
+    public ResponseEntity<Map<String, Boolean>> checkVerificationStatus(@RequestParam String email) {
+        boolean verified = authService.isEmailVerified(email);
+        return ResponseEntity.ok(Map.of("verified", verified));
     }
 
     @PostMapping("/resend-verification")
