@@ -236,19 +236,26 @@ export const StatCard: React.FC<{
   hint?: React.ReactNode;
   tone?: 'default' | 'accent';
   className?: string;
-}> = ({ label, value, hint, tone = 'default', className }) => (
-  <Card className={cn('flex flex-col justify-between p-3.5 sm:p-4 transition-shadow hover:shadow-card-hover min-w-0', className)}>
+  valueClassName?: string;
+}> = ({ label, value, hint, tone = 'default', className, valueClassName }) => (
+  <Card
+    className={cn(
+      'flex flex-col justify-between p-3 sm:p-3.5 transition-shadow hover:shadow-card-hover min-w-0 overflow-hidden',
+      className
+    )}
+  >
     <div className="min-w-0">
       <p
-        className="text-xs font-semibold uppercase tracking-wider text-muted leading-snug min-h-[2.25rem] flex items-center"
+        className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-muted leading-snug min-h-[2.25rem] flex items-center"
         title={label}
       >
         {label}
       </p>
       <div
         className={cn(
-          'tabular mt-2 text-base sm:text-lg xl:text-xl font-bold tracking-tight',
-          tone === 'accent' ? 'text-accent' : 'text-ink'
+          'tabular mt-1.5 text-base sm:text-lg font-bold tracking-tight truncate',
+          tone === 'accent' ? 'text-accent' : 'text-ink',
+          valueClassName
         )}
         title={typeof value === 'string' ? value : undefined}
       >

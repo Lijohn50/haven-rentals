@@ -293,11 +293,13 @@ export const AdminSummaryPage: React.FC = () => {
               label="Gross merchandise value"
               value={formatMoney(summary.data.grossMerchandiseValue)}
               tone="accent"
+              valueClassName="text-sm sm:text-base xl:text-base 2xl:text-lg"
             />
             <StatCard
               label="Platform revenue"
               value={formatMoney(summary.data.platformRevenue)}
               tone="accent"
+              valueClassName="text-sm sm:text-base xl:text-base 2xl:text-lg"
             />
             <StatCard
               label="New users"
