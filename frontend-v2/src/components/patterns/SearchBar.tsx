@@ -2,7 +2,7 @@ import React, { useEffect, useId, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DayPicker, type DateRange } from 'react-day-picker';
 import 'react-day-picker/style.css';
-import { CalendarDays, MapPin, Search, SlidersHorizontal, Users } from 'lucide-react';
+import { CalendarDays, MapPin, Search, SlidersHorizontal, Users, X } from 'lucide-react';
 import { BRAND } from '@/config/brand';
 import { ROUTES } from '@/config/routes';
 import { useDebouncedValue } from '@/hooks/useUtilities';
@@ -86,6 +86,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [guests, setGuests] = useState(prefill.guests);
   const [dateError, setDateError] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState<'destination' | 'dates' | 'guests'>('destination');
+
+  const openMobileSearch = (section?: 'destination' | 'dates' | 'guests') => {
+    setMobileSection(section ?? (city ? 'dates' : 'destination'));
+    setMobileOpen(true);
+  };
 
   // `useState` only reads `prefill` on the first render, so a URL-driven change (a filter
   // chip clearing the city, the back button) left the boxes showing the old search.
@@ -207,21 +213,9 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
   const segmentValue = 'mt-0.5 flex items-center gap-2 truncate text-sm font-medium text-muted';
   const datesLabel = checkIn && checkOut ? formatDateRange(checkIn, checkOut) : 'Add dates';
 
-  const renderForm = (isModal: boolean) => (
-    <div
-      className={cn(
-        'rounded-[20px] bg-surface/95 p-2 shadow-search ring-1 ring-black/5 backdrop-blur sm:p-2.5',
-        isModal && 'rounded-none bg-transparent p-0 shadow-none ring-0 backdrop-blur-none'
-      )}
-    >
-      <div
-        className={cn(
-          'grid gap-1',
-          isModal
-            ? 'grid-cols-1'
-            : 'lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,0.9fr)_auto] lg:items-center'
-        )}
-      >
+  const renderDesktopForm = () => (
+    <div className="rounded-[20px] bg-surface/95 p-2 shadow-search ring-1 ring-black/5 backdrop-blur sm:p-2.5">
+      <div className="grid gap-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)_minmax(0,0.9fr)_auto] lg:items-center">
         <div className="relative flex min-w-0 flex-col justify-center rounded-2xl px-4 py-2.5 transition-colors hover:bg-sand focus-within:bg-surface focus-within:shadow-card focus-within:ring-1 focus-within:ring-primary/30">
           <label htmlFor={inputId} className={segmentLabel}>
             Where to?
@@ -413,6 +407,238 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
     </div>
   );
 
+  const renderMobileModal = () => (
+    <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
+      <DialogContent className="max-w-md p-0 overflow-hidden rounded-3xl">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4 pr-12">
+          <DialogTitle className="text-base font-semibold text-text">Edit your search</DialogTitle>
+        </div>
+
+        <div className="max-h-[calc(85vh-8rem)] overflow-y-auto p-4 space-y-3 sm:p-5">
+          {/* Destination */}
+          {mobileSection === 'destination' ? (
+            <div className="rounded-2xl border-2 border-primary/30 bg-surface p-4 shadow-sm">
+              <p className="text-sm font-semibold text-text">Where to?</p>
+              <div className="relative mt-2.5">
+                <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" aria-hidden />
+                <Input
+                  autoComplete="off"
+                  autoFocus
+                  className="h-10 rounded-xl border-line bg-sand/30 pl-9 pr-9 text-sm font-medium text-text placeholder:text-muted/70 focus:border-primary focus:ring-1 focus:ring-primary"
+                  placeholder="Search city or destination"
+                  value={destination}
+                  onChange={(event) => {
+                    setDestination(event.target.value);
+                    setCity(event.target.value);
+                    setCountry('');
+                  }}
+                />
+                {destination && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDestination('');
+                      setCity('');
+                      setCountry('');
+                    }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted hover:text-text"
+                    aria-label="Clear destination"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {options.length > 0 && (
+                <ul className="mt-2 max-h-44 overflow-auto rounded-xl border border-line bg-surface p-1 shadow-sm divide-y divide-line/40">
+                  {options.map((option) => (
+                    <li
+                      key={`${option.city}-${option.country}`}
+                      className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-sand"
+                      onClick={() => {
+                        choose(option);
+                        setMobileSection('dates');
+                      }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
+                          <MapPin className="h-3.5 w-3.5" />
+                        </span>
+                        <div>
+                          <span className="font-semibold text-text">{option.city}</span>
+                          <span className="block text-xs text-muted">{option.country}</span>
+                        </div>
+                      </div>
+                      <span className="rounded-pill bg-sand px-2 py-0.5 text-xs text-muted">
+                        {option.listingCount} {option.listingCount === 1 ? 'home' : 'homes'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="mt-3 flex justify-end border-t border-line/60 pt-2.5">
+                <Button size="sm" onClick={() => setMobileSection('dates')}>
+                  Next: Dates
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMobileSection('destination')}
+              className="flex w-full items-center justify-between rounded-2xl border border-line bg-surface p-3.5 text-left shadow-sm transition-all hover:bg-sand/40 active:scale-[0.99]"
+            >
+              <div className="min-w-0">
+                <span className={segmentLabel}>Where</span>
+                <p className="mt-0.5 truncate text-sm font-semibold text-text">
+                  {city || destination || "Anywhere (flexible)"}
+                </p>
+              </div>
+              <span className="shrink-0 text-xs font-semibold text-primary">Change</span>
+            </button>
+          )}
+
+          {/* Dates */}
+          {mobileSection === 'dates' ? (
+            <div className="rounded-2xl border-2 border-primary/30 bg-surface p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-text">When's your trip?</p>
+                {checkIn && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRange({ from: undefined, to: undefined });
+                      setDateError(null);
+                    }}
+                    className="text-xs font-semibold text-primary underline underline-offset-2"
+                  >
+                    Clear dates
+                  </button>
+                )}
+              </div>
+              <p className="mt-0.5 text-xs text-muted">
+                {checkIn && checkOut
+                  ? `${formatDateRange(checkIn, checkOut)} (${nightsBetween(checkIn, checkOut)} ${nightsBetween(checkIn, checkOut) === 1 ? 'night' : 'nights'})`
+                  : checkIn
+                    ? 'Now select a check-out date'
+                    : 'Select check-in and check-out dates'}
+              </p>
+
+              {dateError && (
+                <div className="mt-2">
+                  <InlineAlert tone="warning">{dateError}</InlineAlert>
+                </div>
+              )}
+
+              <div className="mt-3 flex justify-center overflow-x-auto">
+                <DayPicker
+                  mode="range"
+                  numberOfMonths={1}
+                  selected={range}
+                  onSelect={(next) => {
+                    setRange(next ?? { from: undefined, to: undefined });
+                    setDateError(null);
+                  }}
+                  disabled={datesDisabled}
+                  className="[--rdp-accent-color:rgb(var(--color-primary))] [--rdp-day_selected-background-color:rgb(var(--color-primary))] [--rdp-day_selected-color:white] [--rdp-range_middle-background-color:rgb(var(--color-primary-soft))] [--rdp-range_middle-color:rgb(var(--color-primary-dark))]"
+                />
+              </div>
+
+              <div className="mt-3 flex items-center justify-between border-t border-line/60 pt-2.5">
+                <button
+                  type="button"
+                  className="text-xs font-medium text-muted hover:text-text"
+                  onClick={() => {
+                    setRange({ from: undefined, to: undefined });
+                    setMobileSection('guests');
+                  }}
+                >
+                  Skip dates
+                </button>
+                <Button size="sm" onClick={() => setMobileSection('guests')}>
+                  Next: Guests
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMobileSection('dates')}
+              className="flex w-full items-center justify-between rounded-2xl border border-line bg-surface p-3.5 text-left shadow-sm transition-all hover:bg-sand/40 active:scale-[0.99]"
+            >
+              <div className="min-w-0">
+                <span className={segmentLabel}>When</span>
+                <p className="mt-0.5 truncate text-sm font-semibold text-text">{datesLabel}</p>
+              </div>
+              <span className="shrink-0 text-xs font-semibold text-primary">Change</span>
+            </button>
+          )}
+
+          {/* Guests */}
+          {mobileSection === 'guests' ? (
+            <div className="rounded-2xl border-2 border-primary/30 bg-surface p-4 shadow-sm">
+              <p className="text-sm font-semibold text-text">Who's coming?</p>
+              <div className="mt-3 rounded-xl border border-line bg-sand/30 p-3">
+                <Stepper
+                  label="Guests"
+                  value={guests}
+                  min={1}
+                  max={BRAND.maxGuests}
+                  onChange={setGuests}
+                  suffix={guests === 1 ? ' guest' : ' guests'}
+                />
+              </div>
+              <p className="mt-2 text-xs text-muted">
+                Up to {BRAND.maxGuests} guests. The exact limit for each home is shown on its page.
+              </p>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMobileSection('guests')}
+              className="flex w-full items-center justify-between rounded-2xl border border-line bg-surface p-3.5 text-left shadow-sm transition-all hover:bg-sand/40 active:scale-[0.99]"
+            >
+              <div className="min-w-0">
+                <span className={segmentLabel}>Who</span>
+                <p className="mt-0.5 truncate text-sm font-semibold text-text">
+                  {guests} {guests === 1 ? 'guest' : 'guests'}
+                </p>
+              </div>
+              <span className="shrink-0 text-xs font-semibold text-primary">Change</span>
+            </button>
+          )}
+        </div>
+
+        {/* Modal Bottom Actions */}
+        <div className="border-t border-line bg-surface/95 px-5 py-3.5 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              setDestination('');
+              setCity('');
+              setCountry('');
+              setRange({ from: undefined, to: undefined });
+              setGuests(1);
+              setDateError(null);
+            }}
+            className="text-xs font-semibold text-muted underline-offset-4 hover:text-text hover:underline"
+          >
+            Clear all
+          </button>
+          <Button
+            size="md"
+            onClick={() => submit(true)}
+            className="flex items-center gap-2 px-6 shadow-md"
+          >
+            <Search className="h-4 w-4" aria-hidden />
+            <span>Search</span>
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (!hero) {
     return (
       <div className={cn('w-full', shell)}>
@@ -420,7 +646,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
         <div className="lg:hidden">
           <button
             type="button"
-            onClick={() => setMobileOpen(true)}
+            onClick={() => openMobileSearch()}
             className="flex w-full items-center gap-3 rounded-full border border-line bg-surface/95 px-3.5 py-2 shadow-sm backdrop-blur transition-all active:scale-[0.99] text-left hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
             aria-label="Edit search destination, dates, and guests"
           >
@@ -440,19 +666,12 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
             </div>
           </button>
 
-          <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
-            <DialogContent className="max-w-md p-5">
-              <DialogTitle className="text-base font-semibold text-text">Edit your search</DialogTitle>
-              <div className="mt-4">
-                {renderForm(true)}
-              </div>
-            </DialogContent>
-          </Dialog>
+          {renderMobileModal()}
         </div>
 
         {/* Desktop View: Full Horizontal Bar (>= lg) */}
         <div className="hidden lg:block">
-          {renderForm(false)}
+          {renderDesktopForm()}
         </div>
       </div>
     );
@@ -460,7 +679,7 @@ const showList = destination.trim().length >= 2 && !dismissed && options.length 
 
   return (
     <div className={cn('w-full', shell)}>
-      {renderForm(false)}
+      {renderDesktopForm()}
     </div>
   );
 };
