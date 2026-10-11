@@ -237,7 +237,7 @@ export const StatCard: React.FC<{
   tone?: 'default' | 'accent';
   className?: string;
 }> = ({ label, value, hint, tone = 'default', className }) => (
-  <Card className={cn('flex flex-col justify-between p-4 sm:p-4.5 xl:p-5 transition-shadow hover:shadow-card-hover min-w-0', className)}>
+  <Card className={cn('flex flex-col justify-between p-3.5 sm:p-4 transition-shadow hover:shadow-card-hover min-w-0', className)}>
     <div className="min-w-0">
       <p
         className="text-xs font-semibold uppercase tracking-wider text-muted leading-snug min-h-[2.25rem] flex items-center"
@@ -247,7 +247,7 @@ export const StatCard: React.FC<{
       </p>
       <div
         className={cn(
-          'tabular mt-2 text-lg sm:text-xl xl:text-2xl font-bold tracking-tight',
+          'tabular mt-2 text-base sm:text-lg xl:text-xl font-bold tracking-tight',
           tone === 'accent' ? 'text-accent' : 'text-ink'
         )}
         title={typeof value === 'string' ? value : undefined}
