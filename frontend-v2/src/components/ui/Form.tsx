@@ -40,7 +40,7 @@ export const Field: React.FC<FieldProps> = ({
 );
 
 const controlClasses =
-  'w-full rounded-control border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted/70 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:bg-bg disabled:text-muted aria-[invalid=true]:border-danger';
+  'h-10 w-full rounded-control border border-line bg-surface px-3 text-sm text-ink placeholder:text-muted/70 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:bg-bg disabled:text-muted aria-[invalid=true]:border-danger';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hasError?: boolean;
@@ -97,7 +97,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, hasError, ...props }, ref) => (
     <textarea
       ref={ref}
-      className={cn(controlClasses, 'min-h-[96px] resize-y leading-relaxed', hasError && 'border-danger', className)}
+      className={cn(controlClasses, 'h-auto min-h-[96px] py-2 resize-y leading-relaxed', hasError && 'border-danger', className)}
       {...props}
     />
   )

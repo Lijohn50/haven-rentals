@@ -156,9 +156,9 @@ export const AdminUsersPage: React.FC = () => {
         </p>
       </div>
 
-      <Card className="p-4">
+      <Card className="p-4 sm:p-5 shadow-card">
         <form
-          className="flex flex-wrap items-end gap-3"
+          className="flex flex-wrap items-end gap-3.5"
           onSubmit={(event) => {
             event.preventDefault();
             change({ query: draftQuery.trim() === '' ? null : draftQuery.trim() });
@@ -173,7 +173,7 @@ export const AdminUsersPage: React.FC = () => {
               onChange={(event) => setDraftQuery(event.target.value)}
             />
           </Field>
-          <Field label="Role" htmlFor="admin-user-role" className="w-44">
+          <Field label="Role" htmlFor="admin-user-role" className="w-full sm:w-44">
             <Select
               id="admin-user-role"
               value={role ?? ''}
@@ -187,7 +187,7 @@ export const AdminUsersPage: React.FC = () => {
               ))}
             </Select>
           </Field>
-          <Field label="Status" htmlFor="admin-user-status" className="w-40">
+          <Field label="Status" htmlFor="admin-user-status" className="w-full sm:w-40">
             <Select
               id="admin-user-status"
               value={status ?? ''}
@@ -201,7 +201,7 @@ export const AdminUsersPage: React.FC = () => {
               ))}
             </Select>
           </Field>
-          <Button type="submit">
+          <Button type="submit" className="px-5">
             <Search className="h-4 w-4" aria-hidden />
             Search
           </Button>

@@ -18,6 +18,7 @@ import {
   InlineAlert,
   Input,
   Pagination,
+  Select,
   Skeleton,
   Textarea,
   TraceId,
@@ -94,37 +95,53 @@ export const AdminReviewsPage: React.FC = () => {
         </p>
       </div>
 
-      <Card className="p-4">
-        <form className="flex flex-wrap items-end gap-3" onSubmit={submitSearch}>
-          <Field label="Status" className="min-w-[12rem]">
-            <select
+      <Card className="p-4 sm:p-5 shadow-card">
+        <form className="flex flex-wrap items-end gap-3.5" onSubmit={submitSearch}>
+          <Field label="Status" htmlFor="review-status" className="w-full sm:w-56">
+            <Select
+              id="review-status"
               value={status ?? 'ALL'}
               onChange={(e) => {
                 const value = e.target.value;
                 setStatus(value === 'ALL' ? undefined : (value as ReviewStatus));
                 setPage(0);
               }}
-              className="w-full rounded-control border border-line bg-bg px-3 py-2 text-sm text-ink"
             >
               {STATUS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </Field>
-          <Field label="Search" htmlFor="review-search" className="min-w-[16rem] flex-1" hint="Reviewer or listing title.">
+          <Field label="Search" htmlFor="review-search" className="min-w-[16rem] flex-1">
             <Input
               id="review-search"
+              type="search"
               value={term}
-              placeholder="Name or listing title"
+              placeholder="Search by reviewer name or listing title…"
               onChange={(event) => setTerm(event.target.value)}
             />
           </Field>
-          <Button type="submit">
-            <Search className="h-4 w-4" aria-hidden />
-            Search
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button type="submit" className="px-5">
+              <Search className="h-4 w-4" aria-hidden />
+              Search
+            </Button>
+            {submittedTerm && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setTerm('');
+                  setSubmittedTerm('');
+                  setPage(0);
+                }}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
         </form>
       </Card>
 

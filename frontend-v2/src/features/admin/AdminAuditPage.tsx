@@ -303,7 +303,7 @@ export const AdminAuditPage: React.FC = () => {
 
       <Card className="p-4">
         <form
-          className="flex flex-wrap items-end gap-3"
+          className="flex flex-wrap items-end gap-3.5"
           onSubmit={(event) => {
             event.preventDefault();
             applyFilters();
@@ -312,7 +312,7 @@ export const AdminAuditPage: React.FC = () => {
           <Field
             label="Actor id"
             htmlFor="audit-actor"
-            className="w-32"
+            className="w-full sm:w-32"
             error={actorInvalid ? 'Enter a numeric user id' : null}
           >
             <Input
@@ -326,7 +326,7 @@ export const AdminAuditPage: React.FC = () => {
             />
           </Field>
 
-          <Field label="Entity type" htmlFor="audit-entity" className="w-44">
+          <Field label="Entity type" htmlFor="audit-entity" className="w-full sm:w-44">
             <Input
               id="audit-entity"
               placeholder="Listing, User, Dispute…"
@@ -335,7 +335,7 @@ export const AdminAuditPage: React.FC = () => {
             />
           </Field>
 
-          <Field label="Action" htmlFor="audit-action" className="w-56">
+          <Field label="Action" htmlFor="audit-action" className="w-full sm:w-56">
             <Select
               id="audit-action"
               value={action}
@@ -350,7 +350,7 @@ export const AdminAuditPage: React.FC = () => {
             </Select>
           </Field>
 
-          <Field label="From" htmlFor="audit-from" className="w-40">
+          <Field label="From" htmlFor="audit-from" className="w-full sm:w-40">
             <Input
               id="audit-from"
               type="date"
@@ -360,7 +360,7 @@ export const AdminAuditPage: React.FC = () => {
             />
           </Field>
 
-          <Field label="To" htmlFor="audit-to" className="w-40">
+          <Field label="To" htmlFor="audit-to" className="w-full sm:w-40">
             <Input
               id="audit-to"
               type="date"
@@ -370,7 +370,7 @@ export const AdminAuditPage: React.FC = () => {
             />
           </Field>
 
-          <Button type="submit" disabled={actorInvalid}>
+          <Button type="submit" disabled={actorInvalid} className="px-5">
             Apply filters
           </Button>
           {hasFilters && (

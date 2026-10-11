@@ -80,7 +80,7 @@ const StatusBars: React.FC<{
   ];
 
   return (
-    <div>
+    <div className="min-w-0">
       <div className="mb-3 flex justify-end">
         <Button
           variant="ghost"
@@ -103,19 +103,22 @@ const StatusBars: React.FC<{
           columns={columns}
           rows={rows}
           getRowKey={(row) => row.status}
+          minWidth="min-w-full"
         />
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2.5">
           {rows.map((row) => (
-            <li key={row.status} className="flex items-center gap-3">
-              <span className="w-36 shrink-0 truncate text-sm text-ink">{row.entry.label}</span>
-              <span className="h-3 flex-1 overflow-hidden rounded-control bg-bg">
+            <li key={row.status} className="flex items-center gap-3 min-w-0">
+              <span className="w-28 sm:w-36 shrink-0 truncate text-sm text-ink" title={row.entry.label}>
+                {row.entry.label}
+              </span>
+              <span className="h-2.5 flex-1 min-w-[3rem] overflow-hidden rounded-full bg-sand">
                 <span
-                  className={`block h-full rounded-control ${TONE_BAR[row.entry.tone]}`}
+                  className={`block h-full rounded-full transition-all duration-300 ${TONE_BAR[row.entry.tone]}`}
                   style={{ width: `${max > 0 ? Math.round((row.count / max) * 100) : 0}%` }}
                 />
               </span>
-              <span className="tabular w-10 shrink-0 text-right text-sm text-muted">
+              <span className="tabular w-12 shrink-0 text-right text-sm font-medium text-ink">
                 {row.count}
               </span>
             </li>
@@ -206,37 +209,47 @@ export const AdminSummaryPage: React.FC = () => {
         </p>
       </div>
 
-      <Card className="p-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <Field label="From" htmlFor="summary-from" className="w-40">
-            <Input
-              id="summary-from"
-              type="date"
-              value={draftFrom}
-              max={to}
-              onChange={(event) => setDraftFrom(event.target.value)}
-            />
-          </Field>
-          <Field label="To" htmlFor="summary-to" className="w-40">
-            <Input
-              id="summary-to"
-              type="date"
-              value={draftTo}
-              min={from}
-              onChange={(event) => setDraftTo(event.target.value)}
-            />
-          </Field>
-          <Button
-            disabled={rangeInverted || rangeTooLong}
-            onClick={() => applyRange(draftFrom, draftTo)}
-          >
-            Apply range
-          </Button>
-          <div className="flex flex-wrap gap-1">
+      <Card className="overflow-hidden p-4 sm:p-5 shadow-card">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <Field label="From" htmlFor="summary-from" className="w-full sm:w-44">
+              <Input
+                id="summary-from"
+                type="date"
+                value={draftFrom}
+                max={to}
+                onChange={(event) => setDraftFrom(event.target.value)}
+              />
+            </Field>
+            <Field label="To" htmlFor="summary-to" className="w-full sm:w-44">
+              <Input
+                id="summary-to"
+                type="date"
+                value={draftTo}
+                min={from}
+                onChange={(event) => setDraftTo(event.target.value)}
+              />
+            </Field>
+            <Button
+              className="w-full sm:w-auto px-5"
+              disabled={rangeInverted || rangeTooLong}
+              onClick={() => applyRange(draftFrom, draftTo)}
+            >
+              Apply range
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-line/60">
+            <span className="text-xs font-medium text-muted mr-1">Quick presets:</span>
             {[7, 30, 90, 365].map((days) => (
-              <Button key={days} variant="outline" size="sm" onClick={() => applyPreset(days)}>
+              <button
+                key={days}
+                type="button"
+                onClick={() => applyPreset(days)}
+                className="inline-flex items-center rounded-pill border border-line bg-surface px-3 py-1 text-xs font-medium text-ink transition-colors hover:bg-sand hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              >
                 Last {days} days
-              </Button>
+              </button>
             ))}
           </div>
         </div>
@@ -255,9 +268,9 @@ export const AdminSummaryPage: React.FC = () => {
       </Card>
 
       {summary.isLoading && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3.5 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-24 w-full" />
+            <Skeleton key={index} className="h-28 w-full" />
           ))}
         </div>
       )}
@@ -275,7 +288,7 @@ export const AdminSummaryPage: React.FC = () => {
 
       {summary.data && !isEmpty && (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-3.5 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             <StatCard
               label="Gross merchandise value"
               value={formatMoney(summary.data.grossMerchandiseValue)}
@@ -308,7 +321,7 @@ export const AdminSummaryPage: React.FC = () => {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="p-5">
+            <Card className="overflow-hidden p-5 shadow-card">
               <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
                 Bookings by status
               </h2>
@@ -318,7 +331,7 @@ export const AdminSummaryPage: React.FC = () => {
                 emptyLabel="No bookings were created in this range."
               />
             </Card>
-            <Card className="p-5">
+            <Card className="overflow-hidden p-5 shadow-card">
               <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
                 Disputes by status
               </h2>
@@ -330,7 +343,7 @@ export const AdminSummaryPage: React.FC = () => {
             </Card>
           </div>
 
-          <Card className="p-5">
+          <Card className="overflow-hidden p-5 shadow-card">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
               Top cities
             </h2>
@@ -342,38 +355,39 @@ export const AdminSummaryPage: React.FC = () => {
                 columns={cityColumns}
                 rows={cities}
                 getRowKey={(row) => row.city}
+                minWidth="min-w-full sm:min-w-[28rem]"
               />
             )}
           </Card>
         </>
       )}
 
-      <Card className="p-5">
+      <Card className="overflow-hidden p-5 shadow-card">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
           Work queues
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Button asChild variant="outline" className="h-auto justify-between py-3">
-            <Link to={ROUTES.ADMIN_LISTINGS}>
-              <span className="flex items-center gap-2">
-                <ClipboardList className="h-4 w-4" aria-hidden />
-                Pending listings
+          <Button asChild variant="outline" className="h-auto justify-between py-3 px-4">
+            <Link to={ROUTES.ADMIN_LISTINGS} className="min-w-0">
+              <span className="flex items-center gap-2 min-w-0 truncate">
+                <ClipboardList className="h-4 w-4 shrink-0 text-muted" aria-hidden />
+                <span className="truncate">Pending listings</span>
                 {pending.data && (
-                  <span className="tabular rounded-full bg-warning-soft px-2 py-0.5 text-xs text-warning-text">
+                  <span className="tabular rounded-full bg-warning-soft px-2 py-0.5 text-xs font-semibold text-warning-text shrink-0">
                     {pending.data.totalElements}
                   </span>
                 )}
               </span>
-              <ArrowRight className="h-4 w-4" aria-hidden />
+              <ArrowRight className="h-4 w-4 shrink-0 ml-2 text-muted" aria-hidden />
             </Link>
           </Button>
-          <Button asChild variant="outline" className="h-auto justify-between py-3">
-            <Link to={`${ROUTES.SUPPORT_DISPUTES}?status=OPEN`}>
-              <span className="flex items-center gap-2">
-                <Gavel className="h-4 w-4" aria-hidden />
-                Open disputes
+          <Button asChild variant="outline" className="h-auto justify-between py-3 px-4">
+            <Link to={`${ROUTES.SUPPORT_DISPUTES}?status=OPEN`} className="min-w-0">
+              <span className="flex items-center gap-2 min-w-0 truncate">
+                <Gavel className="h-4 w-4 shrink-0 text-muted" aria-hidden />
+                <span className="truncate">Open disputes</span>
               </span>
-              <ArrowRight className="h-4 w-4" aria-hidden />
+              <ArrowRight className="h-4 w-4 shrink-0 ml-2 text-muted" aria-hidden />
             </Link>
           </Button>
         </div>

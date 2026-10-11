@@ -89,6 +89,7 @@ export interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   caption?: string;
   className?: string;
+  minWidth?: string;
 }
 
 /** Dense, sticky-header table for the host and staff consoles (architecture 13). */
@@ -99,38 +100,41 @@ export function DataTable<T>({
   onRowClick,
   caption,
   className,
+  minWidth,
 }: DataTableProps<T>) {
+  const tableMinWidth = minWidth ?? (columns.length <= 3 ? 'min-w-full' : 'min-w-[40rem]');
+
   return (
     // `overflow-x-auto` alone computes overflow-y to `auto` as well, which makes this the
     // scroll container and leaves the sticky header with no range to stick inside. The
     // height cap gives it one, so `thead` stays put while the body scrolls.
-    <div className={cn('max-h-[70vh] overflow-auto rounded-card border border-line bg-surface', className)}>
-      <table className="w-full min-w-[40rem] border-collapse text-sm">
+    <div className={cn('max-h-[70vh] overflow-auto rounded-card border border-line bg-surface shadow-sm', className)}>
+      <table className={cn('w-full border-collapse text-sm', tableMinWidth)}>
         {caption && <caption className="sr-only">{caption}</caption>}
-        <thead className="sticky top-0 z-10 bg-bg text-left text-xs uppercase tracking-wide text-muted">
+        <thead className="sticky top-0 z-10 border-b-2 border-line bg-sand/95 backdrop-blur-sm text-left text-xs font-semibold uppercase tracking-wider text-ink shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
-                className={cn('px-4 py-3 font-medium', column.numeric && 'text-right', column.className)}
+                className={cn('px-4 py-3.5 font-semibold text-ink whitespace-nowrap select-none', column.numeric && 'text-right', column.className)}
               >
                 {column.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-line/60">
           {rows.map((row) => (
             <tr
               key={getRowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={cn('border-t border-line', onRowClick && 'cursor-pointer hover:bg-bg')}
+              className={cn('transition-colors', onRowClick ? 'cursor-pointer hover:bg-sand/60' : 'hover:bg-sand/30')}
             >
               {columns.map((column) => (
                 <td
                   key={column.key}
-                  className={cn('px-4 py-3 align-middle text-ink', column.numeric && 'text-right tabular')}
+                  className={cn('px-4 py-3.5 align-middle text-ink', column.numeric && 'text-right tabular', column.className)}
                 >
                   {column.render(row)}
                 </td>
