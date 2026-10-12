@@ -34,7 +34,11 @@ import type { BookingHostSummary } from '@/types/api';
 export const TripDetailPage: React.FC = () => {
   const { reference } = useParams();
   const [searchParams] = useSearchParams();
-  const paymentSuccess = searchParams.get('payment') === 'success';
+  const paymentParam = searchParams.get('payment');
+  const paymentSuccess = paymentParam === 'success';
+  const paymentExpired = paymentParam === 'expired';
+  const paymentFailed = paymentParam === 'failed';
+  const paymentCancelled = paymentParam === 'cancelled';
   useDocumentTitle(reference ? `Trip ${reference}` : 'Trip');
 
   const navigate = useNavigate();
@@ -113,7 +117,25 @@ export const TripDetailPage: React.FC = () => {
 
       {paymentSuccess && (
         <InlineAlert tone="success">
-          Payment completed successfully via SSLCommerz! Your stay is confirmed.
+          Payment completed successfully! Your stay is confirmed.
+        </InlineAlert>
+      )}
+
+      {paymentExpired && (
+        <InlineAlert tone="danger">
+          The hold for this booking expired before payment completed. If any funds were deducted, an automatic refund has been queued.
+        </InlineAlert>
+      )}
+
+      {paymentFailed && (
+        <InlineAlert tone="danger">
+          Payment was not successful or was declined by the provider. Please try again.
+        </InlineAlert>
+      )}
+
+      {paymentCancelled && (
+        <InlineAlert tone="info">
+          Payment was cancelled. You can complete your payment before the reservation hold expires.
         </InlineAlert>
       )}
 
@@ -141,10 +163,17 @@ export const TripDetailPage: React.FC = () => {
       </header>
 
       <div className="flex flex-wrap items-center gap-2 no-print">
-        {actions.includes('PAY') && (
+        {actions.includes('PAY') && !hold.expired && stay.status !== 'EXPIRED' && (
           <Button asChild variant="accent">
             <Link to={ROUTES.TRIP_PAY(stay.reference)}>
-              {hold.expired ? 'Complete payment' : 'Pay and finish booking'}
+              Pay and finish booking
+            </Link>
+          </Button>
+        )}
+        {(hold.expired || stay.status === 'EXPIRED') && stay.listing && (
+          <Button asChild variant="outline">
+            <Link to={ROUTES.LISTING(stay.listing.id)}>
+              Hold expired · Reserve again
             </Link>
           </Button>
         )}

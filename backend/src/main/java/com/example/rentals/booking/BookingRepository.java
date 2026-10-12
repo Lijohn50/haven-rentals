@@ -31,6 +31,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, JpaSpec
 
     int countByGuestIdAndStatus(Long guestId, BookingStatus status);
 
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.guest.id = :guestId AND b.status = com.example.rentals.booking.BookingStatus.PENDING_PAYMENT AND (b.expiresAt IS NULL OR b.expiresAt > :now)")
+    int countActiveHoldsByGuestId(@Param("guestId") Long guestId, @Param("now") Instant now);
+
     Page<Booking> findByGuestIdOrderByCreatedAtDesc(Long guestId, Pageable pageable);
 
     Page<Booking> findByGuestIdAndStatusOrderByCreatedAtDesc(Long guestId, BookingStatus status, Pageable pageable);

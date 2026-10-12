@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -152,6 +153,7 @@ public class Listing {
     private Set<Amenity> amenities = new HashSet<>();
 
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @BatchSize(size = 30)
     @OrderBy("sortOrder ASC")
     private List<ListingPhoto> photos = new ArrayList<>();
 

@@ -706,6 +706,7 @@ export interface ConversationResponse {
   id: number;
   listingId: number;
   listingTitle: string;
+  listingPhotoUrl?: string | null;
   counterpartId: number;
   counterpartDisplayName: string;
   lastMessageAt: string | null;

@@ -189,11 +189,11 @@ export const PayPage: React.FC = () => {
   const hold = useCountdown(booking.data?.expiresAt);
 
   if (booking.data && gate.current === null) {
-    const expiresAt = booking.data.expiresAt;
-    gate.current =
-      booking.data.allowedActions.includes('PAY') &&
-      expiresAt !== null &&
-      new Date(expiresAt).getTime() > Date.now();
+    const isPayableOrHoldExpired =
+      booking.data.allowedActions.includes('PAY') ||
+      booking.data.status === 'PENDING_PAYMENT' ||
+      booking.data.status === 'EXPIRED';
+    gate.current = isPayableOrHoldExpired;
   }
 
   const payment = useBookingPaymentDetail(
@@ -231,7 +231,7 @@ export const PayPage: React.FC = () => {
   const stay = booking.data;
   const total = stay.priceBreakdown.totalAmount;
   const requested = !stay.instantBook;
-  const expired = hold.expired;
+  const expired = hold.expired || stay.status === 'EXPIRED';
 
   const startAgain = () => {
     const search = new URLSearchParams({

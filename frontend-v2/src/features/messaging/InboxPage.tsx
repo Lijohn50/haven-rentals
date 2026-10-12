@@ -93,7 +93,7 @@ const ConversationRow: React.FC<{
       )}
     >
       <PhotoThumb
-        src={null}
+        src={conversation.listingPhotoUrl ?? null}
         alt={conversation.listingTitle}
         className="h-12 w-16 shrink-0"
       />

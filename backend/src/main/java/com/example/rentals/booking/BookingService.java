@@ -96,7 +96,7 @@ public class BookingService {
             throw new ApiException(ErrorCode.EMAIL_NOT_VERIFIED, HttpStatus.FORBIDDEN, "Email must be verified before booking");
         }
 
-        int activeHolds = bookingRepository.countByGuestIdAndStatus(guestId, BookingStatus.PENDING_PAYMENT);
+        int activeHolds = bookingRepository.countActiveHoldsByGuestId(guestId, clock.instant());
         if (activeHolds >= 3) {
             throw new BusinessRuleException("Maximum 3 pending booking holds allowed at a time");
         }
@@ -702,10 +702,13 @@ public class BookingService {
         List<BookingAction> actions = new ArrayList<>();
         boolean isGuest = userId.equals(b.getGuest().getId());
         boolean isHost = userId.equals(b.getHost().getId());
+        Instant now = clock.instant();
 
         if (isGuest) {
             if (b.getStatus() == BookingStatus.PENDING_PAYMENT) {
-                actions.add(BookingAction.PAY);
+                if (b.getExpiresAt() == null || b.getExpiresAt().isAfter(now)) {
+                    actions.add(BookingAction.PAY);
+                }
             }
             if (b.getStatus() == BookingStatus.PENDING_APPROVAL || b.getStatus() == BookingStatus.CONFIRMED) {
                 actions.add(BookingAction.CANCEL);
@@ -717,8 +720,10 @@ public class BookingService {
             actions.add(BookingAction.MESSAGE);
         } else if (isHost) {
             if (b.getStatus() == BookingStatus.PENDING_APPROVAL) {
-                actions.add(BookingAction.APPROVE);
-                actions.add(BookingAction.DECLINE);
+                if (b.getExpiresAt() == null || b.getExpiresAt().isAfter(now)) {
+                    actions.add(BookingAction.APPROVE);
+                    actions.add(BookingAction.DECLINE);
+                }
             }
             if (b.getStatus() == BookingStatus.CONFIRMED) {
                 actions.add(BookingAction.CANCEL);

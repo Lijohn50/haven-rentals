@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -95,13 +96,17 @@ public class AvailabilityService {
         Number count = (Number) entityManager.createNativeQuery("""
             SELECT COUNT(*) FROM bookings b
             WHERE b.listing_id = :listingId
-              AND b.status IN ('PENDING_PAYMENT', 'PENDING_APPROVAL', 'CONFIRMED')
+              AND (
+                b.status = 'CONFIRMED'
+                OR (b.status IN ('PENDING_PAYMENT', 'PENDING_APPROVAL') AND (b.expires_at IS NULL OR b.expires_at > :now))
+              )
               AND b.check_in < :checkOut
               AND b.check_out > :checkIn
         """)
         .setParameter("listingId", listingId)
         .setParameter("checkIn", checkIn)
         .setParameter("checkOut", checkOut)
+        .setParameter("now", Timestamp.from(clock.instant()))
         .getSingleResult();
 
         return count != null && count.longValue() > 0;
@@ -136,13 +141,17 @@ public class AvailabilityService {
         List<Object[]> bookedRanges = entityManager.createNativeQuery("""
             SELECT check_in, check_out FROM bookings
             WHERE listing_id = :listingId
-              AND status IN ('PENDING_PAYMENT', 'PENDING_APPROVAL', 'CONFIRMED')
+              AND (
+                status = 'CONFIRMED'
+                OR (status IN ('PENDING_PAYMENT', 'PENDING_APPROVAL') AND (expires_at IS NULL OR expires_at > :now))
+              )
               AND check_in < :toExclusive
               AND check_out > :from
         """)
         .setParameter("listingId", listingId)
         .setParameter("from", from)
         .setParameter("toExclusive", to.plusDays(1))
+        .setParameter("now", Timestamp.from(clock.instant()))
         .getResultList();
 
         List<CalendarDayResponse> days = new ArrayList<>();
@@ -166,8 +175,8 @@ public class AvailabilityService {
                     reason = CalendarUnavailableReason.BLOCKED;
                 } else {
                     boolean isBooked = bookedRanges.stream().anyMatch(r -> {
-                        LocalDate bIn = ((java.sql.Date) r[0]).toLocalDate();
-                        LocalDate bOut = ((java.sql.Date) r[1]).toLocalDate();
+                        LocalDate bIn = toLocalDate(r[0]);
+                        LocalDate bOut = toLocalDate(r[1]);
                         return !d.isBefore(bIn) && d.isBefore(bOut);
                     });
                     if (isBooked) {
@@ -253,5 +262,11 @@ public class AvailabilityService {
         return listingRepository.findByIdAndHostId(listingId, hostId)
                 .filter(l -> l.getStatus() != ListingStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Listing not found"));
+    }
+
+    private LocalDate toLocalDate(Object val) {
+        if (val instanceof LocalDate ld) return ld;
+        if (val instanceof java.sql.Date d) return d.toLocalDate();
+        return LocalDate.parse(val.toString());
     }
 }
