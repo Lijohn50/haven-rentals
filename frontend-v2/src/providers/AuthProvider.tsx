@@ -79,18 +79,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       const outcome = await refreshOnce();
-      if (outcome !== 'refreshed') {
+      if (outcome === 'expired') {
         if (!cancelled) applyUser(null);
         return;
       }
-      try {
-        const me = await userApi.me();
-        if (!cancelled) {
-          applyUser(me);
-          queryClient.setQueryData(['me'], me);
+      if (outcome === 'refreshed') {
+        try {
+          const me = await userApi.me();
+          if (!cancelled) {
+            applyUser(me);
+            queryClient.setQueryData(['me'], me);
+          }
+        } catch (error) {
+          const status = (error as { status?: number })?.status;
+          if (status === 401 && !cancelled) {
+            applyUser(null);
+          }
         }
-      } catch {
-        if (!cancelled) applyUser(null);
+      } else {
+        // 'retry-later': temporary server restart or network glitch.
+        // Preserve cached user from localStorage so reload does not kick the user out.
+        const cached = readSnapshot();
+        if (cached && !cancelled) {
+          setUser(cached);
+          setStatus('authenticated');
+        }
       }
     };
 

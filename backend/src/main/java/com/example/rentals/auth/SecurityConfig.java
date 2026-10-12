@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -128,14 +129,16 @@ public class SecurityConfig {
         // Standard CORS for application frontend
         CorsConfiguration config = new CorsConfiguration();
         String originsStr = appProperties.getCors().getOrigins();
-        List<String> origins = Arrays.stream(originsStr.split(","))
+        List<String> origins = new ArrayList<>(Arrays.stream(originsStr.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .toList();
+                .toList());
+        if (!origins.contains("https://stay-have.me")) origins.add("https://stay-have.me");
+        origins.add("https://*.stay-have.me");
 
-        config.setAllowedOrigins(origins);
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Idempotency-Key", "X-Request-Id"));
+        config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Location", "X-Request-Id"));
         config.setAllowCredentials(false);
 

@@ -17,8 +17,10 @@ RUN mvn -s settings.xml clean package -DskipTests -B
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
-# Create unprivileged application user
-RUN groupadd -r appgroup && useradd -r -g appgroup -d /app appuser
+# Install curl for container health check and create unprivileged application user
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r appgroup && useradd -r -g appgroup -d /app appuser
 
 # Create upload directory and set permissions
 RUN mkdir -p /app/uploads && chown -R appuser:appgroup /app
@@ -28,8 +30,8 @@ COPY --from=build --chown=appuser:appgroup /workspace/target/rentals-backend-1.0
 
 USER appuser
 
-# Standard JVM settings with UTC timezone and container memory limits
-ENV JAVA_OPTS="-Duser.timezone=UTC -XX:MaxRAMPercentage=75 -Djava.security.egd=file:/dev/./urandom"
+# Standard JVM settings with UTC timezone and safe memory bounds for 512MB containers
+ENV JAVA_OPTS="-Duser.timezone=UTC -Xmx280m -Xss512k -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError -Djava.security.egd=file:/dev/./urandom"
 ENV SERVER_PORT=8080
 
 EXPOSE 8080

@@ -17,16 +17,72 @@ const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp'];
 // Same pattern the backend validates against (PhotoLinkRequest.url).
 const CLOUDINARY_URL_PATTERN = /^https:\/\/[a-z0-9.-]+\.cloudinary\.com\/.+/;
 
-function preflight(file: File): Promise<string | null> {
-  return new Promise((resolve) => {
-    if (!ACCEPTED.includes(file.type)) return resolve('Unsupported format. Use JPEG, PNG or WebP.');
-    if (file.size > BRAND.maxPhotoBytes) return resolve(`File is larger than ${BRAND.maxPhotoBytes / (1024 * 1024)} MB.`);
-    createImageBitmap(file).then((bitmap) => {
-      if (bitmap.width < BRAND.photoMinSide || bitmap.height < BRAND.photoMinSide) return resolve(`Image must be at least ${BRAND.photoMinSide}×${BRAND.photoMinSide} px.`);
-      if (bitmap.width > BRAND.photoMaxSide || bitmap.height > BRAND.photoMaxSide) return resolve(`Image must be at most ${BRAND.photoMaxSide}×${BRAND.photoMaxSide} px.`);
-      resolve(null);
-    }).catch(() => resolve('Could not read the image file.'));
-  });
+async function optimizeImageForUpload(file: File): Promise<File> {
+  if (!ACCEPTED.includes(file.type)) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const maxSide = 2048;
+    let { width, height } = bitmap;
+    if (width <= maxSide && height <= maxSide && file.size <= 1.5 * 1024 * 1024) {
+      bitmap.close();
+      return file;
+    }
+    if (width > maxSide || height > maxSide) {
+      if (width > height) {
+        height = Math.round((height * maxSide) / width);
+        width = maxSide;
+      } else {
+        width = Math.round((width * maxSide) / height);
+        height = maxSide;
+      }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+    const targetType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, targetType, 0.88)
+    );
+    if (!blob) return file;
+    const safeName = file.name.replace(/\.[^/.]+$/, targetType === 'image/png' ? '.png' : '.jpg');
+    return new File([blob], safeName, { type: targetType, lastModified: Date.now() });
+  } catch {
+    return file;
+  }
+}
+
+async function prepareAndPreflight(file: File): Promise<{ file: File; error: string | null }> {
+  if (!ACCEPTED.includes(file.type)) {
+    return { file, error: 'Unsupported format. Use JPEG, PNG or WebP.' };
+  }
+  if (file.size > 30 * 1024 * 1024) {
+    return { file, error: 'File is larger than 30 MB.' };
+  }
+  const optimized = await optimizeImageForUpload(file);
+  if (optimized.size > BRAND.maxPhotoBytes) {
+    return { file: optimized, error: `File is larger than ${BRAND.maxPhotoBytes / (1024 * 1024)} MB.` };
+  }
+  try {
+    const bitmap = await createImageBitmap(optimized);
+    const { width, height } = bitmap;
+    bitmap.close();
+    if (width < BRAND.photoMinSide || height < BRAND.photoMinSide) {
+      return { file: optimized, error: `Image must be at least ${BRAND.photoMinSide}×${BRAND.photoMinSide} px.` };
+    }
+    if (width > BRAND.photoMaxSide || height > BRAND.photoMaxSide) {
+      return { file: optimized, error: `Image must be at most ${BRAND.photoMaxSide}×${BRAND.photoMaxSide} px.` };
+    }
+  } catch {
+    return { file: optimized, error: 'Could not read the image file.' };
+  }
+  return { file: optimized, error: null };
 }
 
 function SortablePhoto({ photo, position, onMakeCover, onDelete, disabled }: { photo: PhotoResponse; position: number; onMakeCover: () => void; onDelete: () => void; disabled: boolean }) {
@@ -77,8 +133,8 @@ export const PhotosTab: React.FC<{ listing: ListingResponse }> = ({ listing }) =
         setPhotoError(`You can upload at most ${BRAND.maxPhotosPerListing} photos.`);
         break;
       }
-      const file = fileArray[i];
-      const err = await preflight(file);
+      const rawFile = fileArray[i];
+      const { file, error: err } = await prepareAndPreflight(rawFile);
       if (err) { setPhotoError(err); setUploadProgress({ done: i + 1, total: fileArray.length }); continue; }
       try {
         await mutations.uploadPhoto.mutateAsync({ id: listing.id, file });

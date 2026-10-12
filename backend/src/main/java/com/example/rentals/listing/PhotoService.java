@@ -80,17 +80,24 @@ public class PhotoService {
         int width = image.getWidth();
         int height = image.getHeight();
         if (width < 400 || height < 400 || width > 8000 || height > 8000) {
+            image.flush();
             throw new BusinessRuleException("Image dimensions must be between 400x400 and 8000x8000 pixels");
         }
 
-        // Re-encode to strip EXIF/GPS metadata
-        byte[] cleanBytes;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ImageIO.write(image, detectedFormat.equals("jpeg") ? "jpg" : detectedFormat, baos);
-            cleanBytes = baos.toByteArray();
-        } catch (IOException e) {
-            cleanBytes = bytes;
+        // Re-encode to strip EXIF/GPS metadata for JPEG/PNG
+        byte[] cleanBytes = bytes;
+        if (!detectedFormat.equals("webp")) {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                boolean written = ImageIO.write(image, detectedFormat.equals("jpeg") ? "jpg" : detectedFormat, baos);
+                if (written && baos.size() > 0) {
+                    cleanBytes = baos.toByteArray();
+                }
+            } catch (Exception e) {
+                log.warn("Could not re-encode image, keeping original bytes: {}", e.getMessage());
+                cleanBytes = bytes;
+            }
         }
+        image.flush();
 
         String ext = detectedFormat.equals("jpeg") ? "jpg" : detectedFormat;
         String contentType = "image/" + (detectedFormat.equals("jpg") ? "jpeg" : detectedFormat);
