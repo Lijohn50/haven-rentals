@@ -1,11 +1,27 @@
 import { ENV } from '@/config/env';
 
+function resolveApiOrigin(): string {
+  if (ENV.API_ORIGIN) {
+    return ENV.API_ORIGIN.replace(/\/$/, '');
+  }
+  // If API_BASE_URL is absolute (e.g. "https://api.stay-have.me/api/v1"), extract origin ("https://api.stay-have.me")
+  if (ENV.API_BASE_URL && /^https?:\/\//i.test(ENV.API_BASE_URL)) {
+    try {
+      return new URL(ENV.API_BASE_URL).origin;
+    } catch {
+      // ignore invalid URL
+    }
+  }
+  return '';
+}
+
 /** Media URLs come back relative (`/api/v1/media/listings/12/file.jpg`); prefix if needed. */
 export function mediaUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   if (/^https?:\/\//i.test(url)) return url;
-  if (!ENV.API_ORIGIN) return url;
-  return `${ENV.API_ORIGIN.replace(/\/$/, '')}${url.startsWith('/') ? '' : '/'}${url}`;
+  const origin = resolveApiOrigin();
+  if (!origin) return url;
+  return `${origin}${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
 export const PLACEHOLDER_IMAGE =

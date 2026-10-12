@@ -117,6 +117,14 @@ public class SecurityConfig {
         sslcommerzCors.setAllowCredentials(false);
         source.registerCorsConfiguration("/api/v1/payments/sslcommerz/**", sslcommerzCors);
 
+        // Permissive CORS for public media assets (images)
+        CorsConfiguration mediaCors = new CorsConfiguration();
+        mediaCors.setAllowedOriginPatterns(List.of("*"));
+        mediaCors.setAllowedMethods(List.of("GET", "OPTIONS"));
+        mediaCors.setAllowedHeaders(List.of("*"));
+        mediaCors.setAllowCredentials(false);
+        source.registerCorsConfiguration("/api/v1/media/**", mediaCors);
+
         // Standard CORS for application frontend
         CorsConfiguration config = new CorsConfiguration();
         String originsStr = appProperties.getCors().getOrigins();

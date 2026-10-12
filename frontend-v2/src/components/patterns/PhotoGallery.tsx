@@ -53,6 +53,9 @@ export const PhotoGallery: React.FC<{
           <img
             src={mediaUrl(cover.url) ?? PLACEHOLDER_IMAGE}
             alt={`${title} photo 1`}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+            }}
             className="h-full w-full cursor-zoom-in object-cover transition duration-300 hover:brightness-95"
           />
         </button>
@@ -70,6 +73,9 @@ export const PhotoGallery: React.FC<{
               src={mediaUrl(photo.url) ?? PLACEHOLDER_IMAGE}
               alt={`${title} photo ${indexInGrid + 2}`}
               loading="lazy"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+              }}
               className="h-full w-full cursor-zoom-in object-cover transition duration-300 hover:brightness-95"
             />
           </button>
@@ -94,6 +100,9 @@ export const PhotoGallery: React.FC<{
           <img
             src={mediaUrl(ordered[index]?.url) ?? PLACEHOLDER_IMAGE}
             alt={`${title} photo ${index + 1} of ${ordered.length}`}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+            }}
             className="max-h-[75vh] w-full rounded-card object-contain"
           />
           <div className="mt-3 flex items-center justify-between">
@@ -140,6 +149,14 @@ export const PhotoThumb: React.FC<{
   className?: string;
 }> = ({ src, alt, className }) => (
   <div className={cn('overflow-hidden rounded-card bg-neutral-soft', className)}>
-    <img src={mediaUrl(src) ?? PLACEHOLDER_IMAGE} alt={alt} loading="lazy" className="h-full w-full object-cover" />
+    <img
+      src={mediaUrl(src) ?? PLACEHOLDER_IMAGE}
+      alt={alt}
+      loading="lazy"
+      onError={(e) => {
+        (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+      }}
+      className="h-full w-full object-cover"
+    />
   </div>
 );

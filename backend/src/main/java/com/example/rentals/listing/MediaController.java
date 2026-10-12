@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class MediaController {
 
-    private static final Pattern FILENAME_PATTERN = Pattern.compile("^[0-9a-fA-F-]{36}\\.(jpg|png|webp)$");
+    private static final Pattern FILENAME_PATTERN = Pattern.compile("^[0-9a-fA-F-]{36}\\.(jpe?g|png|webp)$", Pattern.CASE_INSENSITIVE);
     private final StorageService storageService;
 
     @GetMapping("/listings/{listingId}/{filename}")
@@ -32,10 +32,11 @@ public class MediaController {
 
         byte[] bytes = storageService.load(filename);
 
+        String lower = filename.toLowerCase();
         String contentType = MediaType.IMAGE_JPEG_VALUE;
-        if (filename.endsWith(".png")) {
+        if (lower.endsWith(".png")) {
             contentType = MediaType.IMAGE_PNG_VALUE;
-        } else if (filename.endsWith(".webp")) {
+        } else if (lower.endsWith(".webp")) {
             contentType = "image/webp";
         }
 
